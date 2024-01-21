@@ -1,8 +1,9 @@
+#include "Multiplexer.hpp"
 #include "Server.hpp"
 
 int main() {
 
-    Server server;
+    Multiplexer().run(Server());
 
     return 0;
 }
