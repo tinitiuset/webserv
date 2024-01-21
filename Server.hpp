@@ -6,18 +6,21 @@
 #include <string.h>
 #include <iostream>
 #include <unistd.h>
-
-#define PORT 8080
+#include "defaults.hpp"
+#include "Logger.hpp"
 
 class Server {
 
 private:
 	int sockfd;
-	struct sockaddr_in servaddr;
+	sockaddr_in servaddr;
 
 public:
 	Server();
 	~Server();
+
+	int getSocketFd() const;
+	int Accept() const;
 };
 
 #endif
