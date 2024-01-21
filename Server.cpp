@@ -1,6 +1,6 @@
 #include "Server.hpp"
 
-Server::Server() {
+Server::Server() : servaddr() {
 	// https://man7.org/linux/man-pages/man2/socket.2.html
 	// AF_INET: IPv4
 	// SOCK_STREAM: TCP
@@ -8,8 +8,6 @@ Server::Server() {
 		throw std::runtime_error("Socket creation failed\n");
 	else
 		std::cout << "Socket successfully created\n";
-
-	bzero(&servaddr, sizeof(servaddr));
 
 	// Assign IP and port
 	// AF_INET: IPv4
@@ -20,12 +18,9 @@ Server::Server() {
 	servaddr.sin_port = htons(PORT);
 
 	// https://man7.org/linux/man-pages/man2/bind.2.html
-	try {
-		bind(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr));
-		std::cout << "Socket successfully binded\n";
-	} catch (std::exception &e) {
-		std::cout << e.what() << std::endl;
-	}
+	(bind(sockfd, reinterpret_cast<struct sockaddr*>(&servaddr), sizeof(servaddr)) == -1)
+		? throw std::runtime_error("Binding failed\n")
+		: std::cout << "Socket successfully binded\n";
 
 	// https://man7.org/linux/man-pages/man2/listen.2.html
 	try {
