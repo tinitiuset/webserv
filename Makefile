@@ -5,7 +5,7 @@ STANDARD =	-std=c++98
 DEBUG =		-g0	# 0, 1, 2, 3 DEBUG INFORMATION LEVELS
 FLAGS =		-Wall -Werror -Wextra
 
-SRC_FILES = *.cpp
+SRC_FILES = main.cpp Server.cpp
 
 all: $(NAME)
 
