@@ -4,10 +4,9 @@ Server::Server() : servaddr() {
 	// https://man7.org/linux/man-pages/man2/socket.2.html
 	// AF_INET: IPv4
 	// SOCK_STREAM: TCP
-	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-		throw std::runtime_error("Socket creation failed\n");
-	else
-		std::cout << "Socket successfully created\n";
+	((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+		? throw std::runtime_error("Socket creation failed\n")
+		: std::cout << "Socket successfully created\n";
 
 	// Assign IP and port
 	// AF_INET: IPv4
