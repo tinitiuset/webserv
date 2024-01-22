@@ -1,31 +1,29 @@
 /******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ConnectingSocket.hpp                               :+:      :+:    :+:   */
+/*   ListeningSocket.hpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: imontero <imontero@student.42urduliz.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/22 12:06:46 by imontero          #+#    #+#             */
-/*   Updated: 2024/01/22 12:18:35 by imontero         ###   ########.fr       */
+/*   Created: 2024/01/22 12:06:48 by imontero          #+#    #+#             */
+/*   Updated: 2024/01/22 18:41:30 by imontero         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #pragma once
 
-#include "ASocket.hpp"
+#include "BindingSocket.hpp"
+#include <netinet/in.h>
 
-/* 
-    Child class of ASocket
-    connectToNetwork function implemented with connect
-*/
-
-class ConnectingSocket: public ASocket
+class ListeningSocket: public BindingSocket
 {
     private:
-
+        int _backlog;
+        int _listen;
     public:
-        ConnectingSocket(int domain, int service, int protocol, int port, u_long interface);
+        ListeningSocket(int domain, int service, int protocol, int port, u_long interface, int backlog);
+        
+        void    startListening();
 
-        int connectToNetwork(int sock, struct sockaddr_in address);
-
+        int     getBacklog();
 };

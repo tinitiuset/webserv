@@ -1,3 +1,17 @@
+/******************************************************************************/
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ConnectingSocket.cpp                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: imontero <imontero@student.42urduliz.co    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/01/22 12:06:15 by imontero          #+#    #+#             */
+/*   Updated: 2024/01/22 12:06:16 by imontero         ###   ########.fr       */
+/*                                                                            */
+/******************************************************************************/
+
+
+
 #include "ConnectingSocket.hpp"
 
 ConnectingSocket::ConnectingSocket(int domain, int service, int protocol, int port, u_long interface):

@@ -6,15 +6,14 @@
 /*   By: imontero <imontero@student.42urduliz.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 08:59:20 by imontero          #+#    #+#             */
-/*   Updated: 2024/01/22 11:09:51 by imontero         ###   ########.fr       */
+/*   Updated: 2024/01/22 16:16:14 by imontero         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
-
-#pragma once
 
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include "defaults.hpp"
 
 class ASocket
 {
@@ -34,9 +33,8 @@ class ASocket
         void    testConnection(int testSocket);
         
        //getters
-       struct sockaddr_in  getAddress();
+       struct sockaddr_in   getAddress();
        int                  getSock();
        int                  getConnection();
        
-
 };
