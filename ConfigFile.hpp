@@ -4,17 +4,19 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include <EachServer.hpp>
+#include "EachServer.hpp"
 
 class ConfigFile
 {
     private:
         
-        std::vector<EachServer *>  _serverVect;
+        //std::vector<EachServer *>  _serverVect;
+        EachServer  *_serverArr;
+        int         _servAmount;                   
 
 
     public:
-        ConfigFile(char *str);
+        ConfigFile(std::ifstream &file, int n);
         ~ConfigFile();
 
         

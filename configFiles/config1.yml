@@ -12,6 +12,7 @@ server:
     error 406: ./public/html/foca.html
   location: /
     file: index.html
+  methods:
     GET: on
     POST: on
     DELETE: on

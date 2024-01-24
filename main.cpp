@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <fstream>
+#include "ConfigFile.hpp"
 
 int main(int ac, char **av)
 {
@@ -12,19 +14,30 @@ int main(int ac, char **av)
 		return (std::cerr << "Unexpected config file" << std::endl, 0);
 
     std::string     line;
-    int             i = 0;
+    int             count = 0;
     
+    while (std::getline(file, line)) 
+        if (line.find("server:") != std::string::npos)
+            ++count;
+    if (count < 1)
+        return (std::cerr << "Invalid config file" << std::endl, 0);
+    //file.seekg(0, std::ios::beg);
+    file.close();
+    file.open(av[1]);
+    std::getline(file, line);
+    std::cout << line << std::endl;
     while (std::getline(file, line))
     {
         if (line.find("server:") != std::string::npos)
-            i++;
+            continue;
         else if (line.find("error ") != std::string::npos)
-        {
-            std::cout << ">>>>>[" <<line.substr(10, 3) << "]" << std::endl;
-            std::cout << "*****" << "[" <<line.substr(15) << "]" << std::endl;
-        }
+            std::cout << "[" <<line.substr(line.find("error ") + std::string("error ").length()) << "]" << std::endl;
         else if (line.find("server_name: ") != std::string::npos)
-            std::cout << "[" <<line.substr(line.find("server_name:") + std::string("server_name :").length()) << "]" << std::endl;
+        {
+            std::cout << "[" <<line.substr(15) << "]" << std::endl;
+
+            //std::cout << "[" <<line.substr(line.find("server_name:") + std::string("server_name :").length()) << "]" << std::endl;
+        }
         else if (line.find("ip: ") != std::string::npos)
             std::cout << "[" <<line.substr(line.find("ip: ") + std::string("ip: ").length()) << "]" << std::endl;
         else if (line.find("root: ") != std::string::npos)

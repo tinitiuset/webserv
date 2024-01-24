@@ -14,7 +14,7 @@ class EachServer
         std::string                                                 _root;
         std::map<int, std::string>                                  _errors;
         std::vector<int>                                            _ports;
-        std::map<std::string, std::map<std::string, std::string>>   _locations;
+        std::map<std::string, std::map<std::string, std::string> >   _locations;
         
     public:
      

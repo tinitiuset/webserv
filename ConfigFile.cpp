@@ -1,35 +1,29 @@
 #include "ConfigFile.hpp"
 #include "EachServer.hpp"
 
-ConfigFile::ConfigFile(char *str)
+ConfigFile::ConfigFile(std::ifstream &file, int n)
 {
-    std::ifstream   file(str);
-    if (!file.is_open())
-    {
-        std::cerr << "Unexpected config file" << std::endl;
-		return ;
-    }
+    _serverArr = new EachServer[n];
 
     std::string     line;
-    int             i = 0;
+    int             i = -1;
     
     while (std::getline(file, line))
     {
+        
         if (line.find("server:") != std::string::npos)
-        {
-            EachServer *srv = new EachServer();
-            _serverVect.push_back(srv);
-        }
-        else if (line.find("default_errors:") != std::string::npos)
-            continue;
+            i++;
         else if (line.find("error ") != std::string::npos)
         {
-            srv.setErrors()
+            _serverArr[i].setErrors(std::atoi(line.substr(10, 3).c_str()), line.substr(15));
             //std::cout << ">>>>>[" <<line.substr(10, 3) << "]" << std::endl;
             //std::cout << "*****" << "[" <<line.substr(15) << "]" << std::endl;
         }
         else if (line.find("server_name: ") != std::string::npos)
+        {
+            _serverArr[i].setServerName = 
             std::cout << "[" <<line.substr(line.find("server_name:") + std::string("server_name :").length()) << "]" << std::endl;
+        }    
         else if (line.find("ip: ") != std::string::npos)
             std::cout << "[" <<line.substr(line.find("ip: ") + std::string("ip: ").length()) << "]" << std::endl;
         else if (line.find("root: ") != std::string::npos)
@@ -54,7 +48,7 @@ ConfigFile::ConfigFile(char *str)
             std::cout << "[" <<line.substr(line.find("DELETE: ") + std::string("DELETE: ").length()) << "]" << std::endl;
         else if (line.find("upload_folder: ") != std::string::npos)
             std::cout << "[" <<line.substr(line.find("upload_folder: ") + std::string("upload_folder: ").length()) << "]" << std::endl;
-
+        
     }
 
  
