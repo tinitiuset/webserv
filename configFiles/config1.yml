@@ -1,0 +1,38 @@
+server:
+  server_name: site1.com
+  ip: 0.0.0.0
+  port: 61001
+  port: 80
+  port: 8080
+  root: ./www/site1
+  body_size: 500
+  default_errors:
+    error 404: ./public/html/404.html
+    error 405: ./public/html/405.html
+    error 406: ./public/html/foca.html
+  location: /
+    file: index.html
+    GET: on
+    POST: on
+    DELETE: on
+  location: /goto42
+    redirect: www.42urduliz.com
+  location: /ai
+    autoindex: on
+    upload_folder: /upload
+  location: /favicon.ico
+    file: icon1.png
+  location: /images/sample
+    file: images/sample_image1.jpg
+
+server:
+  server_name: site2.com
+  ip: 127.0.0.1
+  port: 61002
+  root: ./www/site2
+  location: /
+    file: index.html
+  location: /favicon.ico
+    file: icon2.png
+  location: /images/sample
+    file: images/sample_image2.png
