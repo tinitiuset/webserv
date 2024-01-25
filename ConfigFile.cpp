@@ -1,59 +1,60 @@
 #include "ConfigFile.hpp"
 #include "EachServer.hpp"
 
-ConfigFile::ConfigFile(std::ifstream &file, int n)
+class EachServer;
+
+ConfigFile::ConfigFile(char *str, int n): _servAmount(n)
 {
     _serverArr = new EachServer[n];
-
+    std::ifstream file;
+    file.open(str);
     std::string     line;
+    std::string     keyOuter;
     int             i = -1;
     
     while (std::getline(file, line))
     {
-        
         if (line.find("server:") != std::string::npos)
             i++;
-        else if (line.find("error ") != std::string::npos)
-        {
-            _serverArr[i].setErrors(std::atoi(line.substr(10, 3).c_str()), line.substr(15));
-            //std::cout << ">>>>>[" <<line.substr(10, 3) << "]" << std::endl;
-            //std::cout << "*****" << "[" <<line.substr(15) << "]" << std::endl;
-        }
         else if (line.find("server_name: ") != std::string::npos)
-        {
-            _serverArr[i].setServerName = 
-            std::cout << "[" <<line.substr(line.find("server_name:") + std::string("server_name :").length()) << "]" << std::endl;
-        }    
+            _serverArr[i].setServerName(line.substr(15));
+        else if (line.find("error ") != std::string::npos)
+            _serverArr[i].setErrors(std::atoi(line.substr(10, 3).c_str()), line.substr(15));
         else if (line.find("ip: ") != std::string::npos)
-            std::cout << "[" <<line.substr(line.find("ip: ") + std::string("ip: ").length()) << "]" << std::endl;
+            _serverArr[i].setIp(line.substr(6));
         else if (line.find("root: ") != std::string::npos)
-            std::cout << "[" <<line.substr(line.find("root: ") + std::string("root: ").length()) << "]" << std::endl;
+            _serverArr[i].setRoot(line.substr(8));
         else if (line.find("port: ") != std::string::npos)
-            std::cout << "[" <<line.substr(line.find("port: ") + std::string("port: ").length()) << "]" << std::endl;
+            _serverArr[i].setPorts(std::atoi(line.substr(8).c_str()));
         else if (line.find("body_size: ") != std::string::npos)
-            std::cout << "[" <<line.substr(line.find("body_size: ") + std::string("body_size: ").length()) << "]" << std::endl;
+            _serverArr[i].setBodySize(std::atoi(line.substr(13).c_str()));
         else if (line.find("location: ") != std::string::npos)
-            std::cout << "[" <<line.substr(line.find("location: ") + std::string("location: ").length()) << "]" << std::endl;
+        {
+            keyOuter = line.substr(12);
+            _serverArr[i].setLocationOutKey(keyOuter);
+        }
         else if (line.find("file: ") != std::string::npos)
-            std::cout << "[" <<line.substr(line.find("file: ") + std::string("file: ").length()) << "]" << std::endl;
+            _serverArr[i].setLocationInValue(keyOuter, "file", line.substr(10));
         else if (line.find("redirect: ") != std::string::npos)
-            std::cout << "[" <<line.substr(line.find("redirect: ") + std::string("redirect: ").length()) << "]" << std::endl;
+            _serverArr[i].setLocationInValue(keyOuter, "redirect", line.substr(14));
         else if (line.find("autoindex: ") != std::string::npos)
-            std::cout << "[" <<line.substr(line.find("autoindex: ") + std::string("autoindex: ").length()) << "]" << std::endl;
+            _serverArr[i].setLocationInValue(keyOuter, "autoindex", line.substr(15));
         else if (line.find("GET: ") != std::string::npos)
-            std::cout << "[" <<line.substr(line.find("GET: ") + std::string("GET: ").length()) << "]" << std::endl;
+            _serverArr[i].setLocationInValue(keyOuter, "GET", line.substr(11));
         else if (line.find("POST: ") != std::string::npos)
-            std::cout << "[" <<line.substr(line.find("POST: ") + std::string("POST: ").length()) << "]" << std::endl;
+            _serverArr[i].setLocationInValue(keyOuter, "POST", line.substr(12));
         else if (line.find("DELETE: ") != std::string::npos)
-            std::cout << "[" <<line.substr(line.find("DELETE: ") + std::string("DELETE: ").length()) << "]" << std::endl;
+            _serverArr[i].setLocationInValue(keyOuter, "DELETE", line.substr(14));
         else if (line.find("upload_folder: ") != std::string::npos)
-            std::cout << "[" <<line.substr(line.find("upload_folder: ") + std::string("upload_folder: ").length()) << "]" << std::endl;
+            _serverArr[i].setLocationInValue(keyOuter, "upload_folder", line.substr(19));
         
     }
-
- 
-
+    file.close();
     return ;
+}
 
-
+ConfigFile::~ConfigFile()
+{
+    delete[] _serverArr;
+    return ;
 }

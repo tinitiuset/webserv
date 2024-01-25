@@ -12,11 +12,12 @@ server:
     error 406: ./public/html/foca.html
   location: /
     file: index.html
-  methods:
-    GET: on
-    POST: on
-    DELETE: on
+    methods:
+      GET: on
+      POST: on
+      DELETE: on
   location: /goto42
+    file: potxolo.html
     redirect: www.42urduliz.com
   location: /ai
     autoindex: on
@@ -37,3 +38,19 @@ server:
     file: icon2.png
   location: /images/sample
     file: images/sample_image2.png
+
+server:
+  server_name: susmuelas.com
+  ip: 127.8.8.1
+  port: 8080
+  root: ./www/susmuelas
+  location: /
+    file: index.html
+  location: /favicon.ico
+    file: iconSM.png
+  location: /images/sample
+  methods:
+    GET: on
+    POST: metodo_muelas_chungas
+    DELETE: on
+    file: images/muelaimg.png
