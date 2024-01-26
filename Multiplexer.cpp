@@ -3,22 +3,23 @@
 #include <unistd.h>
 #include <sys/_select.h>
 
+#include "PostRequest.hpp"
+#include "Request.hpp"
+
 Multiplexer::Multiplexer() {
 }
 
 Multiplexer::~Multiplexer() {
 }
 
-void genericResponse(const int fd) {
-	char buffer[1024] = {0};
-	read(fd, buffer, 1024);
-	Logger::debug("Received from client: " + std::string(buffer));
+Request* createRequest(const int &fd) {
+	Request temp;
+	temp.parseRequest(fd);
 
-	const std::string response = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello from server";
-	write(fd, response.c_str(), response.size());
+	if (temp.isPostRequest())
+		return new PostRequest(temp);
 
-	Logger::debug("Response sent to client");
-
+	return NULL;
 }
 
 void Multiplexer::run(const Server &server) {
@@ -45,8 +46,12 @@ void Multiplexer::run(const Server &server) {
 						max_fd = new_fd;
 					}
 				} else {
-					// Currently writing generic responses
-					genericResponse(i);
+					// Remember to delete the request after use
+					Request* request = createRequest(i);
+					if (request == NULL)
+						throw std::runtime_error("Request is not POST");
+					request->printRequest();
+					delete request;
 					close(i);
 					FD_CLR(i, &read_fds);
 				}
