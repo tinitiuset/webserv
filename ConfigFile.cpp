@@ -3,6 +3,8 @@
 
 class EachServer;
 
+
+
 ConfigFile::ConfigFile(char *str, int n): _servAmount(n)
 {
     _serverArr = new EachServer[n];

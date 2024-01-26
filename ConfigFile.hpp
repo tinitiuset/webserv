@@ -1,9 +1,11 @@
-#pragma once
+#ifndef CONFIGFILE_HPP
+#define CONFIGFILE_HPP
 
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include "EachServer.hpp"
+
 
 class ConfigFile
 {
@@ -17,3 +19,5 @@ class ConfigFile
         ~ConfigFile();
 
 };
+
+#endif

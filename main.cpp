@@ -7,6 +7,7 @@
 #include "Multiplexer.hpp"
 #include "Server.hpp"
 
+ConfigFile  *confG;
 
 int main(int ac, char **av)
 {
@@ -25,42 +26,44 @@ int main(int ac, char **av)
     if (count < 1)
         return (std::cerr << "Invalid config file" << std::endl, 0);
     file.close();
-    //std::cout << "count " << count << std::endl;
 
     ConfigFile confFile(av[1], count);
-    
+
+    confG = &confFile;
+
     Multiplexer multip;
     Server      serv;
 
     multip.run(serv);
+    return (0);
 
-    //Multiplexer().run(Server());
 
-    std::cout << confFile._serverArr[0].getServerName() << std::endl;
     
-    std::cout << confFile._serverArr[0].getIp() << std::endl;
+    //std::cout << "count " << count << std::endl;
+
+    /* std::cout << confG->_serverArr[0].getServerName() << std::endl;
+    std::cout << confG->_serverArr[0].getIp() << std::endl;
     
     std::vector<int>::iterator it;
-    for (it = confFile._serverArr[0].getPorts().begin(); it != confFile._serverArr[0].getPorts().end(); ++it)
+    for (it = confG->_serverArr[0].getPorts().begin(); it != confG->_serverArr[0].getPorts().end(); ++it)
         std::cout << *it << std::endl;
     
-    std::cout << confFile._serverArr[0].getRoot() << std::endl;
+    std::cout << confG->_serverArr[0].getRoot() << std::endl;
     
-    std::cout << confFile._serverArr[0].getBodySize() << std::endl;
+    std::cout << confG->_serverArr[0].getBodySize() << std::endl;
     
-    std::cout << confFile._serverArr[0].getErrorPath(404) << std::endl;
-    std::cout << confFile._serverArr[0].getErrorPath(405) << std::endl;
-    std::cout << confFile._serverArr[0].getErrorPath(406) << std::endl;
+    std::cout << confG->_serverArr[0].getErrorPath(404) << std::endl;
+    std::cout << confG->_serverArr[0].getErrorPath(405) << std::endl;
+    std::cout << confG->_serverArr[0].getErrorPath(406) << std::endl;
     
-    std::cout << confFile._serverArr[0].getLocationValue("/", "file") << std::endl;
-    std::cout << confFile._serverArr[2].getLocationValue("/images/sample", "POST") << std::endl;
-    std::cout << confFile._serverArr[2].getLocationValue("/images/sample", "file") << std::endl;
+    std::cout << confG->_serverArr[0].getLocationValue("/", "file") << std::endl;
+    std::cout << confG->_serverArr[2].getLocationValue("/images/sample", "POST") << std::endl;
+    std::cout << confG->_serverArr[2].getLocationValue("/images/sample", "file") << std::endl; */
+    
 
+    // std::cout << confG->_serverArr[9]<< std::endl;
     
-
-    // std::cout << confFile._serverArr[9]<< std::endl;
-    
-    //std::cout << confFile._serverArr[0].getIp() << std::endl;
+    //std::cout << confG->_serverArr[0].getIp() << std::endl;
 
 
 /*
@@ -154,6 +157,6 @@ int main(int ac, char **av)
     std::cout << "[/favicon.ico] [DELETE] => " << "[" << _locations["/favicon.ico"]["DELETE"] << "]" << std::endl;
     std::cout << "[/favicon.ico] [upload_folder] => " << "[" << _locations["/favicon.ico"]["upload_folder"] << "]" << std::endl;
  */
-    return (0);
+    
 
 }

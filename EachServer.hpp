@@ -1,4 +1,5 @@
-#pragma once
+#ifndef EACHSERVER_HPP
+#define EACHSERVER_HPP
 
 
 #include <iostream>
@@ -49,3 +50,5 @@ class EachServer
 
 
 };
+
+#endif
