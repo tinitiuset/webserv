@@ -6,7 +6,7 @@
 /*   By: imontero <imontero@student.42urduliz.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 12:06:31 by imontero          #+#    #+#             */
-/*   Updated: 2024/01/22 18:41:33 by imontero         ###   ########.fr       */
+/*   Updated: 2024/01/26 09:47:49 by imontero         ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -20,7 +20,6 @@ _backlog(backlog)
     startListening();
     testConnection(_listen);
 }
-
 
 void    ListeningSocket::startListening()
 {
