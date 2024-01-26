@@ -4,6 +4,9 @@
 #include <fstream>
 #include <vector>
 #include "ConfigFile.hpp"
+#include "Multiplexer.hpp"
+#include "Server.hpp"
+
 
 int main(int ac, char **av)
 {
@@ -45,6 +48,7 @@ int main(int ac, char **av)
     std::cout << confFile._serverArr[2].getLocationValue("/images/sample", "POST") << std::endl;
     std::cout << confFile._serverArr[2].getLocationValue("/images/sample", "file") << std::endl;
 
+     Multiplexer().run(Server());
 
     // std::cout << confFile._serverArr[9]<< std::endl;
     
@@ -143,6 +147,5 @@ int main(int ac, char **av)
     std::cout << "[/favicon.ico] [upload_folder] => " << "[" << _locations["/favicon.ico"]["upload_folder"] << "]" << std::endl;
  */
     return (0);
-
 
 }

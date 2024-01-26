@@ -7,7 +7,10 @@ FLAGS =		-Wall -Werror -Wextra
 
 SRC_FILES = main.cpp \
 			ConfigFile.cpp \
-			EachServer.cpp
+			EachServer.cpp \
+			Server.cpp \
+			Multiplexer.cpp \
+			Logger.cpp
 
 all: $(NAME)
 
