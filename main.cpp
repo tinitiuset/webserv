@@ -26,7 +26,15 @@ int main(int ac, char **av)
         return (std::cerr << "Invalid config file" << std::endl, 0);
     file.close();
     //std::cout << "count " << count << std::endl;
+
     ConfigFile confFile(av[1], count);
+    
+    Multiplexer multip;
+    Server      serv;
+
+    multip.run(serv);
+
+    //Multiplexer().run(Server());
 
     std::cout << confFile._serverArr[0].getServerName() << std::endl;
     
@@ -48,7 +56,7 @@ int main(int ac, char **av)
     std::cout << confFile._serverArr[2].getLocationValue("/images/sample", "POST") << std::endl;
     std::cout << confFile._serverArr[2].getLocationValue("/images/sample", "file") << std::endl;
 
-     Multiplexer().run(Server());
+    
 
     // std::cout << confFile._serverArr[9]<< std::endl;
     
