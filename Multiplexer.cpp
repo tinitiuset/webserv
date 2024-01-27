@@ -3,20 +3,21 @@
 #include <unistd.h>
 #include <sys/_select.h>
 
-#include "PostRequest.hpp"
 #include "Request.hpp"
+#include "GetRequest.hpp"
+#include "PostRequest.hpp"
 
-Multiplexer::Multiplexer() {
-}
+Multiplexer::Multiplexer() {}
 
-Multiplexer::~Multiplexer() {
-}
+Multiplexer::~Multiplexer() {}
 
 Request* createRequest(const int &fd) {
 	Request temp;
 	temp.parseRequest(fd);
 
-	if (temp.isPostRequest())
+	if(temp.isGetRequest())
+		return new GetRequest(temp);
+	else if (temp.isPostRequest())
 		return new PostRequest(temp);
 
 	return NULL;
@@ -49,8 +50,9 @@ void Multiplexer::run(const Server &server) {
 					// Remember to delete the request after use
 					Request* request = createRequest(i);
 					if (request == NULL)
-						throw std::runtime_error("Request is not POST");
-					request->printRequest();
+						throw std::runtime_error("Request is not POST nor GET");
+					std::string response = request->handle();
+					write(i, response.c_str(), response.length());
 					delete request;
 					close(i);
 					FD_CLR(i, &read_fds);

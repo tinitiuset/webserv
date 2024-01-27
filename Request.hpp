@@ -11,12 +11,13 @@ public:
 	Request();
 	Request(const Request&);
 	Request& operator=(const Request&);
-	~Request();
+	virtual ~Request();
 
 	void parseRequest(const int &);
 	void printRequest() const;
 	bool isGetRequest() const;
 	bool isPostRequest() const;
+	virtual std::string handle() {return NULL;};
 
 private:
 	std::string _method;
