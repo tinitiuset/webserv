@@ -30,7 +30,7 @@ server:
 server:
   server_name: site2.com
   ip: 127.0.0.1
-  port: 61002
+  port: 88
   root: ./www/site2
   location: /
     file: index.html
@@ -42,7 +42,7 @@ server:
 server:
   server_name: susmuelas.com
   ip: 127.8.8.1
-  port: 8080
+  port: 89
   root: ./www/susmuelas
   location: /
     file: index.html

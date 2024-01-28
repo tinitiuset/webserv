@@ -3,7 +3,7 @@ NAME = webserv
 COMPILER =	c++
 STANDARD =	-std=c++98
 DEBUG =		-g0	# 0, 1, 2, 3 DEBUG INFORMATION LEVELS
-FLAGS =		-Wall -Werror -Wextra
+FLAGS =		-Wall -Werror -Wextra #-g3 -fsanitize=address
 
 SRC_FILES = main.cpp \
 			ConfigFile.cpp \

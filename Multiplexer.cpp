@@ -2,7 +2,8 @@
 #include "Multiplexer.hpp"
 
 #include <unistd.h>
-#include <sys/_select.h>
+//#include <sys/_select.h>
+#include <sys/select.h>
 
 Multiplexer::Multiplexer() {
 }

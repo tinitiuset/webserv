@@ -6,21 +6,24 @@
 #include <string.h>
 #include <iostream>
 #include <unistd.h>
+#include <vector>
 #include "defaults.hpp"
 #include "Logger.hpp"
 
 class Server {
 
 private:
-	int sockfd;
+	std::vector<int> sockfd;
 	sockaddr_in servaddr;
 
 public:
 	Server();
 	~Server();
 
-	int getSocketFd() const;
+	std::vector<int> getSocketFd() const;
 	int Accept() const;
+	void	socketOps(int port, int i);
 };
+
 
 #endif

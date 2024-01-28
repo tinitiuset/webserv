@@ -1,7 +1,6 @@
 #ifndef EACHSERVER_HPP
 #define EACHSERVER_HPP
 
-
 #include <iostream>
 #include <vector>
 #include <map>

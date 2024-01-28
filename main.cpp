@@ -6,13 +6,24 @@
 #include "ConfigFile.hpp"
 #include "Multiplexer.hpp"
 #include "Server.hpp"
+#include "defaults.hpp"
 
 ConfigFile  *confG;
 
 int main(int ac, char **av)
 {
-    if (ac != 2)
-        return (std::cout << "Unexpected argument number" << std::endl, 0);
+	std::string defPath = "configFiles/default.yml";
+    
+	if (ac > 2)
+        return (std::cout << "Unexpected argument number" << std::endl, 1);
+	else if (ac == 1)
+	{
+		av[1] = (char *)defPath.c_str();
+		std::cout << av[1] << std::endl;
+	}
+
+	std::cout << defPath << std::endl;
+
 
     std::ifstream   file(av[1]);
     if (!file.is_open())
@@ -33,6 +44,8 @@ int main(int ac, char **av)
 
     Multiplexer multip;
     Server      serv;
+
+	
 
     multip.run(serv);
     return (0);

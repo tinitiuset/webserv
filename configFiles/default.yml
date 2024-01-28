@@ -1,8 +1,9 @@
 server:
-  server_name: site2.com
+  server_name: default.com
   ip: 127.0.0.1
   port: 61002
   root: ./www/site2
+  body_size: 500
   location: /
     file: index.html
   location: /favicon.ico
