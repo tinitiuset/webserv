@@ -3,6 +3,7 @@
 #include "Request.hpp"
 
 #include "Response.hpp"
+#include "Resource.hpp"
 
 class GetRequest: public Request {
 

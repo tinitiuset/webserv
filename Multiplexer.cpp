@@ -52,6 +52,7 @@ void Multiplexer::run(const Server &server) {
 					if (request == NULL)
 						throw std::runtime_error("Request is not POST nor GET");
 					std::string response = request->handle();
+					Logger::debug("Multiplexer::run() sending response of size " + std::to_string(response.length()));
 					write(i, response.c_str(), response.length());
 					delete request;
 					close(i);
