@@ -16,4 +16,6 @@ public:
 
 };
 
+int	getMaxFd(std::vector<std::vector<int> > sockfd);
+
 #endif

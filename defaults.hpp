@@ -6,7 +6,7 @@
 
 extern ConfigFile  *confG;
 
-#define SERVER_PORT 8080
+#define BACKLOG		256
 #define SERVER_MAX_CONNECTIONS 1024
 
 

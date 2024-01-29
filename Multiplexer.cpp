@@ -22,10 +22,10 @@ void genericResponse(const int fd) {
 
 }
 
-/* void Multiplexer::run(const Server &server) {
+void Multiplexer::run(const Server &server) {
 
-	std::vector<std::vector<int> > sockfd = server.getSocketFd();
-	//int	max_fd = *std::max_element(sockfd.begin(), sockfd.end());
+	//std::vector<std::vector<int> > sockfd = server.getSocketFd();
+	int	max_fd = getMaxFd(server.getSocketFd());
 
 	fd_set read_fds;
 	FD_ZERO(&read_fds);
@@ -55,4 +55,19 @@ void genericResponse(const int fd) {
 			}
 		}
 	}
-} */
+}
+
+int	getMaxFd(std::vector<std::vector<int> > sockfd)
+{
+	int max_fd = 0;
+
+	for (size_t i = 0; i < sockfd.size(); ++i)
+	{
+		if (!sockfd[i].empty())
+		{
+			int maxInVector = *std::max_element(sockfd[i].begin(), sockfd[i].end());
+			if (maxInVector > max_fd)
+				max_fd = maxInVector;
+		}
+	}
+}

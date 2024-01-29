@@ -8,7 +8,7 @@ Server::Server(){
 	{
 
 		std::vector<int> ports = confG->_serverArr[i].getPorts();
-		checkRepeatedPorts(ports);
+		checkRepeatedPorts(ports); 
 		std::vector<int>::iterator it;
 		std::vector<int> row;
 		sockfd.push_back(row);
@@ -85,11 +85,11 @@ void	Server::socketOps(int port, int i, int j)
 		? throw std::runtime_error("Socket creation failed\n")
 		: Logger::debug("Socket successfully created");
 
-	// Assign IP and port
+	//Assign IP and port
 	// AF_INET: IPv4
 	// INADDR_ANY: any address for binding
 	// htons: converts port number in host byte order to a port number in network byte order
-	//struct sockaddr_in servaddr;
+	struct sockaddr_in servaddr;
 	memset(&servaddr, 0, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -102,7 +102,7 @@ void	Server::socketOps(int port, int i, int j)
 
 	// https://man7.org/linux/man-pages/man2/listen.2.html
 	try {
-		listen(sockfd[i][j], 5);
+		listen(sockfd[i][j], BACKLOG);
 		Logger::info("Server listening on port " + std::to_string(port)); //OJO to_string cpp11?
 	} catch (std::exception &e) {
 		std::cout << e.what() << std::endl;
