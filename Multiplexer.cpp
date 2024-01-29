@@ -1,9 +1,8 @@
-
 #include "Multiplexer.hpp"
-
+#include "Server.hpp"
 #include <unistd.h>
-//#include <sys/_select.h>
-#include <sys/select.h>
+#include <sys/_select.h>
+//#include <sys/select.h>
 
 Multiplexer::Multiplexer() {
 }
@@ -23,9 +22,10 @@ void genericResponse(const int fd) {
 
 }
 
-void Multiplexer::run(const Server &server) {
+/* void Multiplexer::run(const Server &server) {
 
-	int max_fd = server.getSocketFd();
+	std::vector<std::vector<int> > sockfd = server.getSocketFd();
+	//int	max_fd = *std::max_element(sockfd.begin(), sockfd.end());
 
 	fd_set read_fds;
 	FD_ZERO(&read_fds);
@@ -55,4 +55,4 @@ void Multiplexer::run(const Server &server) {
 			}
 		}
 	}
-}
+} */

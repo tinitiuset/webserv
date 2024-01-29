@@ -1,9 +1,9 @@
 server:
   server_name: site1.com
   ip: 0.0.0.0
-  port: 61001
-  port: 80
-  port: 8080
+  port: 100
+  port: 101
+  port: 102
   root: ./www/site1
   body_size: 500
   default_errors:
@@ -30,7 +30,8 @@ server:
 server:
   server_name: site2.com
   ip: 127.0.0.1
-  port: 88
+  port: 200
+  port: 201
   root: ./www/site2
   location: /
     file: index.html
@@ -42,7 +43,7 @@ server:
 server:
   server_name: susmuelas.com
   ip: 127.8.8.1
-  port: 89
+  port: 300
   root: ./www/susmuelas
   location: /
     file: index.html

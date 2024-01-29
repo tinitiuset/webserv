@@ -47,7 +47,7 @@ int main(int ac, char **av)
 
 	
 
-    multip.run(serv);
+    //multip.run(serv);
     return (0);
 
 
