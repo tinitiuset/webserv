@@ -22,7 +22,8 @@ void genericResponse(const int fd) {
 
 }
 
-void Multiplexer::run(const Server &server) {
+void Multiplexer::run(const Server &server)
+{
 
 	//std::vector<std::vector<int> > sockfd = server.getSocketFd();
 	int	max_fd = getMaxFd(server.getSocketFd());
@@ -31,7 +32,51 @@ void Multiplexer::run(const Server &server) {
 	FD_ZERO(&read_fds);
 	FD_SET(max_fd, &read_fds);
 
-	while (true) {
+	const std::vector<std::vector<int> >& socketFds = server.getSocketFd();
+
+	for (size_t i = 0; i < socketFds.size(); ++i) 
+	{
+    	for (size_t j = 0; j < socketFds[i].size(); ++j) 
+		{
+			while (true)
+			{
+				fd_set temp_fds = read_fds;
+
+				// https://man7.org/linux/man-pages/man2/select.2.html
+				std::cout << "i, j: " << i << ", " << j << std::endl;;
+				std::cout << "--FD----" << socketFds[i][j] << std::endl;
+				std::cout << "-port-" << confG->_serverArr[i].getPorts()[j] << std::endl;
+
+				if (select(max_fd + 1, &temp_fds, NULL, NULL, NULL) == -1)
+					throw std::runtime_error("Select failed\n");
+				std::cout << "--------------" << std::endl;;
+
+				for (int k = 0; k <= max_fd; k++) {
+					if (FD_ISSET(k, &temp_fds)) {
+						if (k == socketFds[i][j])
+						{
+							const int new_fd = server.Accept(i, j);
+							FD_SET(new_fd, &read_fds);
+							if (new_fd > max_fd) {
+								max_fd = new_fd;
+							}
+						}
+						else
+						{
+							// Currently writing generic responses
+							genericResponse(k);
+							close(k);
+							FD_CLR(k, &read_fds);
+						}
+					}
+				}
+			}
+    	}
+	}
+
+
+	/* while (true)
+	{
 		fd_set temp_fds = read_fds;
 
 		// https://man7.org/linux/man-pages/man2/select.2.html
@@ -40,13 +85,16 @@ void Multiplexer::run(const Server &server) {
 
 		for (int i = 0; i <= max_fd; i++) {
 			if (FD_ISSET(i, &temp_fds)) {
-				if (i == server.getSocketFd()) {
+				if (i == server.getSocketFd())
+				{
 					const int new_fd = server.Accept();
 					FD_SET(new_fd, &read_fds);
 					if (new_fd > max_fd) {
 						max_fd = new_fd;
 					}
-				} else {
+				}
+				else
+				{
 					// Currently writing generic responses
 					genericResponse(i);
 					close(i);
@@ -54,7 +102,7 @@ void Multiplexer::run(const Server &server) {
 				}
 			}
 		}
-	}
+	} */
 }
 
 int	getMaxFd(std::vector<std::vector<int> > sockfd)
@@ -70,4 +118,5 @@ int	getMaxFd(std::vector<std::vector<int> > sockfd)
 				max_fd = maxInVector;
 		}
 	}
+	return (max_fd);
 }

@@ -14,14 +14,14 @@ class Server {
 
 private:
 	std::vector<std::vector<int> > sockfd;
-	sockaddr_in servaddr;
+	//sockaddr_in servaddr;
 
 public:
 	Server();
 	~Server();
 
 	std::vector<std::vector<int> > getSocketFd() const;
-	int Accept() const;
+	int Accept(size_t i, size_t j) const;
 	void	socketOps(int port, int i, int j);
 };
 

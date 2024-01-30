@@ -21,6 +21,7 @@ Server::Server(){
 		}
 	}
 
+
 	
 
 	/* ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -62,13 +63,13 @@ Server::~Server() {
 		close(*it); */
 }
 
-int Server::Accept() const {
+int Server::Accept(size_t i, size_t j) const {
 
 	sockaddr_in cli = {};
 	socklen_t len = sizeof(cli);
 
 	// https://man7.org/linux/man-pages/man2/accept.2.html
-	const int connfd = accept(sockfd[0][0], reinterpret_cast<struct sockaddr*>(&cli), &len);
+	const int connfd = accept(sockfd[i][j], reinterpret_cast<struct sockaddr*>(&cli), &len);
 	(connfd < 0)
 		? throw std::runtime_error("Server accept failed\n")
 		: Logger::debug("Server accepted the client");

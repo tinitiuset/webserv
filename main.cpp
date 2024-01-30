@@ -45,9 +45,8 @@ int main(int ac, char **av)
     Multiplexer multip;
     Server      serv;
 
-	
+    multip.run(serv);
 
-    //multip.run(serv);
     return (0);
 
 
