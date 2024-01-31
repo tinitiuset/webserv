@@ -55,7 +55,7 @@ void Multiplexer::run(const Server &server)
 					if (FD_ISSET(k, &temp_fds)) {
 						if (k == socketFds[i][j])
 						{
-							const int new_fd = server.Accept(i, j);
+							int new_fd = server.Accept(i, j);
 							FD_SET(new_fd, &read_fds);
 							if (new_fd > max_fd) {
 								max_fd = new_fd;
