@@ -82,32 +82,44 @@ std::vector<std::vector<int> >	Server::getSocketFd() const {
 
 void	Server::socketOps(int port, int i, int j)
 {
-	((sockfd[i][j] = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-		? throw std::runtime_error("Socket creation failed\n")
-		: Logger::debug("Socket successfully created");
-
-	//Assign IP and port
-	// AF_INET: IPv4
-	// INADDR_ANY: any address for binding
-	// htons: converts port number in host byte order to a port number in network byte order
 	struct sockaddr_in servaddr;
 	memset(&servaddr, 0, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	servaddr.sin_port = htons(port);
 
+	((sockfd[i][j] = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+		? throw std::runtime_error("Socket creation failed\n")
+		: Logger::debug("Socket successfully created");
+
+	//set socket as reusable
+
+	int	option = 1;
+	((setsockopt(sockfd[i][j], SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option)) == -1))
+	? throw std::runtime_error("Setting to reusable failed\n")
+	: Logger::debug("Socket options successfully setted");
+
+
 	// https://man7.org/linux/man-pages/man2/bind.2.html
 	(bind(sockfd[i][j], reinterpret_cast<struct sockaddr*>(&servaddr), sizeof(servaddr)) == -1)
 		? throw std::runtime_error("Binding failed\n")
 		: Logger::debug("Socket successfully binded");
 
+	
 	// https://man7.org/linux/man-pages/man2/listen.2.html
 	try {
 		listen(sockfd[i][j], BACKLOG);
-		Logger::info("Server listening on port " + std::to_string(port)); //OJO to_string cpp11?
+		//Logger::info("Server listening on port " + std::to_string(port)); //OJO to_string cpp11?
 	} catch (std::exception &e) {
 		std::cout << e.what() << std::endl;
 	}
+
+	//setting socket as non blocking
+	(fcntl(sockfd[i][j], F_SETFL, O_NONBLOCK) == -1)
+	? throw std::runtime_error("Setting to nonblocking failed")
+	: Logger::debug("Socket setted to non blocking");
+
+	std::cout << "Server " << i << ": Socket " << sockfd[i][j] << " listening in port " << port << std::endl;
 }
 
 void	checkRepeatedPorts(const std::vector<int> &vector)
@@ -118,3 +130,17 @@ void	checkRepeatedPorts(const std::vector<int> &vector)
                 throw std::runtime_error("Repeated ports in config file\n"); 
 }
 
+size_t *Server::getSockFdCoords(int fd) const
+{
+	size_t coords[2];
+
+	for (size_t i = 0; i < sockfd.size(); ++i)
+		for (size_t j = 0; j < sockfd[i].size(); ++j)
+			if (sockfd[i][j] == fd)
+			{
+				coords[0] = i;
+				coords[1] = j;
+				return (coords);
+			}
+	return (NULL);
+}

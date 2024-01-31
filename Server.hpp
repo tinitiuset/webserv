@@ -6,6 +6,7 @@
 #include <string.h>
 #include <iostream>
 #include <unistd.h>
+#include <fcntl.h>
 #include <vector>
 #include "defaults.hpp"
 #include "Logger.hpp"
@@ -23,6 +24,7 @@ public:
 	std::vector<std::vector<int> > getSocketFd() const;
 	int Accept(size_t i, size_t j) const;
 	void	socketOps(int port, int i, int j);
+	size_t *getSockFdCoords(int fd) const;
 };
 
 void	checkRepeatedPorts(const std::vector<int> &vector);

@@ -28,13 +28,81 @@ void genericResponse(const int fd) {
 
 void Multiplexer::run(const Server &server) 
 {
-    
-	
+	int	selectRes;
+
+	fd_set	readSet;
+	fd_set	writeSet;
+	int max_fd = getMaxFd(server.getSocketFd());
+
 	while (!_endserver)
 	{
-        int max_fd = getMaxFd(server.getSocketFd());
+        // Select for I/O multiplexing
+		
+		
+		fd_set tmpReadSet = readSet;
+		fd_set tmpWriteSet = writeSet;
+		
+		selectRes = select(max_fd + 1, &tmpReadSet, &tmpWriteSet, NULL, NULL);
+		
+		if (selectRes == 0)
+			std::cout << "Selection OK" << std::endl;
+		else if (selectRes == -1)
+		{
+			if (!_endserver)
+				throw std::runtime_error("Select failed\n"); 
+			continue ;
+		}
+		else
+		{
+			int fd = 3;
+			
+			while (fd <= max_fd)
+			{
+				if (FD_ISSET(fd, &tmpReadSet))
+				{
+					if (fd == server.getSocketFd()[0][0])
+					{
+						int new_fd = server.Accept(0, 0);
+						FD_SET(new_fd, &readSet);
+						if (new_fd > max_fd)
+							max_fd = new_fd;
+					}
+					else
+					{
+						genericResponse(fd);
+						close(fd);
+						FD_CLR(fd, &readSet);
+					}
+				}
+				else if (FD_ISSET(fd, &tmpWriteSet))
+				{
+					if (fd == server.getSocketFd()[0][0])
+					{
+						int new_fd = server.Accept(0, 0);
+						FD_SET(new_fd, &writeSet);
+						if (new_fd > max_fd)
+							max_fd = new_fd;
+					}
+					else
+					{
+						genericResponse(fd);
+						close(fd);
+						FD_CLR(fd, &writeSet);
+					}
+				}
+				fd++;
+			}
+
+		}
+	}
+}
+
+
+
+
+		//-----------
       
-        fd_set read_fds;
+        /* fd_set read_fds;
         FD_ZERO(&read_fds);
 
         for (size_t i = 0; i < server.getSocketFd().size(); ++i) {
@@ -76,7 +144,7 @@ void Multiplexer::run(const Server &server)
             }
         }
     }
-}
+} */
 	/* for (int k = 0; k <= max_fd; k++) {
 					if (FD_ISSET(k, &read_fds)) {
 						if (k == socketFds[i][j])
@@ -150,3 +218,27 @@ void	Multiplexer::signalHandler(int signal)
 	if (signal == SIGINT || signal == SIGTERM)
 		_endserver = true;
 }
+
+size_t	Multiplexer::getServerFdIdx(int fd) const
+{
+	for (size_t i = 0; i < serverFdVec.size(); ++i)
+		if (fd == serverFdVec[i])
+			return (i);
+	return (-1);
+}
+
+size_t	Multiplexer::getClientFdIdx(int fd) const
+{
+	for (size_t i = 0; i < clientFdVec.size(); ++i)
+		if (fd == clientFdVec[i])
+			return (i);
+	return (-1);
+}
+
+void	Multiplexer::setServerFdVec(std::vector<std::vector<int> > sockfd)
+{
+	for (size_t i = 0; i < sockfd.size(); ++i)
+		for (size_t j = 0; j < sockfd[i].size(); ++j)
+			serverFdVec.push_back(sockfd[i][j]);
+}
+
