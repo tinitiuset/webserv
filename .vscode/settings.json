@@ -53,6 +53,7 @@
         "optional": "cpp",
         "ostream": "cpp",
         "ratio": "cpp",
+        "set": "cpp",
         "sstream": "cpp",
         "stack": "cpp",
         "stdexcept": "cpp",

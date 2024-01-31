@@ -108,8 +108,6 @@ void	Server::socketOps(int port, int i, int j)
 	} catch (std::exception &e) {
 		std::cout << e.what() << std::endl;
 	}
-	std::cout << "sockfd[" << i << "][" << j << "]: " << sockfd[i][j] << std::endl;
-	std::cout << "port glob: " << confG->_serverArr[i].getPorts()[j] << std::endl;
 }
 
 void	checkRepeatedPorts(const std::vector<int> &vector)

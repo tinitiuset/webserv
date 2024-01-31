@@ -8,11 +8,16 @@
 
 class Multiplexer {
 
+private:
+
 public:
+	static bool	_endserver;
+
 	Multiplexer();
 	~Multiplexer();
 
-    void run(const Server &);
+    void	run(const Server &);
+	static void	signalHandler(int signal);
 
 };
 

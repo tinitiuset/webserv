@@ -4,7 +4,11 @@
 #include <sys/_select.h>
 //#include <sys/select.h>
 
-Multiplexer::Multiplexer() {
+Multiplexer::Multiplexer()
+{
+
+	signal(SIGINT, signalHandler);
+	signal(SIGTERM, signalHandler);
 }
 
 Multiplexer::~Multiplexer() {
@@ -22,40 +26,65 @@ void genericResponse(const int fd) {
 
 }
 
-void Multiplexer::run(const Server &server)
+void Multiplexer::run(const Server &server) 
 {
-
-	//std::vector<std::vector<int> > sockfd = server.getSocketFd();
-	int	max_fd = getMaxFd(server.getSocketFd());
-
-	fd_set read_fds;
-	FD_ZERO(&read_fds);
-	FD_SET(max_fd, &read_fds);
-
-	const std::vector<std::vector<int> >& socketFds = server.getSocketFd();
-
-	for (size_t i = 0; i < socketFds.size(); ++i) 
+    
+	
+	while (!_endserver)
 	{
-    	for (size_t j = 0; j < socketFds[i].size(); ++j) 
-		{
-			while (true)
-			{
-				fd_set temp_fds = read_fds;
+        int max_fd = getMaxFd(server.getSocketFd());
+      
+        fd_set read_fds;
+        FD_ZERO(&read_fds);
 
-				// https://man7.org/linux/man-pages/man2/select.2.html
-				std::cout << "i, j: " << i << ", " << j << std::endl;;
-				std::cout << "--FD----" << socketFds[i][j] << std::endl;
-				std::cout << "-port-" << confG->_serverArr[i].getPorts()[j] << std::endl;
+        for (size_t i = 0; i < server.getSocketFd().size(); ++i) {
+            for (size_t j = 0; j < server.getSocketFd()[i].size(); ++j) {
+                FD_SET(server.getSocketFd()[i][j], &read_fds);
+            }
+		}
 
-				if (select(max_fd + 1, &temp_fds, NULL, NULL, NULL) == -1)
-					throw std::runtime_error("Select failed\n");
-				std::cout << "--------------" << std::endl;;
+        fd_set temp_fds = read_fds;
 
-				for (int k = 0; k <= max_fd; k++) {
-					if (FD_ISSET(k, &temp_fds)) {
+        if (select(max_fd + 1, &temp_fds, NULL, NULL, NULL) == -1) {
+            std::cout << "Select failed\n" << std::endl;
+			continue ;
+			//throw std::runtime_error("Select failed\n");
+        }
+		//std::cout << "--- while if. max_fd: " << max_fd << std::endl;
+        for (size_t i = 0; i < server.getSocketFd().size(); ++i) {
+            for (size_t j = 0; j < server.getSocketFd()[i].size(); ++j) {
+                int current_socket = server.getSocketFd()[i][j];
+                if (FD_ISSET(current_socket, &temp_fds)) {
+                    if (current_socket == server.getSocketFd()[i][j]) {
+                        // Nuevo cliente
+                        const int new_fd = server.Accept(i, j);
+						std::cout << "*** if. socketFds[i][j]: " << current_socket << std::endl;
+						std::cout << "*** if. new_fd: " << new_fd << std::endl;
+						std::cout << "*** if. max_fd: " << max_fd << std::endl;
+                        FD_SET(new_fd, &read_fds);
+                        if (new_fd > max_fd) {
+                            max_fd = new_fd;
+                        }
+                    } else {
+                        // Cliente existente
+						std::cout << "~~~ else: " << std::endl;
+                        genericResponse(current_socket);
+                        close(current_socket);
+                        FD_CLR(current_socket, &read_fds);
+                    }
+                }
+            }
+        }
+    }
+}
+	/* for (int k = 0; k <= max_fd; k++) {
+					if (FD_ISSET(k, &read_fds)) {
 						if (k == socketFds[i][j])
 						{
 							int new_fd = server.Accept(i, j);
+							std::cout << "*** if. socketFds[i][j]: " << socketFds[i][j] << std::endl;
+							std::cout << "*** if. new_fd: " << new_fd << std::endl;
+							std::cout << "*** if. max_fd: " << max_fd << std::endl;
 							FD_SET(new_fd, &read_fds);
 							if (new_fd > max_fd) {
 								max_fd = new_fd;
@@ -63,17 +92,11 @@ void Multiplexer::run(const Server &server)
 						}
 						else
 						{
+							std::cout << "~~~ else: " << std::endl;
 							// Currently writing generic responses
 							genericResponse(k);
 							close(k);
-							FD_CLR(k, &read_fds);
-						}
-					}
-				}
-			}
-    	}
-	}
-
+							FD_CLR(k, &read_fds); */
 
 	/* while (true)
 	{
@@ -103,7 +126,6 @@ void Multiplexer::run(const Server &server)
 			}
 		}
 	} */
-}
 
 int	getMaxFd(std::vector<std::vector<int> > sockfd)
 {
@@ -119,4 +141,12 @@ int	getMaxFd(std::vector<std::vector<int> > sockfd)
 		}
 	}
 	return (max_fd);
+}
+
+bool	Multiplexer::_endserver = false;
+
+void	Multiplexer::signalHandler(int signal)
+{
+	if (signal == SIGINT || signal == SIGTERM)
+		_endserver = true;
 }
