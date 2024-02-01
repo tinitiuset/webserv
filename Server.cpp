@@ -130,17 +130,23 @@ void	checkRepeatedPorts(const std::vector<int> &vector)
                 throw std::runtime_error("Repeated ports in config file\n"); 
 }
 
-size_t *Server::getSockFdCoords(int fd) const
+/*
+	We must check first if the function returns an empty vector (fd not found in nested vector)
+	returns a vector] (coord[0] = i and coord[1] = j) 
+	which is the location of an fd inside the nested fd vector that
+	corresponds with the config location ports and whatever
+*/
+std::vector<int>	Server::getSockFdCoords(int fd) const
 {
-	size_t coords[2];
+	std::vector<int> coords;
 
 	for (size_t i = 0; i < sockfd.size(); ++i)
 		for (size_t j = 0; j < sockfd[i].size(); ++j)
 			if (sockfd[i][j] == fd)
 			{
-				coords[0] = i;
-				coords[1] = j;
+				coords.push_back(i);
+                coords.push_back(j);
 				return (coords);
 			}
-	return (NULL);
+	return (coords);
 }

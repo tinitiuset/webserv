@@ -1,18 +1,13 @@
 #include "Multiplexer.hpp"
 #include "Server.hpp"
+#include "Logger.hpp"
 #include <unistd.h>
 #include <sys/_select.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <fcntl.h>
+
 //#include <sys/select.h>
-
-Multiplexer::Multiplexer()
-{
-
-	signal(SIGINT, signalHandler);
-	signal(SIGTERM, signalHandler);
-}
-
-Multiplexer::~Multiplexer() {
-}
 
 void genericResponse(const int fd) {
 	char buffer[1024] = {0};
@@ -26,18 +21,35 @@ void genericResponse(const int fd) {
 
 }
 
+Multiplexer::Multiplexer()
+{
+
+	signal(SIGINT, signalHandler);
+	signal(SIGTERM, signalHandler);
+}
+
+Multiplexer::~Multiplexer() {
+}
+
 void Multiplexer::run(const Server &server) 
 {
 	int	selectRes;
 
 	fd_set	readSet;
 	fd_set	writeSet;
+
+	FD_ZERO(&readSet);
+	FD_ZERO(&writeSet);
+
+	setServerFdVec(server.getSocketFd());
 	int max_fd = getMaxFd(server.getSocketFd());
+
+	for (size_t k = 0; k < serverFdVec.size(); ++k)
+		FD_SET(serverFdVec[k], &readSet);
 
 	while (!_endserver)
 	{
         // Select for I/O multiplexing
-		
 		
 		fd_set tmpReadSet = readSet;
 		fd_set tmpWriteSet = writeSet;
@@ -58,142 +70,75 @@ void Multiplexer::run(const Server &server)
 			
 			while (fd <= max_fd)
 			{
+				//sleep(2);
+				int	locReadVec = getServerFdIdx(fd);
+				int	locWriteVec = getClientFdIdx(fd);
+
+				std::cout << "Socket " << fd <<" ready to receive" << std::endl;
+				std::cout << "socket: " << fd << " - max_fd: " << max_fd << std::endl;
 				if (FD_ISSET(fd, &tmpReadSet))
 				{
-					if (fd == server.getSocketFd()[0][0])
+					if (locReadVec != -1)
 					{
-						int new_fd = server.Accept(0, 0);
-						FD_SET(new_fd, &readSet);
-						if (new_fd > max_fd)
-							max_fd = new_fd;
+						// ACCEPT REQUEST
+						struct sockaddr 	cli;
+						socklen_t	clilen = sizeof(cli);
+						int			cliFd;
+
+						std::cout << "Server accepting client communication\n";
+
+						cliFd = accept(fd, (struct sockaddr *)&cli, &clilen);
+						cliFd == -1
+						? throw std::runtime_error("Failed to accept\n")
+						: Logger::debug("Client socket accepted by server\n");
+
+						(fcntl(cliFd, F_SETFL, O_NONBLOCK) == -1)
+						? throw std::runtime_error("Failed to set client socket as non-blocked\n0")
+						: Logger::debug("Client socket set as non-blocking\n");
+
+						clientFdVec.push_back(cliFd);
+						/*
+						if any config data is needed here we can call
+						size_t *getSockFdCoords(int fd) and store result in int i and int j
+						i for server index 
+						j for nested vectors index
+						*/
+						FD_SET(cliFd, &readSet);
+						if (cliFd > max_fd)
+							max_fd = cliFd;
+
+						Logger::debug("Client connected\n");
+						std::cout << "clifd: " << cliFd << " - max_fd: " << max_fd << std::endl;
 					}
-					else
+					else if(locWriteVec != -1)
 					{
-						genericResponse(fd);
-						close(fd);
-						FD_CLR(fd, &readSet);
+						//READ REQUEST...
+						FD_CLR(clientFdVec[locWriteVec], &tmpReadSet);
+						//if se ha leido una solicitud y hay datos para enviar:
+							//FD_SET(clientFdVec[locWriteVec], &tmpWriteSet);
+						FD_SET(clientFdVec[locWriteVec], &tmpWriteSet);	
 					}
 				}
 				else if (FD_ISSET(fd, &tmpWriteSet))
 				{
-					if (fd == server.getSocketFd()[0][0])
-					{
-						int new_fd = server.Accept(0, 0);
-						FD_SET(new_fd, &writeSet);
-						if (new_fd > max_fd)
-							max_fd = new_fd;
-					}
-					else
-					{
-						genericResponse(fd);
-						close(fd);
-						FD_CLR(fd, &writeSet);
-					}
+					//SEND RESPONSE
+					Logger::debug("Fd ready to send data");
+					genericResponse(fd);
+					close(clientFdVec[locWriteVec]);
+					if (clientFdVec[locWriteVec] == max_fd)
+						max_fd--;
+					FD_CLR(clientFdVec[locWriteVec], &writeSet);
+					clientFdVec.erase(clientFdVec.begin() + locWriteVec);
 				}
 				fd++;
 			}
-
+			
 		}
 	}
 }
 
 
 
-
-		//-----------
-      
-        /* fd_set read_fds;
-        FD_ZERO(&read_fds);
-
-        for (size_t i = 0; i < server.getSocketFd().size(); ++i) {
-            for (size_t j = 0; j < server.getSocketFd()[i].size(); ++j) {
-                FD_SET(server.getSocketFd()[i][j], &read_fds);
-            }
-		}
-
-        fd_set temp_fds = read_fds;
-
-        if (select(max_fd + 1, &temp_fds, NULL, NULL, NULL) == -1) {
-            std::cout << "Select failed\n" << std::endl;
-			continue ;
-			//throw std::runtime_error("Select failed\n");
-        }
-		//std::cout << "--- while if. max_fd: " << max_fd << std::endl;
-        for (size_t i = 0; i < server.getSocketFd().size(); ++i) {
-            for (size_t j = 0; j < server.getSocketFd()[i].size(); ++j) {
-                int current_socket = server.getSocketFd()[i][j];
-                if (FD_ISSET(current_socket, &temp_fds)) {
-                    if (current_socket == server.getSocketFd()[i][j]) {
-                        // Nuevo cliente
-                        const int new_fd = server.Accept(i, j);
-						std::cout << "*** if. socketFds[i][j]: " << current_socket << std::endl;
-						std::cout << "*** if. new_fd: " << new_fd << std::endl;
-						std::cout << "*** if. max_fd: " << max_fd << std::endl;
-                        FD_SET(new_fd, &read_fds);
-                        if (new_fd > max_fd) {
-                            max_fd = new_fd;
-                        }
-                    } else {
-                        // Cliente existente
-						std::cout << "~~~ else: " << std::endl;
-                        genericResponse(current_socket);
-                        close(current_socket);
-                        FD_CLR(current_socket, &read_fds);
-                    }
-                }
-            }
-        }
-    }
-} */
-	/* for (int k = 0; k <= max_fd; k++) {
-					if (FD_ISSET(k, &read_fds)) {
-						if (k == socketFds[i][j])
-						{
-							int new_fd = server.Accept(i, j);
-							std::cout << "*** if. socketFds[i][j]: " << socketFds[i][j] << std::endl;
-							std::cout << "*** if. new_fd: " << new_fd << std::endl;
-							std::cout << "*** if. max_fd: " << max_fd << std::endl;
-							FD_SET(new_fd, &read_fds);
-							if (new_fd > max_fd) {
-								max_fd = new_fd;
-							}
-						}
-						else
-						{
-							std::cout << "~~~ else: " << std::endl;
-							// Currently writing generic responses
-							genericResponse(k);
-							close(k);
-							FD_CLR(k, &read_fds); */
-
-	/* while (true)
-	{
-		fd_set temp_fds = read_fds;
-
-		// https://man7.org/linux/man-pages/man2/select.2.html
-		if (select(max_fd + 1, &temp_fds, NULL, NULL, NULL) == -1)
-			throw std::runtime_error("Select failed\n");
-
-		for (int i = 0; i <= max_fd; i++) {
-			if (FD_ISSET(i, &temp_fds)) {
-				if (i == server.getSocketFd())
-				{
-					const int new_fd = server.Accept();
-					FD_SET(new_fd, &read_fds);
-					if (new_fd > max_fd) {
-						max_fd = new_fd;
-					}
-				}
-				else
-				{
-					// Currently writing generic responses
-					genericResponse(i);
-					close(i);
-					FD_CLR(i, &read_fds);
-				}
-			}
-		}
-	} */
 
 int	getMaxFd(std::vector<std::vector<int> > sockfd)
 {

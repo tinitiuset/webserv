@@ -19,14 +19,13 @@ public:
 	Multiplexer();
 	~Multiplexer();
 
-    void	run(const Server &);
+    void		run(const Server &);
 	static void	signalHandler(int signal);
 
-	size_t	getServerFdIdx(int fd) const;
-	size_t	getClientFdIdx(int fd) const;
-	void	setServerFdVec(std::vector<std::vector<int> >);
+	size_t		getServerFdIdx(int fd) const;
+	size_t		getClientFdIdx(int fd) const;
+	void		setServerFdVec(std::vector<std::vector<int> >);
 	
-
 };
 
 int	getMaxFd(std::vector<std::vector<int> > sockfd);

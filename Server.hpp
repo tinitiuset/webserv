@@ -22,9 +22,10 @@ public:
 	~Server();
 
 	std::vector<std::vector<int> > getSocketFd() const;
-	int Accept(size_t i, size_t j) const;
+	int 	Accept(size_t i, size_t j) const;
 	void	socketOps(int port, int i, int j);
-	size_t *getSockFdCoords(int fd) const;
+	std::vector<int> getSockFdCoords(int fd) const;
+
 };
 
 void	checkRepeatedPorts(const std::vector<int> &vector);
