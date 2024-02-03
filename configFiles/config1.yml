@@ -2,8 +2,6 @@ server:
   server_name: site1.com
   ip: 0.0.0.0
   port: 1000
-  port: 1001
-  port: 1002
   root: ./www/site1
   body_size: 500
   default_errors:
@@ -31,7 +29,6 @@ server:
   server_name: site2.com
   ip: 127.0.0.1
   port: 2000
-  port: 2001
   root: ./www/site2
   location: /
     file: index.html

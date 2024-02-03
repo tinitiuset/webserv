@@ -23,13 +23,11 @@ void genericResponse(const int fd) {
 
 Multiplexer::Multiplexer()
 {
-
 	signal(SIGINT, signalHandler);
 	signal(SIGTERM, signalHandler);
 }
 
-Multiplexer::~Multiplexer() {
-}
+Multiplexer::~Multiplexer() {}
 
 void Multiplexer::run(const Server &server) 
 {
@@ -41,21 +39,43 @@ void Multiplexer::run(const Server &server)
 	FD_ZERO(&readSet);
 	FD_ZERO(&writeSet);
 
-	setServerFdVec(server.getSocketFd());
-	int max_fd = getMaxFd(server.getSocketFd());
+	std::cout << std::endl << "--------------" << std::endl << std::endl;
 
-	for (size_t k = 0; k < serverFdVec.size(); ++k)
-		FD_SET(serverFdVec[k], &readSet);
+	setServerFdVec(server.getSocketFd());
+
+	std::cout << "Server fd vector size: " << serverFdVec.size() << std::endl;
+	std::cout << "Server fd vec[]: ";
+	for (size_t i = 0; i < serverFdVec.size(); ++i)
+	{
+		FD_SET(serverFdVec[i], &readSet);
+		std::cout << serverFdVec[i] << " ";
+	}
+
+	std::cout << std::endl;
+
+	std::cout << "Client fd vector: ";
+	for (size_t i = 0; i < clientFdVec.size(); ++i)
+		std::cout << clientFdVec[i] << " ";
+	
+	std::cout << std::endl;
+
+	int max_fd = getMaxFd(server.getSocketFd());
+	std::cout << "Max fd: " << max_fd << std::endl;
+
+	std::cout << std::endl << "--------------" << std::endl << std::endl;
+
 
 	while (!_endserver)
 	{
-        // Select for I/O multiplexing
-		
+        std::cout << "\nNEW WHILE ITERATION\n" << std::endl;
+		//Select for I/O multiplexing
+		sleep(2);
 		fd_set tmpReadSet = readSet;
 		fd_set tmpWriteSet = writeSet;
 		
 		selectRes = select(max_fd + 1, &tmpReadSet, &tmpWriteSet, NULL, NULL);
-		
+		std::cout << "Select result: " << selectRes << std::endl;
+
 		if (selectRes == 0)
 			std::cout << "Selection OK" << std::endl;
 		else if (selectRes == -1)
@@ -64,23 +84,27 @@ void Multiplexer::run(const Server &server)
 				throw std::runtime_error("Select failed\n"); 
 			continue ;
 		}
-		else
+		else if (selectRes > 0)
 		{
 			int fd = 3;
 			
 			while (fd <= max_fd)
 			{
-				//sleep(2);
+				std::cout << "\nNEW FD <= max_fd ITERATION\n" << std::endl;
 				int	locReadVec = getServerFdIdx(fd);
 				int	locWriteVec = getClientFdIdx(fd);
 
-				std::cout << "Socket " << fd <<" ready to receive" << std::endl;
+				std::cout << "locReadVec: " << locReadVec << " - locWriteVec: " << locWriteVec << std::endl;
+				
 				std::cout << "socket: " << fd << " - max_fd: " << max_fd << std::endl;
+
 				if (FD_ISSET(fd, &tmpReadSet))
 				{
+					std::cout << "Socket " << fd <<" ready to receive" << std::endl;
 					if (locReadVec != -1)
 					{
-						// ACCEPT REQUEST
+						std::cout << "\n*  IN ACCEPT" << std::endl;
+						// ACCEPT REQUEST 
 						struct sockaddr 	cli;
 						socklen_t	clilen = sizeof(cli);
 						int			cliFd;
@@ -91,6 +115,8 @@ void Multiplexer::run(const Server &server)
 						cliFd == -1
 						? throw std::runtime_error("Failed to accept\n")
 						: Logger::debug("Client socket accepted by server\n");
+
+						std::cout << "IN ACCEPT Client fd: " << cliFd << std::endl;
 
 						(fcntl(cliFd, F_SETFL, O_NONBLOCK) == -1)
 						? throw std::runtime_error("Failed to set client socket as non-blocked\n0")
@@ -108,7 +134,7 @@ void Multiplexer::run(const Server &server)
 							max_fd = cliFd;
 
 						Logger::debug("Client connected\n");
-						std::cout << "clifd: " << cliFd << " - max_fd: " << max_fd << std::endl;
+						std::cout << "IN ACCEPT clifd: " << cliFd << " - max_fd: " << max_fd << std::endl;
 					}
 					else if(locWriteVec != -1)
 					{
@@ -116,23 +142,31 @@ void Multiplexer::run(const Server &server)
 						FD_CLR(clientFdVec[locWriteVec], &tmpReadSet);
 						//if se ha leido una solicitud y hay datos para enviar:
 							//FD_SET(clientFdVec[locWriteVec], &tmpWriteSet);
-						FD_SET(clientFdVec[locWriteVec], &tmpWriteSet);	
+						FD_SET(clientFdVec[locWriteVec], &tmpWriteSet);
+						std::cout << "\n* IN READ REQUEST clientFdVec[" << locWriteVec << "]: " << clientFdVec[locWriteVec] << std::endl;
 					}
 				}
 				else if (FD_ISSET(fd, &tmpWriteSet))
 				{
 					//SEND RESPONSE
 					Logger::debug("Fd ready to send data");
+					std::cout << "\n*  IN SEND RESPONSE clientFdVec[" << locWriteVec << "]: " << clientFdVec[locWriteVec] << std::endl;
+					std::cout << "IN SEND RESPONSE max_fd: " << max_fd << std::endl;
 					genericResponse(fd);
 					close(clientFdVec[locWriteVec]);
 					if (clientFdVec[locWriteVec] == max_fd)
 						max_fd--;
 					FD_CLR(clientFdVec[locWriteVec], &writeSet);
 					clientFdVec.erase(clientFdVec.begin() + locWriteVec);
+					std::cout << "IN SEND RESPONSE" << clientFdVec[locWriteVec] << "]: " << clientFdVec[locWriteVec];	
+					for (size_t i = 0; i < clientFdVec.size(); ++i)
+					{
+						std::cout << clientFdVec[i] << " ";
+					}
+					std::cout << std::endl;
 				}
 				fd++;
 			}
-			
 		}
 	}
 }
