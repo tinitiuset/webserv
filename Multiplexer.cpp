@@ -2,10 +2,15 @@
 #include "Server.hpp"
 #include "Logger.hpp"
 #include <unistd.h>
-#include <sys/_select.h>
+//#include <sys/_select.h>
+#include <sys/select.h>
+#include <csignal>
+#include <algorithm>
+
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <fcntl.h>
+
 
 //#include <sys/select.h>
 
@@ -100,7 +105,7 @@ void Multiplexer::run(const Server &server)
 
 				if (FD_ISSET(fd, &tmpReadSet))
 				{
-					std::cout << "Socket " << fd <<" ready to receive" << std::endl;
+					std::cout << ">>cumple FD_ISSET(fd, &tmpReadSet)" << std::endl;
 					if (locReadVec != -1)
 					{
 						std::cout << "\n*  IN ACCEPT" << std::endl;
@@ -109,56 +114,104 @@ void Multiplexer::run(const Server &server)
 						socklen_t	clilen = sizeof(cli);
 						int			cliFd;
 
-						std::cout << "Server accepting client communication\n";
-
 						cliFd = accept(fd, (struct sockaddr *)&cli, &clilen);
 						cliFd == -1
 						? throw std::runtime_error("Failed to accept\n")
 						: Logger::debug("Client socket accepted by server\n");
 
-						std::cout << "IN ACCEPT Client fd: " << cliFd << std::endl;
+						std::cout << "Client fd: " << cliFd << std::endl;
+						
+						//print server vector
+						std::cout << "Server fd vector: ";
+						for (size_t i = 0; i < serverFdVec.size(); ++i)
+							std::cout << serverFdVec[i] << " ";
+						std::cout << std::endl;
+						//print client vector
+						std::cout << "Client fd vector: ";
+						for (size_t i = 0; i < clientFdVec.size(); ++i)
+							std::cout << clientFdVec[i] << " ";
+						std::cout << std::endl;
+
 
 						(fcntl(cliFd, F_SETFL, O_NONBLOCK) == -1)
 						? throw std::runtime_error("Failed to set client socket as non-blocked\n0")
 						: Logger::debug("Client socket set as non-blocking\n");
 
 						clientFdVec.push_back(cliFd);
+						std::cout << "pushed back clientFdVec: " << cliFd << std::endl;
 						/*
 						if any config data is needed here we can call
 						size_t *getSockFdCoords(int fd) and store result in int i and int j
 						i for server index 
 						j for nested vectors index
 						*/
+						std::cout << "FD_SET cliFd: " << cliFd << std::endl;
 						FD_SET(cliFd, &readSet);
 						if (cliFd > max_fd)
 							max_fd = cliFd;
 
-						Logger::debug("Client connected\n");
-						std::cout << "IN ACCEPT clifd: " << cliFd << " - max_fd: " << max_fd << std::endl;
+						
+
+						//Logger::debug("Client connected\n");
+						std::cout << "clifd: " << cliFd << " - max_fd: " << max_fd << std::endl;
+						std::cout << "Server fd vector: ";
+						for (size_t i = 0; i < serverFdVec.size(); ++i)
+							std::cout << serverFdVec[i] << " ";
+						std::cout << std::endl;
+						//print client vector
+						std::cout << "Client fd vector: ";
+						for (size_t i = 0; i < clientFdVec.size(); ++i)
+							std::cout << clientFdVec[i] << " ";
+						std::cout << std::endl;
 					}
 					else if(locWriteVec != -1)
 					{
 						//READ REQUEST...
-						FD_CLR(clientFdVec[locWriteVec], &tmpReadSet);
+						std::cout << "\n*  IN READ REQUEST" << std::endl;
+						std::cout << "FD_CLR(clientFdVec[locWriteVec], &tmpReadSet) " << clientFdVec[locWriteVec] << std::endl;
+						FD_CLR(clientFdVec[locWriteVec], &readSet);
 						//if se ha leido una solicitud y hay datos para enviar:
 							//FD_SET(clientFdVec[locWriteVec], &tmpWriteSet);
-						FD_SET(clientFdVec[locWriteVec], &tmpWriteSet);
-						std::cout << "\n* IN READ REQUEST clientFdVec[" << locWriteVec << "]: " << clientFdVec[locWriteVec] << std::endl;
+						FD_SET(clientFdVec[locWriteVec], &writeSet);
+						std::cout << "FD_SET clientFdVec[" << locWriteVec << "]: " << clientFdVec[locWriteVec] << std::endl;
+						std::cout << "Server fd vector: ";
+						for (size_t i = 0; i < serverFdVec.size(); ++i)
+							std::cout << serverFdVec[i] << " ";
+						std::cout << std::endl;
+						//print client vector
+						std::cout << "Client fd vector: ";
+						for (size_t i = 0; i < clientFdVec.size(); ++i)
+							std::cout << clientFdVec[i] << " ";
+						std::cout << std::endl;
 					}
 				}
 				else if (FD_ISSET(fd, &tmpWriteSet))
 				{
+					std::cout << ">>cumple FD_ISSET(fd, &tmpWriteSet)" << std::endl;
 					//SEND RESPONSE
-					Logger::debug("Fd ready to send data");
+					//Logger::debug("Fd ready to send data");
 					std::cout << "\n*  IN SEND RESPONSE clientFdVec[" << locWriteVec << "]: " << clientFdVec[locWriteVec] << std::endl;
-					std::cout << "IN SEND RESPONSE max_fd: " << max_fd << std::endl;
+					std::cout << "fd: " << fd << " max_fd: " << max_fd << std::endl;
+					std::cout << "Server fd vector: ";
+					for (size_t i = 0; i < serverFdVec.size(); ++i)
+						std::cout << serverFdVec[i] << " ";
+					std::cout << std::endl;
+					//print client vector
+					std::cout << "Client fd vector: ";
+					for (size_t i = 0; i < clientFdVec.size(); ++i)
+						std::cout << clientFdVec[i] << " ";
+					std::cout << std::endl;
+					std::cout << "generic responsa called" << std::endl;
 					genericResponse(fd);
+					std::cout << "close clientFdVec[" << locWriteVec << "]: " << clientFdVec[locWriteVec] << std::endl;
 					close(clientFdVec[locWriteVec]);
 					if (clientFdVec[locWriteVec] == max_fd)
 						max_fd--;
+					std::cout << "max_fd: " << max_fd << std::endl;
+					std::cout << "FD_CLR clientFdVec[" << locWriteVec << "]: " << clientFdVec[locWriteVec] << std::endl;
 					FD_CLR(clientFdVec[locWriteVec], &writeSet);
 					clientFdVec.erase(clientFdVec.begin() + locWriteVec);
-					std::cout << "IN SEND RESPONSE" << clientFdVec[locWriteVec] << "]: " << clientFdVec[locWriteVec];	
+					std::cout << "erased at client fd vector: ";
 					for (size_t i = 0; i < clientFdVec.size(); ++i)
 					{
 						std::cout << clientFdVec[i] << " ";
