@@ -41,6 +41,7 @@ server:
   server_name: susmuelas.com
   ip: 127.8.8.1
   port: 5002
+  port: 6001
   root: ./www/susmuelas
   location: /
     file: index.html
