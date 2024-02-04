@@ -39,7 +39,7 @@ void Request::parseRequest(const int &fd) {
 
 	std::string headerLine;
 	while (std::getline(requestStream, headerLine) && headerLine != "\r") {
-		headerLine.erase(std::remove(headerLine.end() - 1, headerLine.end(), '\r'), headerLine.end()); // Remove trailing '\r'
+		headerLine.erase(headerLine.end() - 1, headerLine.end()); // Remove trailing '\r'
 		std::istringstream headerLineStream(headerLine);
 		std::string key;
 		std::getline(headerLineStream, key, ':');
