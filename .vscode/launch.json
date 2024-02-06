@@ -5,13 +5,15 @@
             "name": "Debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/home/josu/Documents/webserv/webserv",
+            "program": "/Users/jzubizar/Documents/webserv/webserv",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "gdb",
+            //"MIMode": "gdb",
+            "MIMode": "lldb",
+            //"miDebuggerPath": "/path/to/your/gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

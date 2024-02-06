@@ -7,6 +7,8 @@
 class PostRequest: public Request {
 	private:
 		std::string _real_body;
+		std::string _type;
+	
 	public:
 		PostRequest(const Request&);
 		~PostRequest();

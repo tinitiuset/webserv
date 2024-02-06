@@ -1,15 +1,18 @@
 #include "PostRequest.hpp"
 
-PostRequest::PostRequest(const Request& request): Request(request) {}
+PostRequest::PostRequest(const Request& request): Request(request), _type(_headers["Content-Type"]) {}
 
 PostRequest::~PostRequest() {}
 std::string PostRequest::handle() {
 
-	// Needs work
-	// Needs work
-	// Needs work
+	// AddToList
+	// UploadFile
+	// SetCookie
+	// deChunck
 
-	Logger::debug("GetRequest::handle() called");
+	Logger::debug("PostRequest::handle() called");
+
+	
 
 	Response response;
 

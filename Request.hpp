@@ -19,7 +19,7 @@ public:
 	bool isPostRequest() const;
 	virtual std::string handle() {return NULL;};
 
-private:
+protected:
 	std::string _method;
 	std::string _uri;
 	std::map<std::string, std::string> _headers;
