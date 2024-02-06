@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Formulario</title>
+</head>
+<body>
+    <h2>Formulario</h2>
+    <form action="/procesar_formulario" method="GET">
+        <label for="input_text">Ingrese texto (letras, números o espacios):</label><br>
+        <input type="text" id="input_text" name="input_text" pattern="[a-zA-Z0-9\s]+" title="Solo letras, números o espacios son permitidos" required><br><br>
+
+        <label for="method">Seleccione el método:</label><br>
+        <select id="method" name="method">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+        </select><br><br>
+
+        <input type="submit" value="Enviar">
+    </form>
+</body>
+</html>
