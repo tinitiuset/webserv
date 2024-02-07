@@ -3,10 +3,8 @@
 #include <unistd.h>
 
 
-Cgi::Cgi(): cgiExtension("py"), cmd("python3"), script("cgi-bin/sos.py")
+Cgi::Cgi(): cgiExtension("py"), cmd("python3"), script("cgi-bin/sos.py"), arg("input_text=hola+cara+culo+ajeroso")
 {
-    arg  = "cagon tus muelas";
-
     //open socket file descriptor as the client socket will come from the server
     socket = open("cgi-bin/socket", O_WRONLY);
     if (socket == -1)
@@ -19,19 +17,37 @@ Cgi::~Cgi()
     close(socket);
 }
 
-void Cgi::initCgi()
+std::string Cgi::initCgi()
 {
-    pid_t   pid;
-    int     status;
+    pid_t       pid;
+    int         status;
+    int         fd[2];
+    std::string	resp = "*";
 
+    if (pipe(fd) == -1)
+    {
+        throw std::runtime_error("pipe failed");
+
+    }
     pid = fork();
     if (pid == -1)
         throw std::runtime_error("fork failed");
     else if (pid == 0) //child process
-        selCgi();
-    else //parent process
-        waitpid(pid, &status, 0);
+        selCgi(fd);
+    //else //parent process
+    waitpid(pid, &status, 0);
+    close(fd[1]);
 
+    char    buffer[1024];
+    while (ssize_t bytes = read(fd[0], buffer, sizeof(buffer)))
+    {
+        if (bytes < 0)
+            throw std::runtime_error("fd read error");
+        buffer[bytes] = '\0';
+        resp += buffer;
+    }
+    close(fd[0]);
+    return (resp);
 }
 
 char    **Cgi::setArgs()
@@ -46,9 +62,10 @@ char    **Cgi::setArgs()
     return (cmdargs);
 }
 
-void Cgi::selCgi()
+void Cgi::selCgi(int *fd)
 {    
-    if (dup2(socket, STDOUT_FILENO) == -1)
+    close(fd[0]);
+    if (dup2(fd[1], STDOUT_FILENO) == -1)
         throw std::runtime_error("dup failed");
     if (cgiExtension == "py")
         execPy();

@@ -6,20 +6,20 @@
 class Cgi
 {
     public:
-        std::string cgiExtension;
-        std::string cmd;
-        std::string script;
-        std::string arg;
-        int         socket;
+        std::string     cgiExtension;
+        std::string     cmd;
+        std::string     script;
+        std::string     arg;
+        int             socket;
 
         Cgi();
         ~Cgi();
 
-        void    selCgi();
-        void    execPy();
-        void    execSh();
-        void    initCgi();
-        char    **setArgs();
+        void            selCgi(int *fd);
+        void            execPy();
+        void            execSh();
+        std::string     initCgi();
+        char            **setArgs();
 };
 
 #endif

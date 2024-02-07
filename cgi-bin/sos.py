@@ -22,11 +22,13 @@ if len(sys.argv) < 2:
 	print("Error")
 	exit()
 else:
-     i = 1
-     argument = ""
-     while i < len(sys.argv):
-          argument += sys.argv[i].strip() + " "
-          i += 1
+    argument = sys.argv[1]
+    if ("=") in argument:
+        argument = argument[(argument.find("=") + 1):]
+        argument = argument.replace("+", " ")
+    else:
+        print("Unexpected input")
+        exit()
 input = argument.strip()
 output = ""
 i = 0
@@ -34,7 +36,7 @@ while i < len(input):
     if input[i].upper() in morse_code.keys():
         output += morse_code[input[i].upper()] + ' '
     elif input[i] == ' ':
-        output += '/' + ' '
+        output += "  " + ' '
     i += 1
    
 print(output)

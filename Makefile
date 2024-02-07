@@ -5,7 +5,7 @@ STANDARD =	-std=c++98
 DEBUG =		#-g0	# 0, 1, 2, 3 DEBUG INFORMATION LEVELS
 FLAGS =		-Wall -Werror -Wextra -g3 #-fsanitize=address
 
-SRC_FILES = cgi-bin/testcgi.cpp \
+SRC_FILES = cgi-bin/testcgimain.cpp \
 			Cgi.cpp 
 
 all: $(NAME)
