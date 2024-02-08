@@ -1,5 +1,9 @@
 #include "EachServer.hpp"
 
+EachServer::EachServer(): _bodySize(1024)
+{
+}
+
 void    EachServer::setServerName(std::string servname)
 {
     _serverName = servname;

@@ -2,24 +2,32 @@
 #define CGI_HPP
 
 #include <iostream>
+#include <map>
 
 class Cgi
 {
-    public:
-        std::string     cgiExtension;
-        std::string     cmd;
-        std::string     script;
-        std::string     arg;
-        int             socket;
+    private:
 
-        Cgi();
+        std::string                         _reqLine;
+        std::map<std::string, std::string>  _headers;
+	    std::string                         _body;
+        char                                **_env;
+        int                                 _servIdx;
+    
+    public:
+
+        Cgi(std::string reqLine, std::map<std::string, std::string> headers, std::string _body);
         ~Cgi();
 
-        void            selCgi(int *fd);
+        void            selMethod();
+        void            setGetEnv();
+        void            setPostEnv();
+        void            setStdOut();
+
+
         void            execPy();
         void            execSh();
         std::string     initCgi();
-        char            **setArgs();
 };
 
 #endif

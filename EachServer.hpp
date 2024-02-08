@@ -19,6 +19,9 @@ class EachServer
         
     public:
      
+        EachServer();
+        ~EachServer();
+
         void            setServerName(std::string servname);
         void            setIp(std::string ip);
         void            setRoot(std::string root);

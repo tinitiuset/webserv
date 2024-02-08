@@ -86,7 +86,18 @@ void	Server::socketOps(int port, int i, int j)
 	memset(&servaddr, 0, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-	servaddr.sin_port = htons(port);
+	
+	try
+	{
+		if (port <= 0 || port > 65535)
+			throw std::runtime_error("Invalid port number\n");
+		servaddr.sin_port = htons(port);
+	}
+	catch (std::exception &e) 
+	{
+		std::cout << e.what() << std::endl;
+	}
+
 
 	((sockfd[i][j] = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		? throw std::runtime_error("Socket creation failed\n")

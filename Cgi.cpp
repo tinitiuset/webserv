@@ -2,19 +2,36 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+//CHECK ERROR MANAGEMENT
 
-Cgi::Cgi(): cgiExtension("py"), cmd("python3"), script("cgi-bin/sos.py"), arg("input_text=hola+cara+culo+ajeroso")
+
+Cgi::Cgi(std::string reqLine, std::map<std::string, std::string> headers, std::string body):
+_reqLine(reqLine), _headers(headers), _body(body) 
 {
-    //open socket file descriptor as the client socket will come from the server
-    socket = open("cgi-bin/socket", O_WRONLY);
-    if (socket == -1)
-        throw std::runtime_error("open error");
-    
+    _env = NULL;
 }
+
 
 Cgi::~Cgi(){}
 
-std::string Cgi::initCgi()  //CHECK ERROR MANAGEMENT
+void    Cgi::selMethod()
+{
+    if (_reqLine.substr(0, 3) == "GET") //also check if method is supported in config????
+        setEnv();
+    else if (_reqLine.substr(0, 4) == "POST") //also check if method is supported in config????
+        setStdOut();
+    else
+    {
+        std::cerr << "method not supported" << std::endl;
+        return ; //?
+    }
+
+
+}
+
+
+
+std::string Cgi::initCgi()  
 {
     pid_t       pid;
     int         status;
@@ -22,10 +39,7 @@ std::string Cgi::initCgi()  //CHECK ERROR MANAGEMENT
     std::string	resp = "";
 
     if (pipe(fd) == -1)
-    {
         throw std::runtime_error("pipe failed");
-
-    }
     pid = fork();
     if (pid == -1)
         throw std::runtime_error("fork failed");
@@ -47,14 +61,11 @@ std::string Cgi::initCgi()  //CHECK ERROR MANAGEMENT
     return (resp);
 }
 
-char    **Cgi::setArgs()
+char    **Cgi::setEnv()
 {
     char    **cmdargs = new char*[3];
 
-    cmdargs[0] = const_cast<char*>(cmd.c_str());
-    cmdargs[1] = const_cast<char*>(script.c_str());
-    cmdargs[2] = const_cast<char*>(arg.c_str());
-    cmdargs[3] = NULL;
+    
 
     return (cmdargs);
 }
@@ -89,7 +100,8 @@ void    Cgi::execSh()
     
     if (execve("/bin/bash", cmdargs, NULL) == -1)
     {
-        throw std::runtime_error("cgi failed");
+        std::cerr << "cgi failed" << std::endl;
         delete cmdargs;
+        exit;
     }
 }

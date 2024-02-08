@@ -48,8 +48,8 @@ server:
   location: /favicon.ico
     file: iconSM.png
   location: /images/sample
-  methods:
-    GET: on
-    POST: metodo_muelas_chungas
-    DELETE: on
-    file: images/muelaimg.png
+    methods:
+      GET: on
+      POST: metodo_chungas
+      DELETE: on
+      file: images/muelaimg.png
