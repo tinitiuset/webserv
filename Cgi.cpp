@@ -12,17 +12,14 @@ Cgi::Cgi(): cgiExtension("py"), cmd("python3"), script("cgi-bin/sos.py"), arg("i
     
 }
 
-Cgi::~Cgi()
-{
-    close(socket);
-}
+Cgi::~Cgi(){}
 
-std::string Cgi::initCgi()
+std::string Cgi::initCgi()  //CHECK ERROR MANAGEMENT
 {
     pid_t       pid;
     int         status;
     int         fd[2];
-    std::string	resp = "*";
+    std::string	resp = "";
 
     if (pipe(fd) == -1)
     {
@@ -80,8 +77,9 @@ void    Cgi::execPy()
     
     if (execve("/usr/local/bin/python3", cmdargs, NULL) == -1)
     {
-        throw std::runtime_error("cgi failed");
+        std::cerr << "cgi failed" << std::endl;
         delete cmdargs;
+        exit;
     }
 }
 
