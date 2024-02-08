@@ -1,7 +1,7 @@
 server:
   server_name: site1.com
   ip: 0.0.0.0
-  port: rferger
+  port: 
   root: ./www/site1
   body_size: 500
   default_errors:
@@ -41,7 +41,6 @@ server:
   server_name: susmuelas.com
   ip: 127.8.8.1
   port: 5002
-  port: 6001
   root: ./www/susmuelas
   location: /
     file: index.html
