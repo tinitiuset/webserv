@@ -6,21 +6,28 @@
 #include <string.h>
 #include <iostream>
 #include <unistd.h>
+#include <fcntl.h>
+#include <vector>
 #include "defaults.hpp"
 #include "Logger.hpp"
 
 class Server {
 
 private:
-	int sockfd;
-	sockaddr_in servaddr;
+	std::vector<std::vector<int> > sockfd;
+	//sockaddr_in servaddr;
 
 public:
 	Server();
 	~Server();
 
-	int getSocketFd() const;
-	int Accept() const;
+	std::vector<std::vector<int> > getSocketFd() const;
+	int 	Accept(size_t i, size_t j) const;
+	void	socketOps(int port, int i, int j);
+	std::vector<int> getSockFdCoords(int fd) const;
+
 };
+
+void	checkRepeatedPorts(const std::vector<int> &vector);
 
 #endif
