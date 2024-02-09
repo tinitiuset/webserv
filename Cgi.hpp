@@ -9,14 +9,12 @@ class Cgi
     private:
 
         int                                 _servIdx;
-        int                                 _port;
-        std::string                         _reqLine;
-        std::map<std::string, std::string>  _headers;
-	    std::string                         _body;
+        std::string                         _method;
+        std::string                         _uri;
+        std::string                         _quStr;
         char                                **_env;
         int                                 _fd[2];
         int                                 _fdOut;
-        std::string                         _method;
     
     public:
 
@@ -33,6 +31,9 @@ class Cgi
         void            execSh();
         std::string     initCgi();
 };
+
+std::string getPath(const std::string &line);
+std::string getQuStr(const std::string &line);
 
 #endif
 

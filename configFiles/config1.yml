@@ -47,6 +47,7 @@ server:
     file: index.html
   location: /favicon.ico
     file: iconSM.png
+  location: /cgi-bin/
   location: /images/sample
     methods:
       GET: on

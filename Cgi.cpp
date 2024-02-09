@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <vector>
 #include "defaults.hpp"
+#include "Utils.hpp"
+//#include <string>
 
 //CHECK ERROR MANAGEMENT
 
@@ -42,21 +44,32 @@ void    Cgi::selMethod()
     }
 }
 
+
+
 void    Cgi::setGETEnv()
 {
     char    **cmdargs = new char*[15];
 
     std::vector<std::string>    envVect;
 
-    envVect[0] = "SERVER_NAME=" + confG->_serverArr[_servIdx].getServerName();
-    envVect[1] = "GATEWAY_INTERFACE=CGI/1.1";
-    envVect[2] = "SERVER_PROTOCOL=HTTP/1.1";
-    envVect[3] = "SERVER_PORT="
+    envVect.push_back("SERVER_NAME=" + confG->_serverArr[_servIdx].getServerName());
+    envVect.push_back("GATEWAY_INTERFACE=CGI/1.1");
+    envVect.push_back("SERVER_PROTOCOL=HTTP/1.1");
+    envVect.push_back("REQUEST_METHOD=" + _method);
+    
+    //si llega como GET /cgi-bin/sos.py
+    std::string script_name = getPath(_reqLine);
+    if (access(script_name.c_str(), X_OK))
+        throw std::runtime_error("script not found");
+    envVect.push_back("SCRIPT_NAME=" + script_name);
 
-    return (cmdargs);
+    
+
+
+
 }
 
-std::string Cgi::initCgi()  
+/* std::string Cgi::initCgi()  
 {
     pid_t       pid;
     int         status;
@@ -121,4 +134,35 @@ void    Cgi::execSh()
         delete cmdargs;
         exit;
     }
+} */
+
+std::string getPath(const std::string &line)
+{
+    size_t start = line.find("/");
+    if (start == std::string::npos)
+        throw std::runtime_error("invalid cgi request line"); //check error exit
+    
+    size_t end = line.find("?", start);
+    if (end == std::string::npos)
+        throw std::runtime_error("invalid cgi request line");
+
+    std::string result = line.substr(start, end - start);
+
+    return (result);
 }
+
+std::string getQuStr(const std::string &line)
+{
+    size_t start = line.find("/");
+    if (start == std::string::npos)
+        throw std::runtime_error("invalid cgi request line"); //check error exit
+    
+    size_t end = line.find("?", start);
+    if (end == std::string::npos)
+        throw std::runtime_error("invalid cgi request line");
+
+    std::string result = line.substr(start, end - start);
+
+    return (result);
+}
+
