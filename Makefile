@@ -2,12 +2,11 @@ NAME = webserv
 
 COMPILER =	c++
 STANDARD =	-std=c++98
-DEBUG =		#-g0	# 0, 1, 2, 3 DEBUG INFORMATION LEVELS
-FLAGS =		-Wall -Werror -Wextra -g3 #-fsanitize=address
+DEBUG =		-g0	# 0, 1, 2, 3 DEBUG INFORMATION LEVELS
+FLAGS =		-Wall -Werror -Wextra
 
-SRC_FILES = testcgimain.cpp \
-			
-			#Cgi.cpp 
+SRC_FILES = main.cpp Server.cpp Multiplexer.cpp Logger.cpp Request.cpp PostRequest.cpp \
+			GetRequest.cpp Response.cpp Resource.cpp ConfigFile.cpp EachServer.cpp
 
 all: $(NAME)
 
