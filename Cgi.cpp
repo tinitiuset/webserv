@@ -9,65 +9,109 @@
 //CHECK ERROR MANAGEMENT
 
 
-Cgi::Cgi(int servI, int port, std::string reqLine, std::map<std::string, std::string> headers, std::string body):
-_servIdx(servI),
-_port(port),
-_reqLine(reqLine),
-_headers(headers),
-_body(body) 
+Cgi::Cgi(std::string method, std::string uri, std::string qustr):
+_method(method), _uri(uri), _quStr(qustr)
 {
+    if (uri.substr(uri.length() - 3) == ".py")
+        _interpret = "/usr/local/bin/python3";
+    else if (uri.substr(uri.length() - 3) == ".sh")
+        _interpret = "/bin/bash";
+    else
+        throw std::runtime_error("invalid cgi script");
     _env = NULL;
 }
 
 
-Cgi::~Cgi(){}
+Cgi::~Cgi()
+{
+    delete _env;
+}
 
 void    Cgi::selMethod()
 {
     _fdOut = dup(STDOUT_FILENO);
-    pipe(_fd);
+    _fdIn = dup(STDIN_FILENO);
+    if (pipe(_fd) == -1)
+        throw std::runtime_error("pipe error");
     
-    if (_reqLine.substr(0, 3) == "GET") //also check if method is supported in config????
-    {
-        _method = "GET";
-        setGETEnv();
-    }
-    else if (_reqLine.substr(0, 4) == "POST") //also check if method is supported in config????
-    {
-        _method = "POST";
-        setPost();
-    }
+    if (_method == "GET") //also check if method is supported in config????
+        set4GETEnv();
+    else if (_method == "POST") //also check if method is supported in config????
+        set4Post();
     else
     {
         std::cerr << "method not supported" << std::endl;
         return ; //?
     }
+
+    close(_fd[1]);
+
+    pid_t pid = fork();
+
+    if (pid == -1)
+        throw std::runtime_error("fork error");
+    else if (pid == 0)
+    {
+        close(_fd[0]);
+        close(_fd[1]);
+
+        char *args[2];
+        args[0] = _uri.c_str();
+        args[1] = NULL;
+
+        if (execve(_interpret.c_str(), args, _env) == -1)
+            throw std::runtime_error("execve error");
+            
+    }
+
+    
+
 }
 
-
-
-void    Cgi::setGETEnv()
+void    Cgi::set4GETEnv()
 {
-    char    **cmdargs = new char*[15];
+    char    **env = new char*[7];
 
     std::vector<std::string>    envVect;
 
-    envVect.push_back("SERVER_NAME=" + confG->_serverArr[_servIdx].getServerName());
     envVect.push_back("GATEWAY_INTERFACE=CGI/1.1");
     envVect.push_back("SERVER_PROTOCOL=HTTP/1.1");
     envVect.push_back("REQUEST_METHOD=" + _method);
     
     //si llega como GET /cgi-bin/sos.py
-    std::string script_name = getPath(_reqLine);
-    if (access(script_name.c_str(), X_OK))
+    if (access(_uri.c_str(), X_OK))
         throw std::runtime_error("script not found");
-    envVect.push_back("SCRIPT_NAME=" + script_name);
+    envVect.push_back("SCRIPT_NAME=" + _uri);
+    envVect.push_back("QUERY_STRING=" + _quStr);
+    envVect.push_back("CONTENT_LENGTH=1024");
 
-    
-
-
-
+    for (int i = 0; i < 7; i++)
+        env[i] = (char *)envVect[i].c_str();
+    env[7] = NULL;
 }
+
+void    Cgi::set4Post()
+{
+    char    **env = new char*[3];
+
+    std::vector<std::string>    envVect;
+
+    envVect.push_back("REQUEST_METHOD=" + _method);
+    envVect.push_back("CONTENT_LENGTH=1024");
+
+    for (int i = 0; i < 3; i++)
+        env[i] = (char *)envVect[i].c_str();
+    env[3] = NULL;
+
+    if (dup2(_fd[1], STDIN_FILENO) == -1)
+                throw std::runtime_error("dup error");
+    if (dup2(_fd[0], STDIN_FILENO) == -1)
+                throw std::runtime_error("dup error");
+
+    std::cout << _quStr << std::endl;
+}
+
+
 
 /* std::string Cgi::initCgi()  
 {
