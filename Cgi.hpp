@@ -8,20 +8,24 @@ class Cgi
 {
     private:
 
+        int                                 _servIdx;
+        int                                 _port;
         std::string                         _reqLine;
         std::map<std::string, std::string>  _headers;
 	    std::string                         _body;
         char                                **_env;
-        int                                 _servIdx;
+        int                                 _fd[2];
+        int                                 _fdOut;
+        std::string                         _method;
     
     public:
 
-        Cgi(std::string reqLine, std::map<std::string, std::string> headers, std::string _body);
+        Cgi(int servI, int  port, std::string reqLine, std::map<std::string, std::string> headers, std::string _body);
         ~Cgi();
 
         void            selMethod();
-        void            setGetEnv();
-        void            setPostEnv();
+        void            setGETEnv();
+        void            setPost();
         void            setStdOut();
 
 

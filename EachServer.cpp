@@ -4,6 +4,8 @@ EachServer::EachServer(): _bodySize(1024)
 {
 }
 
+EachServer::~EachServer() {}
+
 void    EachServer::setServerName(std::string servname)
 {
     _serverName = servname;

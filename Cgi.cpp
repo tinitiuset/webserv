@@ -1,12 +1,18 @@
 #include "Cgi.hpp"
 #include <fcntl.h>
 #include <unistd.h>
+#include <vector>
+#include "defaults.hpp"
 
 //CHECK ERROR MANAGEMENT
 
 
-Cgi::Cgi(std::string reqLine, std::map<std::string, std::string> headers, std::string body):
-_reqLine(reqLine), _headers(headers), _body(body) 
+Cgi::Cgi(int servI, int port, std::string reqLine, std::map<std::string, std::string> headers, std::string body):
+_servIdx(servI),
+_port(port),
+_reqLine(reqLine),
+_headers(headers),
+_body(body) 
 {
     _env = NULL;
 }
@@ -16,20 +22,39 @@ Cgi::~Cgi(){}
 
 void    Cgi::selMethod()
 {
+    _fdOut = dup(STDOUT_FILENO);
+    pipe(_fd);
+    
     if (_reqLine.substr(0, 3) == "GET") //also check if method is supported in config????
-        setEnv();
+    {
+        _method = "GET";
+        setGETEnv();
+    }
     else if (_reqLine.substr(0, 4) == "POST") //also check if method is supported in config????
-        setStdOut();
+    {
+        _method = "POST";
+        setPost();
+    }
     else
     {
         std::cerr << "method not supported" << std::endl;
         return ; //?
     }
-
-
 }
 
+void    Cgi::setGETEnv()
+{
+    char    **cmdargs = new char*[15];
 
+    std::vector<std::string>    envVect;
+
+    envVect[0] = "SERVER_NAME=" + confG->_serverArr[_servIdx].getServerName();
+    envVect[1] = "GATEWAY_INTERFACE=CGI/1.1";
+    envVect[2] = "SERVER_PROTOCOL=HTTP/1.1";
+    envVect[3] = "SERVER_PORT="
+
+    return (cmdargs);
+}
 
 std::string Cgi::initCgi()  
 {
@@ -61,14 +86,6 @@ std::string Cgi::initCgi()
     return (resp);
 }
 
-char    **Cgi::setEnv()
-{
-    char    **cmdargs = new char*[3];
-
-    
-
-    return (cmdargs);
-}
 
 void Cgi::selCgi(int *fd)
 {    
