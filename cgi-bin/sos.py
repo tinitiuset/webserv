@@ -15,14 +15,12 @@ def get_code():
     del morse_code[next(iter(morse_code))]
     return(morse_code)
 
-morse_code = get_code()
+argument = input()
 
-
-if len(sys.argv) < 2:
-	print("Error")
+if argument == None or argument == "":
+	print("Input error")
 	exit()
 else:
-    argument = sys.argv[1]
     if ("=") in argument:
         argument = argument[(argument.find("=") + 1):]
         argument = argument.replace("+", " ")
@@ -30,6 +28,9 @@ else:
         print("Unexpected input")
         exit()
 input = argument.strip()
+
+morse_code = get_code()
+
 output = ""
 i = 0
 while i < len(input):

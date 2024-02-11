@@ -10,7 +10,7 @@
 
 
 Cgi::Cgi(std::string method, std::string uri, std::string qustr):
-_method(method), _uri(uri), _quStr(qustr)
+_method(method), _uri(uri), _quStr(qustr), _env(NULL), _resp("")
 {
     if (uri.substr(uri.length() - 3) == ".py")
         _interpret = "/usr/local/bin/python3";
@@ -18,7 +18,6 @@ _method(method), _uri(uri), _quStr(qustr)
         _interpret = "/bin/bash";
     else
         throw std::runtime_error("invalid cgi script");
-    _env = NULL;
 }
 
 

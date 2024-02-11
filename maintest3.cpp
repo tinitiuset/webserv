@@ -7,15 +7,14 @@
 
 int main()
 {
-	int i = 0;
+	int i = 1;
 
-    int fd_parent_to_child[2];
-    int fd_child_to_parent[2];
+    
     pid_t pid;
     std::string resp = "RESP ";
     char buffer[1024];
 
-    char *const args[3] = {const_cast<char*>("python3"), const_cast<char*>("cgi-bin/test.py"), NULL};
+    char *const args[3] = {const_cast<char*>("python3"), const_cast<char*>("cgi-bin/sos.py"), NULL};
 
     // Crear las dos tuberías
 	if (i == 1)
@@ -75,7 +74,7 @@ int main()
         // Escribe en la tubería padre-hijo
 		if (i == 1)
 		{
-			write(fd_parent_to_child[1], "caraculo", 8); // if POST ***
+			write(fd_parent_to_child[1], "caraculo=askeroso", 16); // if POST ***
 			close(fd_parent_to_child[1]);				// if POST ***
 		}
 
