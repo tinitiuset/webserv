@@ -2,7 +2,7 @@ import csv
 import sys
 
 def get_code():
-    file = open('cgi-bin/MORSE.csv',mode='r', encoding='latin-1')
+    file = open('cgi-bin/morse.csv',mode='r', encoding='latin-1')
     fd = file.read()
     file.close()
     raw = fd.replace('_', '-')

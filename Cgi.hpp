@@ -12,6 +12,7 @@ class Cgi
         std::string     _method;
         std::string     _uri;
         std::string     _quStr;
+		std::string		_cgi;
         std::string     _interpret;
         char            **_env;
         int				_fd_parent_to_child[2];
@@ -23,19 +24,12 @@ class Cgi
         Cgi(std::string method, std::string uri, std::string qustr);
         ~Cgi();
 
-        void            selMethod();
+        std::string     initCgi();
         void            set4GETEnv();
         void            set4Post();
-        void            setStdOut();
+        void			readChildOutput();
 
-
-        void            execPy();
-        void            execSh();
-        std::string     initCgi();
 };
-
-std::string getPath(const std::string &line);
-std::string getQuStr(const std::string &line);
 
 #endif
 

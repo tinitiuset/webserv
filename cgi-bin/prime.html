@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prime Checker sample page GET method</title>
+</head>
+<body>
+
+    <h1>Prime Checker</h1>
+
+    <form action="/cgi-bin/prime.pl" method="GET">
+        <p>Enter a numeric value:</p>
+        <input type="text" name="NUM" pattern="[0-9]+" title="Please enter a valid numeric value" required>
+        <br><br>
+        <input type="submit" value="Check Prime">
+    </form>
+
+</body>
+</html>

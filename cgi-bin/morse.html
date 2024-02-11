@@ -1,29 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Formulario</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morse Code Translator</title>
 </head>
 <body>
-    <h2>Formulario</h2>
-    <form action="/procesar_formulario" method="GET">
-        <label for="input_text">Ingrese texto (letras, números o espacios):</label><br>
-        <input type="text" id="input_text" name="input_text" pattern="[a-zA-Z0-9\s]+" title="Solo letras, números o espacios son permitidos" required><br><br>
 
-        <input type="submit" value="Enviar">
+    <h1>Morse Code Translator</h1>
+
+    <form action="/cgi-bin/morse.py" method="POST">
+        <p>Enter a phrase (alphabetical characters only):</p>
+        <input type="text" name="phrase" pattern="[A-Za-z0-9\s]+" title="Please enter only alphabetical characters" required>
+        <br><br>
+        <input type="submit" value="Translate to Morse Code">
     </form>
 
-    <label for="method">Seleccione el método:</label><br>
-    <select id="method" name="method" onchange="changeMethod()">
-        <option value="GET">GET</option>
-        <option value="POST">POST</option>
-    </select><br><br>
-
-    <script>
-        function changeMethod() {
-            var form = document.querySelector('form');
-            var method = document.getElementById('method').value;
-            form.method = method;
-        }
-    </script>
 </body>
 </html>
