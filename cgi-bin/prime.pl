@@ -1,17 +1,23 @@
 #!/usr/bin/perl
 
-
 my $query_string = $ENV{'QUERY_STRING'};
-my ($key, $num) = split '=', $query_string;
 
+if (defined $query_string and $query_string ne "") {
+    my ($key, $num) = split '=', $query_string;
 
-if (is_prime($num)) {
-    print "$num is prime.";
+    if ($num =~ /^\d+$/) {
+        if (is_prime($num)) {
+            print "$num is prime.";
+        } else {
+            print "$num is not prime.";
+        }
+    } else {
+        print "Error: $num is not an integer.";
+    }
 } else {
-    print "$num is not prime.";
+    print "Error: QUERY_STRING is not present or empty.";
 }
 
-# Función para verificar si un número es primo
 sub is_prime {
     my $num = shift;
     return 0 if $num < 2;

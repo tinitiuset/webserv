@@ -7,7 +7,7 @@
 class Utils
 {
     public:
-        static std::string Utils::toString(const int &num);
+        static std::string toString(const int &num);
 };
 
 #endif
