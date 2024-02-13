@@ -36,7 +36,7 @@ int main()
         }
         closedir(dir); // Cierra el directorio
     }
-	else
+	else if
 	{
         // Error al abrir el directorio
         std::cerr << "No se pudo abrir el directorio" << std::endl;
