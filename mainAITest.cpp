@@ -7,14 +7,16 @@
 
 int main()
 {
-	std::string uri = "/www";
-	std::string root = "./cgi-bin";
+	std::string uri = "/chungali";
+	std::string root = "./www";
 
 	std::string result = "";
 	
 	
 	DIR *dir;
     struct dirent *ent;
+
+    result += "HTTP/1.1 200 OK\n\n";
 
 	result += "<html>\n<head>\n<title>Index of ";
 	result += uri + "</title>\n";
@@ -24,21 +26,18 @@ int main()
 
 	result += "<li>\n<a href=\"" + uri + "/" + "..\">" + ".." + "</a>\n</li>\n";
 
-    // Abre el directorio actual
     if ((dir = opendir(root.c_str())) != NULL)
 	{
-        // Lee cada entrada en el directorio
         while ((ent = readdir(dir)) != NULL) 
 		{
             std::string	file(ent->d_name);
 			if (file != "." && file != "..")
 				result += "<li>\n<a href=\"" + uri + "/" + file + "\">" + file + "</a>\n</li>\n";
         }
-        closedir(dir); // Cierra el directorio
+        closedir(dir);
     }
-	else if
+	else
 	{
-        // Error al abrir el directorio
         std::cerr << "No se pudo abrir el directorio" << std::endl;
         return EXIT_FAILURE;
     }
@@ -59,3 +58,4 @@ int main()
 
 	return (0);
 }
+
