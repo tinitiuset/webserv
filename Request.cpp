@@ -68,3 +68,19 @@ bool Request::isGetRequest() const {
 bool Request::isPostRequest() const {
 	return _method == "POST";
 }
+
+Location Request::searchLocation(const std::string &path, const std::vector<Location> &locations) {
+	Location	locat;
+	std::size_t longestMatch = 0;
+	for (std::vector<Location>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
+		if ((*it).getPath().length() > longestMatch)
+		{
+			if (path.find((*it).getPath()) == 0)
+			{
+				locat = *it;
+				longestMatch = (*it).getPath().length();
+			}
+		}
+	}
+	return (locat);
+}

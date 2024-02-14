@@ -5,7 +5,7 @@ COMPILER =	c++
 DEBUG =		-g3	# 0, 1, 2, 3 DEBUG INFORMATION LEVELS
 FLAGS =		-Wall -Werror -Wextra
 
-SRC_FILES = main.cpp Server.cpp Multiplexer.cpp Logger.cpp Request.cpp PostRequest.cpp GetRequest.cpp Response.cpp
+SRC_FILES = main.cpp Server.cpp Multiplexer.cpp Logger.cpp Request.cpp PostRequest.cpp GetRequest.cpp Response.cpp Location.cpp
 
 all: $(NAME)
 
