@@ -19,6 +19,7 @@ public:
 
 	Request();
 	Request(const Request&);
+	Request(const int &fd, const std::vector<Location> &locations);
 	Request& operator=(const Request&);
 	virtual ~Request();
 
@@ -27,9 +28,10 @@ public:
 	bool isGetRequest() const;
 	bool isPostRequest() const;
 	virtual std::string handle() {return NULL;};
-	Location searchLocation(const std::string &path, const std::vector<Location> &locations);
+	std::string getUri() const;
 
 protected:
+	void searchLocation(const std::string &path, const std::vector<Location> &locations);
 	std::string _method;
 	std::string _uri;
 	std::map<std::string, std::string> _headers;

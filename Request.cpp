@@ -12,6 +12,11 @@ Request::Request(const Request& request) {
 	_body = request._body;
 }
 
+Request::Request(const int &fd, const std::vector<Location> &locations) {
+	this->parseRequest(fd);
+	this->searchLocation(_uri, locations);
+}
+
 Request& Request::operator=(const Request& request) {
 	_method = request._method;
 	_uri = request._uri;
@@ -38,8 +43,8 @@ void Request::parseRequest(const int &fd) {
 	requestLineStream >> _method >> _uri;
 
 	std::string headerLine;
-	while (std::getline(requestStream, headerLine) && headerLine != "\r") {
-		headerLine.erase(headerLine.end() - 1, headerLine.end()); // Remove trailing '\r'
+	while (std::getline(requestStream, headerLine) && headerLine != "") {
+		//headerLine.erase(headerLine.end() - 1, headerLine.end()); // Remove trailing '\r'
 		std::istringstream headerLineStream(headerLine);
 		std::string key;
 		std::getline(headerLineStream, key, ':');
@@ -69,18 +74,20 @@ bool Request::isPostRequest() const {
 	return _method == "POST";
 }
 
-Location Request::searchLocation(const std::string &path, const std::vector<Location> &locations) {
-	Location	locat;
+void Request::searchLocation(const std::string &path, const std::vector<Location> &locations) {
 	std::size_t longestMatch = 0;
 	for (std::vector<Location>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
 		if ((*it).getPath().length() > longestMatch)
 		{
 			if (path.find((*it).getPath()) == 0)
 			{
-				locat = *it;
+				_location = *it;
 				longestMatch = (*it).getPath().length();
 			}
 		}
 	}
-	return (locat);
+}
+
+std::string Request::getUri() const {
+	return _uri;
 }

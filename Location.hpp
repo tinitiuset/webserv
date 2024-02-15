@@ -6,7 +6,9 @@
 class Location{
 	private:
 		std::string _path;
+
 	public:
+		Location(std::string path);
 		Location();
 		~Location();
 		std::string getPath() const;

@@ -1,9 +1,23 @@
 #include "Multiplexer.hpp"
 #include "Server.hpp"
+#include "Request.hpp"
+#include "Location.hpp"
+
+#include <stdlib.h>
+#include <fcntl.h>
+#include <vector>
 
 int main() {
+    std::vector<Location> locations;
 
-    Multiplexer().run(Server());
+    locations.push_back(Location("/test"));
+    locations.push_back(Location("/home"));
+    locations.push_back(Location("/test/www"));
+    locations.push_back(Location("/test/www/html"));
+    locations.push_back(Location("/"));
+
+    int fd = open("test.txt", O_RDWR | O_CREAT, 0666);
+    Request req(fd, locations);
 
     return 0;
 }

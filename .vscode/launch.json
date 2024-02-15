@@ -5,14 +5,15 @@
             "name": "Debug",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/Users/jzubizar/Documents/webserv/webserv",
+            //"program": "/Users/jzubizar/Documents/webserv/webserv",
+            "program": "${workspaceFolder}/webserv",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            //"MIMode": "gdb",
-            "MIMode": "lldb",
+            "MIMode": "gdb",
+            //"MIMode": "lldb",
             //"miDebuggerPath": "/path/to/your/gdb",
             "setupCommands": [
                 {
