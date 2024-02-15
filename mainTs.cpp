@@ -1,24 +1,29 @@
 #include <iostream>
 #include <string>
+#include "Utils.hpp"
 
-int main() {
-    std::string ruta = "/ruta/de/ejemplo/archivo.txt";
-    //std::string ruta = "/ruta/de/ejemplo/"; // Prueba
-    //std::string ruta = "/"; // Prueba con solo un "/"
+int main()
+{
+    std::vector<std::string> vec;
+    vec.push_back("apple");
+    vec.push_back("banana");
+    vec.push_back("orange");
+    vec.push_back("grape");
 
-    // Encontrar la posición del penúltimo "/"
-    size_t pos = ruta.find_last_of("/");
-    if (pos != std::string::npos && pos != 0) {
-        // Buscar la posición del penúltimo "/"
-        size_t penultimo_pos = ruta.find_last_of("/", pos - 1);
-        if (penultimo_pos != std::string::npos) {
-            // Eliminar la última parte de la cadena a partir del penúltimo "/"
-            ruta.erase(penultimo_pos + 1);
-        }
+
+    // String que quieres encontrar
+    std::string target = "9";
+
+    // Buscar el string en el vector y obtener el índice
+    int index = Utils::findStrInVector(vec, target);
+
+    // Verificar si se encontró el string
+    if (index != -1) {
+        std::cout << "Se encontró '" << target << "' en el índice " << index << " del vector." << std::endl;
+    } else {
+        std::cout << "No se encontró '" << target << "' en el vector." << std::endl;
     }
 
-    std::cout << "Ruta resultante: " << ruta << std::endl;
 
     return 0;
 }
-
