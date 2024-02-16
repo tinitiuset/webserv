@@ -1,20 +1,18 @@
-#include <iostream>
+#include "Multiplexer.hpp"
+#include "ServerLauncher.hpp"
 #include "./model/Conf.hpp"
+
+Conf *conf;
 
 int main() {
 
-	Conf conf("./config/webserv.conf");
-	conf.parse();
+  conf = new Conf("./config/webserv.conf");
+  conf->parse();
 
-	std::string name = conf.getServer(0).server_name();
-	Redirect* redirectLocation = dynamic_cast<Redirect*>(conf.getServer(0).location("/redirect"));
+  Multiplexer multiplexer;
 
-	Server server(conf.getServer(0));
+  multiplexer.run(ServerLauncher());
 
-	dynamic_cast<Redirect*>(conf.getServer(0).location("/redirect")) == nullptr ?
-		std::cout << "Not a redirect" << std::endl
-		:
-		std::cout << "Is a redirect" << std::endl;
-
-	return 0;
+  delete conf;
+  return 0;
 }

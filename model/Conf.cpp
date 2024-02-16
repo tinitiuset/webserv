@@ -41,3 +41,7 @@ void Conf::parse() {
 Server Conf::getServer(int index) {
 	return _servers[index];
 }
+
+int Conf::getServerCount() {
+	return _servers.size();
+}
