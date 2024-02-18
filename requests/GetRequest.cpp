@@ -8,23 +8,21 @@ GetRequest::~GetRequest() {}
 
 std::string GetRequest::handle() {
 
-	// Needs work
-	// Needs work
-	// Needs work
-
-	Logger::debug("GetRequest::handle() called");
+	Logger::info("GetRequest::handle() handling GET request");
 
 	Response response;
 
-	response.set_body("<html><body><h1>Hello World</h1></body></html>");
+	Resource resource("." + _uri);
+
+	response.set_body(resource.load());
 
 	std::map<std::string, std::string> headers;
 	headers.insert(std::make_pair("Content-Type", "text/html"));
 	headers.insert(std::make_pair("Content-Length", std::to_string(response.body().length())));
 
 	response.set_headers(headers);
+	response.set_start_line(resource.status());
 
-	response.set_start_line("HTTP/1.1 200 OK");
-
+	Logger::info("GetRequest::handle() returning response -> " + response.start_line());
 	return response.format();
 }

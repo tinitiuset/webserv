@@ -21,7 +21,7 @@ int main() {
     Request req(fd, locations);
     Request *postReq = new PostRequest(req);
     postReq->handle();
-    close(fd);
+    cllo
     delete (postReq);
     return 0;
 }
