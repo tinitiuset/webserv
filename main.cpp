@@ -2,6 +2,7 @@
 #include "Server.hpp"
 #include "Request.hpp"
 #include "Location.hpp"
+#include "PostRequest.hpp"
 
 #include <stdlib.h>
 #include <fcntl.h>
@@ -18,6 +19,9 @@ int main() {
 
     int fd = open("test.txt", O_RDWR | O_CREAT, 0666);
     Request req(fd, locations);
-
+    Request *postReq = new PostRequest(req);
+    postReq->handle();
+    close(fd);
+    delete (postReq);
     return 0;
 }

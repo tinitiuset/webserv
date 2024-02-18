@@ -6,14 +6,14 @@
 
 class PostRequest: public Request {
 	private:
-		std::string _real_body;
-		std::string _type;
-	
+		std::map<std::string, std::string> _postHeaders;
 	public:
 		PostRequest(const Request&);
 		~PostRequest();
 		std::string handle();
 		void	parse_body(std::string body);
+		void	parse_type();
+		void	save_file(std::string body);
 };
 
 #endif
