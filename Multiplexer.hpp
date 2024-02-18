@@ -4,7 +4,6 @@
 #include <iostream>
 #include <vector>
 #include "utils/defaults.hpp"
-#include "ServerLauncher.hpp"
 #include "utils/Logger.hpp"
 
 class Multiplexer {
@@ -19,7 +18,7 @@ public:
 	Multiplexer();
 	~Multiplexer();
 
-    void		run(const ServerLauncher &);
+    void		run();
 	static void	signalHandler(int signal);
 
 	size_t		getServerFdIdx(int fd) const;

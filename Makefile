@@ -5,8 +5,8 @@ STANDARD =	-std=c++98
 DEBUG =		-g3	# 0, 1, 2, 3 DEBUG INFORMATION LEVELS
 FLAGS =		#-Wall -Werror -Wextra
 
-SRC_FILES = main.cpp ./model/*.cpp ./requests/*.cpp ./utils/*.cpp Multiplexer.cpp ServerLauncher.cpp
-HEADER_FILES = ./model/*.hpp ./requests/*.hpp ./utils/*.hpp ./cgi/*.hpp
+SRC_FILES = main.cpp ./model/*.cpp ./requests/*.cpp ./utils/*.cpp Multiplexer.cpp
+HEADER_FILES = ./model/*.hpp ./requests/*.hpp ./utils/*.hpp ./cgi/*.hpp ./utils/defaults.hpp
 
 all: $(NAME)
 

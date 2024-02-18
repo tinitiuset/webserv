@@ -38,10 +38,22 @@ void Conf::parse() {
 	file.close();
 }
 
+void Conf::load() {
+	for (size_t i = 0; i < _servers.size(); ++i)
+		_servers[i].bind();
+}
+
 Server Conf::getServer(int index) {
 	return _servers[index];
 }
 
 int Conf::getServerCount() {
 	return _servers.size();
+}
+
+std::vector<int> Conf::getServerSockets() {
+	std::vector<int> sockets;
+	for (size_t i = 0; i < _servers.size(); ++i)
+		sockets.push_back(_servers[i].fd());
+	return sockets;
 }

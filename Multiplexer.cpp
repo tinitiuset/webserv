@@ -1,5 +1,4 @@
 #include "Multiplexer.hpp"
-#include "ServerLauncher.hpp"
 #include "utils/Logger.hpp"
 #include <unistd.h>
 #include <sys/_select.h>
@@ -30,10 +29,10 @@ Multiplexer::Multiplexer()
 
 Multiplexer::~Multiplexer() {}
 
-void Multiplexer::run(const ServerLauncher &server)
+void Multiplexer::run()
 {
 	int	selectRes;
-	int max_fd = conf->getServerCount();
+	int max_fd = conf->getServerCount() + 2;
 
 	fd_set	readSet;
 	fd_set	writeSet;
@@ -41,7 +40,7 @@ void Multiplexer::run(const ServerLauncher &server)
 	FD_ZERO(&readSet);
 	FD_ZERO(&writeSet);
 
-	serverFdVec = server.getSocketFd();
+	serverFdVec = conf->getServerSockets();
 
 	for (size_t i = 0; i < serverFdVec.size(); ++i)
 		FD_SET(serverFdVec[i], &readSet);

@@ -5,6 +5,7 @@
 #define SERVER_MAX_CONNECTIONS 1024
 
 #include "../model/Conf.hpp"
+#include "Logger.hpp"
 
 extern Conf *conf;
 

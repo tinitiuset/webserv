@@ -18,9 +18,11 @@ public:
   ~Conf();
 
   void parse();
+  void load();
 
   Server getServer(int index);
   int getServerCount();
+  std::vector<int> getServerSockets();
 };
 
 #endif

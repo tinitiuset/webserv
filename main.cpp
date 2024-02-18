@@ -1,17 +1,15 @@
 #include "Multiplexer.hpp"
-#include "ServerLauncher.hpp"
-#include "./model/Conf.hpp"
+#include "utils/defaults.hpp"
 
-Conf *conf;
+Conf* conf;
 
 int main() {
 
   conf = new Conf("./config/webserv.conf");
   conf->parse();
+  conf->load();
 
-  Multiplexer multiplexer;
-
-  multiplexer.run(ServerLauncher());
+  Multiplexer().run();
 
   delete conf;
   return 0;
