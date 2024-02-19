@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "Logger.hpp"
+#include "../utils/Logger.hpp"
 
 class Resource {
 

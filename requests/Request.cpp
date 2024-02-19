@@ -1,7 +1,17 @@
 #include "Request.hpp"
 
-#include <sstream>
-#include <unistd.h>
+static std::string status(int code) {
+	switch (code) {
+		case 301:
+			return("Moved Permanently");
+		break;
+		case 302:
+			return("Found");
+		break;
+		default:
+			return("OK");
+	}
+}
 
 Request::Request() {}
 
@@ -67,4 +77,21 @@ bool Request::isGetRequest() const {
 
 bool Request::isPostRequest() const {
 	return _method == "POST";
+}
+
+std::string Request::redirect() {
+	Redirect* redirect = dynamic_cast<Redirect*>(conf->server(0).location(_uri));
+
+	Response response;
+
+	std::string startLine = "HTTP/1.1 " + std::to_string(redirect->code()) + " " + status(redirect->code());
+
+	response.set_start_line(startLine);
+	std::map<std::string, std::string> headers;
+	headers.insert(std::make_pair("Location", redirect->redirect()));
+	response.set_headers(headers);
+
+	Logger::debug("Request::redirect() returning response -> " + response.format());
+
+	return response.format();
 }

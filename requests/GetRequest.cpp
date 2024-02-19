@@ -1,12 +1,13 @@
 #include "GetRequest.hpp"
 
-#include <string>
-
 GetRequest::GetRequest(const Request& request): Request(request) {}
 
 GetRequest::~GetRequest() {}
 
 std::string GetRequest::handle() {
+
+	if (dynamic_cast<Redirect*>(conf->server(0).location(_uri)))
+		return redirect();
 
 	Logger::info("GetRequest::handle() handling GET request");
 

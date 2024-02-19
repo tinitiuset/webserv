@@ -3,9 +3,8 @@
 
 #include <iostream>
 #include <vector>
-#include "defaults.hpp"
-#include "Server.hpp"
-#include "Logger.hpp"
+#include "utils/defaults.hpp"
+#include "utils/Logger.hpp"
 
 class Multiplexer {
 
@@ -19,15 +18,13 @@ public:
 	Multiplexer();
 	~Multiplexer();
 
-    void		run(const Server &);
+    void		run();
 	static void	signalHandler(int signal);
 
 	size_t		getServerFdIdx(int fd) const;
 	size_t		getClientFdIdx(int fd) const;
-	void		setServerFdVec(std::vector<std::vector<int> >);
+	void		setServerFdVec(std::vector<int>);
 	
 };
-
-int	getMaxFd(std::vector<std::vector<int> > sockfd);
 
 #endif

@@ -1,14 +1,13 @@
 #include "Multiplexer.hpp"
-#include "Server.hpp"
-#include "Logger.hpp"
+#include "utils/Logger.hpp"
 #include <unistd.h>
 #include <sys/_select.h>
 #include <csignal>
 #include <algorithm>
 
-#include "Request.hpp"
-#include "GetRequest.hpp"
-#include "PostRequest.hpp"
+#include "requests/Request.hpp"
+#include "requests/GetRequest.hpp"
+#include "requests/PostRequest.hpp"
 
 Request* createRequest(const int &fd) {
 	Request temp;
@@ -30,10 +29,10 @@ Multiplexer::Multiplexer()
 
 Multiplexer::~Multiplexer() {}
 
-void Multiplexer::run(const Server &server)
+void Multiplexer::run()
 {
 	int	selectRes;
-	int max_fd = getMaxFd(server.getSocketFd());
+	int max_fd = conf->serverCount() + 2;
 
 	fd_set	readSet;
 	fd_set	writeSet;
@@ -41,7 +40,7 @@ void Multiplexer::run(const Server &server)
 	FD_ZERO(&readSet);
 	FD_ZERO(&writeSet);
 
-	setServerFdVec(server.getSocketFd());
+	serverFdVec = conf->serverSockets();
 
 	for (size_t i = 0; i < serverFdVec.size(); ++i)
 		FD_SET(serverFdVec[i], &readSet);
@@ -179,10 +178,10 @@ size_t	Multiplexer::getClientFdIdx(int fd) const
 	return (-1);
 }
 
-void	Multiplexer::setServerFdVec(std::vector<std::vector<int> > sockfd)
+void	Multiplexer::setServerFdVec(std::vector<int> sockfd)
 {
 	for (size_t i = 0; i < sockfd.size(); ++i)
-		for (size_t j = 0; j < sockfd[i].size(); ++j)
-			serverFdVec.push_back(sockfd[i][j]);
+		serverFdVec.push_back(sockfd[i]);
+
 }
 
