@@ -3,7 +3,11 @@
 
 #include <map>
 #include <string>
+#include "Response.hpp"
+#include "../utils/defaults.hpp"
 #include "../utils/Logger.hpp"
+
+static std::string status(int code);
 
 class Request {
 public:
@@ -17,7 +21,9 @@ public:
 	void printRequest() const;
 	bool isGetRequest() const;
 	bool isPostRequest() const;
+
 	virtual std::string handle() {return NULL;};
+	std::string redirect();
 
 protected:
 	std::string _method;

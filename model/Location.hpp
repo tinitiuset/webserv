@@ -24,6 +24,7 @@ private:
 
 public:
 	Redirect(std::string&);
+	Redirect(const Redirect& other);
 	~Redirect();
 
 	Redirect* clone() const { return new Redirect(*this); }
@@ -43,6 +44,7 @@ private:
 public:
 
 	Index(std::string&);
+	Index(const Index& other);
 	~Index();
 
 	Index* clone() const { return new Index(*this); }
