@@ -1,24 +1,49 @@
 #include "Cookie.hpp"
+#include "../utils/Utils.hpp"
 
-Cookie::Cookie(): _sesId(1), _hash(0) 
+int	Cookie::_sesId = 1;
+
+Cookie::Cookie(): _hash(0) 
 {
 	_sessionDB["145"] = "0123456";
 	_sessionDB["1"] = "12349";
 };
 
-
-
-
-int	Cookie::generateHash(const int &id)
+int	Cookie::generateHash()
 {
 	int	hashValue;
 	
-	const char *str = std::to_string(id * 4242).c_str();
+	std::string	op = std::to_string(_sesId * 4242);
+	const char *str = op.c_str();
 
 	while (*str)
         hashValue = (hashValue << 5) + *str++;
 
 	return (hashValue);
+}
+
+void	Cookie::generateNewCookie()
+{
+	_newKey = Utils::toString(_sesId); 
+	_newValue = Utils::toString(generateHash());
+
+	_sessionDB[_newKey] = _newValue;
+	_sesId++;
+}
+
+std::string	Cookie::getCookieHeader()
+{
+	std::string cookieResponse = "Set-Cookie: " + _newKey + "=" + _newValue + "\r\n";
+	return (cookieResponse);
+}
+
+std::string	Cookie::getCookieResponse()
+{
+	std::string cookieResponse = "HTTP/1.1 200 OK\r\n";
+	cookieResponse += "Content-Type: text/html\r\n";
+	cookieResponse += getCookieHeader();
+	cookieResponse += "\r\n";
+	return (cookieResponse);
 }
 
 bool	Cookie::isValidCookie(const std::string &httpRequest)
@@ -40,10 +65,14 @@ bool	Cookie::isValidCookie(const std::string &httpRequest)
 
 					std::map<std::string, std::string>::iterator it = _sessionDB.find(key);
                     if (it != _sessionDB.end() && it->second == value)
+					{
+						std::cout << "Key: " << _newKey << " Value: " << _newValue << std::endl;
 						return (true);                    
+					}
 				}
-
 			}
 		}
 	return (false);
 }
+
+int		Cookie::getSesId() {return(_sesId);}

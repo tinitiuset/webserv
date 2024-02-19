@@ -19,18 +19,21 @@
 class Cookie
 {
 	private:
-		int					_sesId;
-		int					_hash;
+		static int							_sesId;				
+		int									_hash;
+		std::string							_newKey;
+		std::string							_newValue;
 		std::map<std::string, std::string> 	_sessionDB;
-		std::vector<int>	_pair;
 
 	public:
 		Cookie();
 
-		int		generateHash(const int &id);
-		bool	isValidCookie(const std::string &request);
-
-
+		static int		getSesId();
+		int				generateHash();
+		void			generateNewCookie();
+		bool			isValidCookie(const std::string &request);
+		std::string		getCookieResponse();
+		std::string		getCookieHeader();
 };
 
 
