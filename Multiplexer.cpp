@@ -32,7 +32,7 @@ Multiplexer::~Multiplexer() {}
 void Multiplexer::run()
 {
 	int	selectRes;
-	int max_fd = conf->getServerCount() + 2;
+	int max_fd = conf->serverCount() + 2;
 
 	fd_set	readSet;
 	fd_set	writeSet;
@@ -40,7 +40,7 @@ void Multiplexer::run()
 	FD_ZERO(&readSet);
 	FD_ZERO(&writeSet);
 
-	serverFdVec = conf->getServerSockets();
+	serverFdVec = conf->serverSockets();
 
 	for (size_t i = 0; i < serverFdVec.size(); ++i)
 		FD_SET(serverFdVec[i], &readSet);

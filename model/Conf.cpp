@@ -15,6 +15,9 @@ void Conf::parse() {
 	std::string serverBlock;
 	int braceCount = 0;
 	while (std::getline(file, line)) {
+
+		if (line.empty()) continue;
+
 		if (line.find("server") != std::string::npos && braceCount == 0) {
 			if (!serverBlock.empty()) {
 				_servers.push_back(Server(serverBlock));
@@ -43,15 +46,15 @@ void Conf::load() {
 		_servers[i].bind();
 }
 
-Server Conf::getServer(int index) {
+Server& Conf::server(int index) {
 	return _servers[index];
 }
 
-int Conf::getServerCount() {
+int Conf::serverCount() {
 	return _servers.size();
 }
 
-std::vector<int> Conf::getServerSockets() {
+std::vector<int> Conf::serverSockets() {
 	std::vector<int> sockets;
 	for (size_t i = 0; i < _servers.size(); ++i)
 		sockets.push_back(_servers[i].fd());

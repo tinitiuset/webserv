@@ -10,6 +10,8 @@ Redirect::Redirect(std::string& loc) {
 	_redirect = loc.substr(loc.find_last_of(' ') + 1, loc.find(';', loc.find_last_of(' ')) - loc.find_last_of(' ') - 1);
 }
 
+Redirect::Redirect(const Redirect& other): Location(other), _code(other._code), _redirect(other._redirect) {}
+
 Redirect::~Redirect() {}
 
 int Redirect::code() const { return _code; }
@@ -28,6 +30,8 @@ Index::Index(std::string& loc) {
 		_methods.push_back(method);
 	}
 }
+
+Index::Index(const Index& other): Location(other), _file(other._file), _autoindex(other._autoindex), _methods(other._methods) {}
 
 Index::~Index() {}
 
