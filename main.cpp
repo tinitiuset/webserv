@@ -1,4 +1,4 @@
-#include "Multiplexer.hpp"
+/* #include "Multiplexer.hpp"
 #include "Server.hpp"
 #include "Request.hpp"
 #include "Location.hpp"
@@ -6,9 +6,9 @@
 
 #include <stdlib.h>
 #include <fcntl.h>
-#include <vector>
+#include <vector> */
 
-int main() {
+/* int main() {
     std::vector<Location> locations;
 
     locations.push_back(Location("/test"));
@@ -24,4 +24,22 @@ int main() {
     cllo
     delete (postReq);
     return 0;
+} */
+
+#include "Multiplexer.hpp"
+#include "utils/defaults.hpp"
+
+Conf* conf;
+
+int main() {
+
+  conf = new Conf("./config/webserv.conf");
+  
+  conf->parse();
+  conf->load();
+
+  Multiplexer().run();
+
+  delete conf;
+  return 0;
 }

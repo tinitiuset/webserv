@@ -1,7 +1,7 @@
 #ifndef GETREQUEST_HPP
 #define GETREQUEST_HPP
-#include "Request.hpp"
 
+#include "Request.hpp"
 #include "Response.hpp"
 #include "Resource.hpp"
 

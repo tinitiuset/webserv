@@ -22,9 +22,9 @@ private:
 	int _port;
 	int _body_size;
 	std::string _root;
-	std::list <Location*> _locations;
 
 public:
+	std::list <Location*> _locations;
 	Server(std::string&);
 	Server(const Server& other);
 	~Server();

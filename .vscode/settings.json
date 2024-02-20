@@ -71,6 +71,10 @@
 		"numeric": "cpp",
 		"random": "cpp",
 		"fstream": "cpp",
-		"numbers": "cpp"
+		"numbers": "cpp",
+		"csignal": "cpp",
+		"iomanip": "cpp",
+		"list": "cpp",
+		"stack": "cpp"
 	}
 }
