@@ -1,7 +1,7 @@
 NAME = webserv
 
 COMPILER =	c++
-STANDARD =	-std=c++98
+STANDARD =	-std=c++11
 DEBUG =		-g3	# 0, 1, 2, 3 DEBUG INFORMATION LEVELS
 FLAGS =		#-Wall -Werror -Wextra
 
@@ -20,6 +20,7 @@ SRC_FILES = main.cpp \
             ./utils/Logger.cpp \
             ./utils/Utils.cpp \
             Multiplexer.cpp
+
 HEADER_FILES =  ./model/*.hpp \
                 ./model/Conf.hpp \
                 ./model/Location.hpp \

@@ -2,6 +2,7 @@
 #define MULTIPLEXER_HPP
 
 #include <iostream>
+#include <string>
 #include <vector>
 #include "utils/defaults.hpp"
 #include "utils/Logger.hpp"

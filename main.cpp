@@ -28,6 +28,7 @@
 
 #include "Multiplexer.hpp"
 #include "utils/defaults.hpp"
+#include <string>
 
 Conf* conf;
 

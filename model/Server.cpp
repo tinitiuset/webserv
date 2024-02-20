@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include <algorithm>
 
 void sanitize(std::string& serverBlock) {
 	std::string result;
@@ -121,7 +122,7 @@ void Server::bind() {
       : Logger::debug("Socket options successfully setted");
 
   // https://man7.org/linux/man-pages/man2/bind.2.html
-  (::bind(_fd, reinterpret_cast<struct sockaddr *>(&servaddr), sizeof(servaddr)) == -1)
+    (::bind(_fd, reinterpret_cast<struct sockaddr *>(&servaddr), sizeof(servaddr)) == -1)
       ? throw std::runtime_error("Binding failed\n")
       : Logger::debug("Socket successfully binded");
 
