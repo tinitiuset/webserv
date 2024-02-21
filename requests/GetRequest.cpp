@@ -6,6 +6,15 @@ GetRequest::~GetRequest() {}
 
 std::string GetRequest::handle() {
 
+	std::cout << "\n**  GetRequest::handle() handling GET request" << std::endl;
+	std::cout << "**  GetRequest::handle() _uri: " << _uri << std::endl;
+	std::cout << "**  GetRequest::handle() _method: " << _method << std::endl;
+	//print headers map
+	for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); ++it)
+		std::cout << "**  GetRequest::handle() _headers: " << it->first << " => " << it->second << std::endl;
+
+	std::cout << "**  GetRequest::handle() _body: " << _body << std::endl << std::endl;
+
 	if (dynamic_cast<Redirect*>(conf->server(0).location(_uri)))
 		return redirect();
 

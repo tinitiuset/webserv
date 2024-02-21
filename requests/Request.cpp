@@ -57,8 +57,16 @@ void Request::parseRequest(const int &fd) {
 		std::getline(headerLineStream, value);
 		_headers[key] = value.substr(1);
 	}
-
+	
 	std::getline(requestStream, _body, '\0');
+
+	std::cout << "\n==Request::parseRequest() _method: " << _method << std::endl;
+	std::cout << "==Request::parseRequest() _uri: " << _uri << std::endl;	
+	//print headers map
+	for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); ++it)
+		std::cout << "==Request::parseRequest() _headers: " << it->first << " => " << it->second << std::endl;
+	std::cout << "==Request::parseRequest() _body: " << _body << std::endl << std::endl;
+
 }
 
 void Request::printRequest() const {
