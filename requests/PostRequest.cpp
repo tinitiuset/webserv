@@ -5,7 +5,8 @@
 
 PostRequest::PostRequest(const Request& request): Request(request) {
 	parse_type();
-	parse_body(_body);
+	if (_headers["Content-Type"] == "multipart/form-data")
+		parse_multipart_body(_body);
 }
 
 PostRequest::~PostRequest() {}
@@ -50,7 +51,8 @@ void PostRequest::parse_type(void) {
 	}
 }
 
-void	PostRequest::parse_body(std::string body){
+//Method to parse the body of the request when Content-Type is multipart/form-data
+void	PostRequest::parse_multipart_body(std::string body){
 	std::string boundary = _headers["boundary"];
 	std::string delimiter = "--" + boundary;
 	std::string delimiter_end = "--" + boundary + "--";
@@ -95,7 +97,6 @@ void	PostRequest::save_file(std::string body){
 	std::string path = _uri + _postHeaders["filename"];
 	std::ofstream outfile(path, std::ios::out | std::ios::binary);
 	outfile << body << std::endl;
-
 	outfile.close();
 
 }
