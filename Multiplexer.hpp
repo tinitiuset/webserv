@@ -5,6 +5,7 @@
 #include <vector>
 #include "utils/defaults.hpp"
 #include "utils/Logger.hpp"
+#include "utils/Utils.hpp"
 
 class Multiplexer {
 

@@ -6,8 +6,12 @@ GetRequest::~GetRequest() {}
 
 std::string GetRequest::handle() {
 
-	if (dynamic_cast<Redirect*>(conf->server(0).location(_uri)))
+/* 	if (dynamic_cast<Redirect*>(conf->getServer(getPort()).location(_uri)))
+		return redirect(); */
+
+	if (dynamic_cast<Redirect*>(getServerInst().location(_uri)))
 		return redirect();
+
 
 	Logger::info("GetRequest::handle() handling GET request");
 

@@ -135,9 +135,6 @@ void Multiplexer::run()
 		close(i);
 }
 
-
-
-
 int	getMaxFd(std::vector<std::vector<int> > sockfd)
 {
 	int max_fd = 0;
@@ -182,6 +179,4 @@ void	Multiplexer::setServerFdVec(std::vector<int> sockfd)
 {
 	for (size_t i = 0; i < sockfd.size(); ++i)
 		serverFdVec.push_back(sockfd[i]);
-
 }
-

@@ -1,4 +1,6 @@
 #include "Response.hpp"
+#include <iostream>
+
 
 Response::Response() {}
 

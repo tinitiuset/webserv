@@ -6,6 +6,7 @@
 #include "Response.hpp"
 #include "../utils/defaults.hpp"
 #include "../utils/Logger.hpp"
+#include "../utils/Utils.hpp"
 
 static std::string status(int code);
 
@@ -21,6 +22,8 @@ public:
 	void printRequest() const;
 	bool isGetRequest() const;
 	bool isPostRequest() const;
+	int	 getPort() const;
+	Server getServerInst() const;
 
 	virtual std::string handle() {return NULL;};
 	std::string redirect();

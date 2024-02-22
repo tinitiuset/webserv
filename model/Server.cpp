@@ -139,5 +139,4 @@ void Server::bind() {
       : Logger::debug("Socket setted to non blocking");
 
   Logger::info("Server " + _server_name + " listening in port " + std::to_string(_port));
-
 }
