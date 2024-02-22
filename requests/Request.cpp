@@ -67,6 +67,27 @@ void Request::parseRequest(const int &fd) {
 		std::cout << "==Request::parseRequest() _headers: " << it->first << " => " << it->second << std::endl;
 	std::cout << "==Request::parseRequest() _body: " << _body << std::endl << std::endl;
 
+
+}
+
+Server Request::getServerInst() const {
+	return conf->getServer(getPort());
+}
+
+int Request::getPort() const
+{
+	std::map<std::string, std::string>::const_iterator it = _headers.find("Host");
+
+	if (it != _headers.end())
+	{
+		size_t pos = it->second.find(":");
+		if ( pos == std::string::npos)
+			return (-1);
+		else
+			return(std::atoi(it->second.substr(pos + 1).c_str()));
+	}
+	else
+		return (-1);
 }
 
 void Request::printRequest() const {
@@ -88,7 +109,8 @@ bool Request::isPostRequest() const {
 }
 
 std::string Request::redirect() {
-	Redirect* redirect = dynamic_cast<Redirect*>(conf->server(0).location(_uri));
+	//Redirect* redirect = dynamic_cast<Redirect*>(conf->getServer(getPort()).location(_uri));
+	Redirect* redirect = dynamic_cast<Redirect*>(getServerInst().location(_uri));
 
 	Response response;
 

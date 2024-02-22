@@ -46,8 +46,13 @@ void Conf::load() {
 		_servers[i].bind();
 }
 
-Server& Conf::server(int index) {
-	return _servers[index];
+Server& Conf::getServer(int port)
+{
+	int i;
+	for (i = 0; i < _servers.size(); ++i)
+		if (_servers[i].port() == port)
+			return (_servers[i]);
+	throw std::runtime_error("Server not found for the specified port");
 }
 
 int Conf::serverCount() {

@@ -15,8 +15,14 @@ std::string GetRequest::handle() {
 
 	std::cout << "**  GetRequest::handle() _body: " << _body << std::endl << std::endl;
 
-	if (dynamic_cast<Redirect*>(conf->server(0).location(_uri)))
+	std::cout << "----------------------" << conf->getServer(getPort()).port() << std::endl;
+
+/* 	if (dynamic_cast<Redirect*>(conf->getServer(getPort()).location(_uri)))
+		return redirect(); */
+
+	if (dynamic_cast<Redirect*>(getServerInst().location(_uri)))
 		return redirect();
+
 
 	Logger::info("GetRequest::handle() handling GET request");
 
