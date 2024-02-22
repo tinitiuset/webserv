@@ -53,13 +53,5 @@ std::string Response::format() const {
 
 	formatted_response += "\r\n" + _body;
 
-	std::cout << "\n>> Response::format() returning response" << std::endl;
-	std::cout << ">> Response::format() start_line: " << _start_line << std::endl;
-	//print headers map
-	for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it)
-		std::cout << ">> Response::format() headers: " << it->first << " => " << it->second << std::endl;
-	std::cout << ">> Response::format() body: " << _body << std::endl << std::endl;
-
-
 	return formatted_response;
 }
