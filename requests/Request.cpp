@@ -1,4 +1,5 @@
 #include "Request.hpp"
+#include "../utils/Utils.hpp"
 
 static std::string status(int code) {
 	switch (code) {
@@ -98,12 +99,11 @@ bool Request::isPostRequest() const {
 }
 
 std::string Request::redirect() {
-	//Redirect* redirect = dynamic_cast<Redirect*>(conf->getServer(getPort()).location(_uri));
 	Redirect* redirect = dynamic_cast<Redirect*>(getServerInst().location(_uri));
 
 	Response response;
 
-	std::string startLine = "HTTP/1.1 " + std::to_string(redirect->code()) + " " + status(redirect->code());
+	std::string startLine = "HTTP/1.1 " + Utils::toString(redirect->code()) + " " + status(redirect->code());
 
 	response.set_start_line(startLine);
 	std::map<std::string, std::string> headers;
