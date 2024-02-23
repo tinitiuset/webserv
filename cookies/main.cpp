@@ -15,8 +15,6 @@ int	main()
 	if (!Cookie::isValidCookie(headers))
 		test = Cookie::getCookieResponse();
 
-
-
 	std::cout << test << std::endl;
 
 	std::cout << Cookie::getSesId() << std::endl;
