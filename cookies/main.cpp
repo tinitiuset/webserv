@@ -3,7 +3,12 @@
 
 int	main()
 {
-	Cookie inst;
+
+	std::map<std::string, std::string> headers;
+
+	headers["Host"] = "localhost:8050";
+	headers["Cookie"] = "1=1756850"
+
 
 	for (int i = 0; i < 2; i++)
 	{
