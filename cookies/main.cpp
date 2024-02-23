@@ -1,28 +1,25 @@
 #include "Cookie.hpp"
 
-
 int	main()
 {
 
 	std::map<std::string, std::string> headers;
 
 	headers["Host"] = "localhost:8050";
-	headers["Cookie"] = "1=1756850"
+	headers["Cookie"] = "1=1756850";
+
+	Cookie::generateNewCookie();
+
+	std::string test;
+
+	if (!Cookie::isValidCookie(headers))
+		test = Cookie::getCookieResponse();
 
 
-	for (int i = 0; i < 2; i++)
-	{
-		std::string httpRequest = "GET /ruta HTTP/1.1\r\nHost: ejemplo.com\r\nCookie: 1=1756850\r\n\r\n";
 
-		std::cout << "session id: " << inst.getSesId() << std::endl;
+	std::cout << test << std::endl;
 
-		if (!inst.isValidCookie(httpRequest))
-		{
-			std::cout << "is not valid. We have to generate new cookie, id++ and set" << std::endl;
-			inst.generateNewCookie();
-			std::cout << inst.getCookieResponse() << std::endl;
-		}
-		else
-			std::cout << "is valid cookie. We do nothing" << std::endl;	
-	}
+	std::cout << Cookie::getSesId() << std::endl;
+
+	return (0);
 }

@@ -1,15 +1,22 @@
 #include "Cookie.hpp"
-#include "../utils/Utils.hpp"
 
 int	Cookie::_sesId = 1;
 
-std::map<std::string, std::string> 	Cookie::_sessionDB = {};
+std::map<std::string, std::string> 	Cookie::_sessionDB;
+int									Cookie::_hash;
+std::string							Cookie::_newKey;
+std::string							Cookie::_newValue;
 
 /* Cookie::Cookie(): _hash(0) 
 {
 	_sessionDB["145"] = "0123456";
 	_sessionDB["1"] = "12349";
 }; */
+
+/* Cookie::Cookie() {
+    // Inicializa _sessionDB aquí
+    _sessionDB = std::map<std::string, std::string>();
+} */
 
 int	Cookie::generateHash()
 {
@@ -35,8 +42,9 @@ void	Cookie::generateNewCookie()
 
 std::string	Cookie::getCookieHeader()
 {
-	std::string cookieResponse = "Set-Cookie: " + _newKey + "=" + _newValue + "\r\n";
-	return (cookieResponse);
+	generateNewCookie();
+	std::string cookieHeader = "Set-Cookie: " + _newKey + "=" + _newValue + "\r\n";
+	return (cookieHeader);
 }
 
 std::string	Cookie::getCookieResponse()
@@ -81,29 +89,25 @@ std::string	Cookie::getCookieResponse()
 
 bool Cookie::isValidCookie(const std::map<std::string, std::string>& headers)
 {
-        // Iterar sobre el mapa de encabezados para buscar la clave "Cookie"
         for (std::map<std::string, std::string>::const_iterator it = headers.begin(); it != headers.end(); ++it) {
-            if (it->first == "Cookie") { // Si se encuentra la clave "Cookie"
-                // Obtener el valor asociado a la clave "Cookie"
+            if (it->first == "Cookie")
+			{
                 std::string cookieString = it->second;
-
-                // Buscar el signo de igual '=' en la cadena del cookie
                 size_t equalPos = cookieString.find('=');
-                if (equalPos != std::string::npos) { // Si se encuentra el signo de igual
-                    // Extraer la clave y el valor del cookie
+                if (equalPos != std::string::npos)
+				{
                     std::string key = cookieString.substr(0, equalPos);
                     std::string value = cookieString.substr(equalPos + 1);
-
-                    // Buscar el par clave-valor en la base de datos de sesiones
                     std::map<std::string, std::string>::iterator dbIt = _sessionDB.find(key);
-                    if (dbIt != _sessionDB.end() && dbIt->second == value) { // Si se encuentra y el valor coincide
-                        std::cout << "Key: " << _newKey << " Value: " << _newValue << std::endl;
-                        return true;
+                    if (dbIt != _sessionDB.end() && dbIt->second == value)
+					{
+                        std::cout << "Si se encuentra y el valor coincide - Key: " << _newKey << " Value: " << _newValue << std::endl;
+                        return (true);
                     }
                 }
             }
         }
-        return false; // Si no se encuentra la clave "Cookie" o no se encuentra la sesión en la base de datos
+        return (false);
     }
 
 int		Cookie::getSesId() {return(_sesId);}

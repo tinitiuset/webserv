@@ -14,6 +14,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include "../utils/Utils.hpp"
 
 
 class Cookie
@@ -21,20 +22,20 @@ class Cookie
 	private:
 		static int									_sesId;				
 		static std::map<std::string, std::string> 	_sessionDB;
-		int											_hash;
-		std::string									_newKey;
-		std::string									_newValue;
+		static int											_hash;
+		static std::string									_newKey;
+		static std::string									_newValue;
 
 	public:
-		//Cookie();
+		Cookie();
 
-		static int		getSesId();
-		int				generateHash();
-		void			generateNewCookie();
+		static int				getSesId();
+		static int				generateHash();
+		static void				generateNewCookie();
 		//bool			isValidCookie(const std::string &request);
-		bool 			isValidCookie(const std::map<std::string, std::string>& _headers);
-		std::string		getCookieResponse();
-		std::string		getCookieHeader();
+		static bool 			isValidCookie(const std::map<std::string, std::string>& _headers);
+		static std::string		getCookieResponse();
+		static std::string		getCookieHeader();
 };
 
 
