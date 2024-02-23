@@ -1,4 +1,5 @@
 #include "GetRequest.hpp"
+#include "../cookies/Cookie.hpp"
 
 GetRequest::GetRequest(const Request& request): Request(request) {}
 
@@ -24,6 +25,18 @@ std::string GetRequest::handle() {
 	std::map<std::string, std::string> headers;
 	headers.insert(std::make_pair("Content-Type", "text/html"));
 	headers.insert(std::make_pair("Content-Length", std::to_string(response.body().length())));
+
+	if (!Cookie::isValidCookie(_headers))
+		headers["Set-Cookie: "] = Cookie::getSetCookieValue();
+
+	std::cout << "\nEN SET-COOKIE: \nheaders[Set-Cookie] = " << headers["Set-Cookie: "] << "\n" << std::endl;
+
+	//volvemos a imprimir map headers
+	std::cout << "\n^^^^^^Printing headers de la request" << std::endl;
+	std::map<std::string, std::string>::const_iterator it;
+	for (it = headers.begin(); it != headers.end(); ++it) {
+		std::cout << it->first << " => " << it->second << std::endl;
+	}
 
 	response.set_headers(headers);
 	response.set_start_line(resource.status());

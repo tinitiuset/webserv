@@ -35,7 +35,7 @@ class Cookie
 		//bool			isValidCookie(const std::string &request);
 		static bool 			isValidCookie(const std::map<std::string, std::string>& _headers);
 		static std::string		getCookieResponse();
-		static std::string		getCookieHeader();
+		static std::string		getSetCookieValue();
 };
 
 
