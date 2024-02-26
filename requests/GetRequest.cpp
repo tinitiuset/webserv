@@ -9,6 +9,9 @@ std::string GetRequest::handle() {
 	if (dynamic_cast<Redirect*>(conf->server(0).location(_uri)))
 		return redirect();
 
+    //if (Location* loc = dynamic_cast<Index*>(conf->server(0).bestLocation(_uri)))
+	//	return "";
+
 	Logger::info("GetRequest::handle() handling GET request");
 
 	Response response;

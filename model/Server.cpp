@@ -95,6 +95,21 @@ Location* Server::location(const std::string& path) const {
 	return nullptr;
 }
 
+Location* Server::bestLocation(const std::string& path) const {
+	std::size_t longestMatch = 0;
+	Location* bestLocation = nullptr;
+	for (std::list<Location*>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
+		Location* location = *it;
+		if (location->path().length() > longestMatch) {
+			if (path.find(location->path()) == 0) {
+				bestLocation = location;
+				longestMatch = location->path().length();
+			}
+		}
+	}
+	return bestLocation;
+}
+
 void Server::bind() {
 
   struct sockaddr_in servaddr = {};
