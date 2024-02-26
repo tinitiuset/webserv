@@ -21,7 +21,9 @@ std::string Redirect::redirect() const { return _redirect; }
 Index::Index(std::string& loc) {
 	_path = loc.substr(loc.find("location") + 9, loc.find('{') - loc.find("location") - 10);
 	_file = loc.substr(loc.find("root") + 5, loc.find(';', loc.find("root")) - loc.find("root") - 5);
+	_index = loc.substr(loc.find("index") + 6, loc.find(';', loc.find("index")) - loc.find("index") - 6);
 	_autoindex = loc.find("autoindex on") != std::string::npos;
+	_cgi = loc.find("cgi on") != std::string::npos;
 
 	std::string methods = loc.substr(loc.find("methods") + 8, loc.find(';', loc.find("methods")) - loc.find("methods") - 8);
 	std::stringstream ss(methods);
@@ -31,10 +33,16 @@ Index::Index(std::string& loc) {
 	}
 }
 
-Index::Index(const Index& other): Location(other), _file(other._file), _autoindex(other._autoindex), _methods(other._methods) {}
+Index::Index(const Index& other): Location(other), _file(other._file), _index(other._index), _autoindex(other._autoindex), _cgi(other._cgi),_methods(other._methods) {}
 
 Index::~Index() {}
 
 std::string Index::file() {	return _file; }
+
+std::string Index::index() { return _index; }
+
+bool Index::autoindex() { return _autoindex; }
+
+bool Index::cgi() { return _cgi; }
 
 std::list<std::string> Index::methods() { return _methods; }
