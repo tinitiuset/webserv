@@ -12,6 +12,11 @@ std::string GetRequest::handle() {
 	if (dynamic_cast<Redirect*>(getServerInst().location(_uri)))
 		return redirect();
 
+    //if (Location* loc = dynamic_cast<Index*>(conf->server(0).bestLocation(_uri)))
+	//	return "";
+
+	if (Location* loc = dynamic_cast<Index*>(getServerInst().bestLocation(_uri)))
+		return "";
 
 	Logger::info("GetRequest::handle() handling GET request");
 

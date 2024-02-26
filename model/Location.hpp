@@ -38,7 +38,9 @@ class Index: public Location {
 
 private:
 	std::string _file;
+	std::string _index;
 	bool _autoindex;
+	bool _cgi;
 	std::list<std::string> _methods;
 
 public:
@@ -50,7 +52,9 @@ public:
 	Index* clone() const { return new Index(*this); }
 
 	std::string file();
+	std::string index();
 	bool autoindex();
+	bool cgi();
 	std::list<std::string> methods();
 };
 
