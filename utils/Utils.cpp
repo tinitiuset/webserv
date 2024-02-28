@@ -7,3 +7,11 @@ std::string Utils::toString(const int &num)
     ss << num;
     return (ss.str());
 }
+
+int Utils::toInt(const std::string &str)
+{
+    std::stringstream ss(str);
+    int num;
+    ss >> num;
+    return (num);
+}

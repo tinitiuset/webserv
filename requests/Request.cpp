@@ -1,5 +1,5 @@
 #include "Request.hpp"
-
+#include "../utils/Utils.hpp"
 #include <sstream>
 #include <unistd.h>
 
@@ -32,7 +32,7 @@ void Request::parseRequest(const int &fd) {
 	char buffer[99999] = {0};
 	read(fd, buffer, 99999);
 	std::string request(buffer);
-
+	std::cout << request.size() << "----" << request.length() << std::endl;
 	Logger::debug("Raw request: " + request);
 
 	std::istringstream requestStream(request);
@@ -53,8 +53,8 @@ void Request::parseRequest(const int &fd) {
 		std::getline(headerLineStream, value);
 		_headers[key] = value.substr(1);
 	}
-
-	std::getline(requestStream, _body, '\0');
+	std::string body_real(&buffer[requestStream.tellg()], Utils::toInt(_headers["Content-Length"]));
+	_body = body_real;
 }
 
 void Request::printRequest() const {
