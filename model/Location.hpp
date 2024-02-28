@@ -4,6 +4,7 @@
 #include <string>
 #include <list>
 #include <sstream>
+#include "../utils/Utils.hpp"
 
 class Location {
 protected:
@@ -14,6 +15,7 @@ public:
 	virtual Location* clone() const = 0;
 
 	std::string path() const;
+	std::string buildRealPath(std::string uri, std::string location, std::string root, std::string &file) const;
 };
 
 class Redirect: public Location {
@@ -44,7 +46,6 @@ private:
 	std::list<std::string> _methods;
 
 public:
-
 	Index(std::string&);
 	Index(const Index& other);
 	~Index();

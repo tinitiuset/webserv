@@ -68,3 +68,15 @@ bool Utils::isDirectory(const char* path)
 
     return S_ISDIR(info.st_mode);
 }
+
+/* 
+	Removes last "/" in a string if the string is anything different than "/"
+*/
+std::string  Utils::removeLastSlash(std::string str)
+{
+	if (str.length() > 1 && str[str.length() - 1] == '/')
+	{
+        str.erase(str.length() - 1);
+    }
+	return (str);
+}

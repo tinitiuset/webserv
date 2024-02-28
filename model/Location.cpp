@@ -4,6 +4,17 @@ Location::~Location() {}
 
 std::string Location::path() const { return _path; }
 
+std::string buildRealPath(std::string uri, std::string location, std::string root, std::string &file)
+{
+	location = Utils::removeLastSlash(location);
+	uri = Utils::removeLastSlash(uri);
+	root = Utils::removeLastSlash(root);
+
+	if (uri == location)
+		return (root + "/" + file);
+	return (Utils::strReplace(uri, location, root));
+}
+
 Redirect::Redirect(std::string& loc) {
 	_path = loc.substr(loc.find("location") + 9, loc.find('{') - loc.find("location") - 10);
 	_code = std::stoi(loc.substr(loc.find("{redirect") + 10, loc.find(';', loc.find("{redirect")) - loc.find("{redirect") - 10));
@@ -21,7 +32,7 @@ std::string Redirect::redirect() const { return _redirect; }
 Index::Index(std::string& loc) {
 	_path = loc.substr(loc.find("location") + 9, loc.find('{') - loc.find("location") - 10);
 	_file = loc.substr(loc.find("root") + 5, loc.find(';', loc.find("root")) - loc.find("root") - 5);
-	_index = loc.substr(loc.find("index") + 6, loc.find(';', loc.find("index")) - loc.find("index") - 6);
+	_index = loc.substr(loc.find("file") + 5, loc.find(';', loc.find("file")) - loc.find("file") - 5);
 	_autoindex = loc.find("autoindex on") != std::string::npos;
 	_cgi = loc.find("cgi on") != std::string::npos;
 
