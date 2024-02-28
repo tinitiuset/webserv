@@ -29,13 +29,31 @@ int Redirect::code() const { return _code; }
 
 std::string Redirect::redirect() const { return _redirect; }
 
-Index::Index(std::string& loc) {
-	_path = loc.substr(loc.find("location") + 9, loc.find('{') - loc.find("location") - 10);
-	_file = loc.substr(loc.find("root") + 5, loc.find(';', loc.find("root")) - loc.find("root") - 5);
-	_index = loc.substr(loc.find("file") + 5, loc.find(';', loc.find("file")) - loc.find("file") - 5);
-	_autoindex = loc.find("autoindex on") != std::string::npos;
-	_cgi = loc.find("cgi on") != std::string::npos;
+Index::Index(std::string& loc) 
+{
+	//initialize all atributtes to 0 or false
 
+	_path = "";
+	_file = "";
+	_index = "";
+	_autoindex = false;
+	_cgi = false;
+	_methods = std::list<std::string>();
+
+	//parse the location string to get the values of the attributes but check if the attribute is present in the string
+	//if it is not present, the value of the attribute will be the default value
+
+	if (loc.find("location") != std::string::npos)
+		_path = loc.substr(loc.find("location") + 9, loc.find('{') - loc.find("location") - 10);
+	if (loc.find("root") != std::string::npos)
+		_file = loc.substr(loc.find("root") + 5, loc.find(';', loc.find("root")) - loc.find("root") - 5);
+	if (loc.find("file") != std::string::npos)
+		_index = loc.substr(loc.find("file") + 5, loc.find(';', loc.find("file")) - loc.find("file") - 5);
+	if (loc.find("autoindex on") != std::string::npos)
+		_autoindex = true;
+	if (loc.find("cgi on") != std::string::npos)
+		_cgi = true;
+	
 	std::string methods = loc.substr(loc.find("methods") + 8, loc.find(';', loc.find("methods")) - loc.find("methods") - 8);
 	std::stringstream ss(methods);
 	std::string method;

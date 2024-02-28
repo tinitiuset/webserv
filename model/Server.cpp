@@ -100,6 +100,9 @@ Location* Server::bestLocation(const std::string& path) const {
 	Location* bestLocation = nullptr;
 	for (std::list<Location*>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
 		Location* location = *it;
+	}
+	for (std::list<Location*>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
+		Location* location = *it;
 		if (location->path().length() > longestMatch) {
 			if (path.find(location->path()) == 0) {
 				bestLocation = location;
@@ -109,6 +112,8 @@ Location* Server::bestLocation(const std::string& path) const {
 	}
 	return bestLocation;
 }
+
+
 
 void Server::bind() {
 

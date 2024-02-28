@@ -59,7 +59,7 @@ void Request::parseRequest(const int &fd) {
 	}
 }
 
-Server Request::getServerInst() const {
+Server& Request::getServerInst() const {
 	return conf->getServer(getPort());
 }
 

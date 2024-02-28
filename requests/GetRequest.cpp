@@ -17,16 +17,9 @@ std::string GetRequest::handle() {
 
 	if (Index* loc = dynamic_cast<Index*>(getServerInst().bestLocation(_uri)))
 	{
-		std::cout << "GetRequest::handle() location found: _uri [" << _uri << "]" << std::endl;
-		std::cout << "GetRequest::handle() location found: Location: [" << loc->path() << "]" << std::endl;
-		std::cout << "GetRequest::handle() location found: loc->file() [" << loc->file() << "]" << std::endl;
-		std::cout << "GetRequest::handle() location found: loc->index() [" << loc->index() << "]" << std::endl;
-		std::cout << "GetRequest::handle() location found: loc->autoindex() [" << loc->autoindex() << "]" << std::endl;
-		std::cout << "GetRequest::handle() location found: loc->cgi() [" << loc->cgi() << "]" << std::endl;
-
-
-		//return "";
+		//realpath
 	}
+	
 
 	Logger::info("GetRequest::handle() handling GET request");
 

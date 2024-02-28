@@ -53,7 +53,5 @@ std::string Response::format() const {
 
 	formatted_response += "\r\n" + _body;
 
-	std::cout << "\n******* Formatted response: [" << formatted_response << "]" << std::endl;
-
 	return formatted_response;
 }
