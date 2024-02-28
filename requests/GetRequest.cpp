@@ -6,10 +6,10 @@ GetRequest::~GetRequest() {}
 
 std::string GetRequest::handle() {
 
-	if (dynamic_cast<Redirect*>(getServerInst().location(_uri)))
+	if (dynamic_cast<Redirect*>(conf->getServer(getPort()).location(_uri)))
 		return redirect();
 
-	if (Index* loc = dynamic_cast<Index*>(getServerInst().bestLocation(_uri)))
+	if (Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri)))
 	{
 		//realpath
 	}

@@ -23,7 +23,6 @@ public:
 	bool isGetRequest() const;
 	bool isPostRequest() const;
 	int	 getPort() const;
-	Server& getServerInst() const;
 
 	virtual std::string handle() {return NULL;};
 	std::string redirect();

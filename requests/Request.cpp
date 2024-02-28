@@ -59,9 +59,7 @@ void Request::parseRequest(const int &fd) {
 	}
 }
 
-Server& Request::getServerInst() const {
-	return conf->getServer(getPort());
-}
+
 
 int Request::getPort() const
 {
@@ -98,8 +96,7 @@ bool Request::isPostRequest() const {
 }
 
 std::string Request::redirect() {
-	//Redirect* redirect = dynamic_cast<Redirect*>(conf->getServer(getPort()).location(_uri));
-	Redirect* redirect = dynamic_cast<Redirect*>(getServerInst().location(_uri));
+	Redirect* redirect = dynamic_cast<Redirect*>(conf->getServer(getPort()).location(_uri));
 
 	Response response;
 

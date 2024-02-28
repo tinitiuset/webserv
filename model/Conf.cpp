@@ -46,7 +46,7 @@ void Conf::load() {
 		_servers[i].bind();
 }
 
-Server& Conf::getServer(int port)
+const Server& Conf::getServer(int port) const
 {
 	int i;
 	for (i = 0; i < _servers.size(); ++i)
