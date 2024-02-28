@@ -11,6 +11,7 @@ protected:
 	std::string _path;
 
 public:
+	Location();
 	virtual ~Location();
 	virtual Location* clone() const = 0;
 
@@ -39,8 +40,8 @@ public:
 class Index: public Location {
 
 private:
+	std::string _root;
 	std::string _file;
-	std::string _index;
 	bool _autoindex;
 	bool _cgi;
 	std::list<std::string> _methods;
@@ -52,8 +53,8 @@ public:
 
 	Index* clone() const { return new Index(*this); }
 
+	std::string root();
 	std::string file();
-	std::string index();
 	bool autoindex();
 	bool cgi();
 	std::list<std::string> methods();
