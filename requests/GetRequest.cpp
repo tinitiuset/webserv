@@ -6,12 +6,20 @@ GetRequest::~GetRequest() {}
 
 std::string GetRequest::handle() {
 
+	std::string resPath= _uri;
+
 	if (dynamic_cast<Redirect*>(conf->getServer(getPort()).location(_uri)))
 		return redirect();
 
 	if (Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri)))
 	{
 		//realpath
+		std::cout << "\n*****uri: " << _uri << std::endl;
+		std::cout << "*****location path: " << loc->path() << std::endl;
+		std::cout << "*****root: " << loc->root() << std::endl;
+		std::cout << "*****file: " << loc->file() << std::endl;
+		resPath = loc->buildRealPath(_uri);
+		std::cout << "*****realpath: " << resPath << std::endl << std::endl;
 	}
 	
 
@@ -19,7 +27,8 @@ std::string GetRequest::handle() {
 
 	Response response;
 
-	Resource resource("." + _uri);
+	//Resource resource("." + _uri);
+	Resource resource("." + resPath);
 
 	response.set_body(resource.load());
 

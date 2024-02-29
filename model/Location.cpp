@@ -6,16 +6,6 @@ Location::~Location() {}
 
 std::string Location::path() const { return _path; }
 
-std::string buildRealPath(std::string uri, std::string location, std::string root, std::string &file) {
-	location = Utils::removeLastSlash(location);
-	uri = Utils::removeLastSlash(uri);
-	root = Utils::removeLastSlash(root);
-
-	if (uri == location)
-		return (root + "/" + file);
-	return (Utils::strReplace(uri, location, root));
-}
-
 Redirect::Redirect(std::string& loc): Location() {
 	_path = loc.substr(loc.find("location") + 9, loc.find('{') - loc.find("location") - 10);
 	_code = std::stoi(loc.substr(loc.find("{redirect") + 10, loc.find(';', loc.find("{redirect")) - loc.find("{redirect") - 10));
@@ -65,3 +55,15 @@ bool Index::autoindex() { return _autoindex; }
 bool Index::cgi() { return _cgi; }
 
 std::list<std::string> Index::methods() { return _methods; }
+
+std::string Index::buildRealPath(std::string &uri)
+{
+	std::string locT = Utils::removeLastSlash(path());
+	std::string rootT = Utils::removeLastSlash(root());
+	std::string uriT = Utils::removeLastSlash(uri);
+
+	if (uriT == locT)
+		return (rootT + "/" + file());
+	rootT += "/";
+	return (Utils::strReplace(uriT, locT, rootT));
+}
