@@ -71,7 +71,7 @@ std::string GetRequest::handle() {
 
 
 	std::map<std::string, std::string> headers;
-	headers.insert(std::make_pair("Content-Type", "text/html"));
+	headers.insert(std::make_pair("Content-Type", resource.mime()));
 	headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
 
 

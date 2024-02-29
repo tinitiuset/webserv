@@ -19,13 +19,64 @@ Resource::~Resource() {}
 
 std::string Resource::load() const {
 	Logger::info("Resource::load() Loading resource from " + _path);
-	std::ifstream file(_path);
-	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-	return content;
+	std::string extension = _path.substr(_path.find_last_of(".") + 1);
+	if (mime().find("text") == std::string::npos) {
+		std::ifstream file(_path, std::ios::binary);
+		std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+		return content;
+	} else {
+		std::ifstream file(_path);
+		std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+		return content;
+	}
 }
 
 std::string Resource::status() const {
 	return _status;
+}
+
+std::string Resource::mime() const {
+	std::string extension = _path.substr(_path.find_last_of(".") + 1);
+	std::string mime = "text/plain";
+	if (extension == "html" || extension == "htm")
+		mime = "text/html";
+	else if (extension == "css")
+		mime = "text/css";
+	else if (extension == "js")
+		mime = "text/javascript";
+	else if (extension == "jpg" || extension == "jpeg")
+		mime = "image/jpeg";
+	else if (extension == "png")
+		mime = "image/png";
+	else if (extension == "gif")
+		mime = "image/gif";
+	else if (extension == "ico")
+		mime = "image/x-icon";
+	else if (extension == "svg")
+		mime = "image/svg+xml";
+	else if (extension == "pdf")
+		mime = "application/pdf";
+	else if (extension == "json")
+		mime = "application/json";
+	else if (extension == "xml")
+		mime = "application/xml";
+	else if (extension == "mp3")
+		mime = "audio/mpeg";
+	else if (extension == "mp4")
+		mime = "video/mp4";
+	else if (extension == "webm")
+		mime = "video/webm";
+	else if (extension == "ogg")
+		mime = "audio/ogg";
+	else if (extension == "wav")
+		mime = "audio/wav";
+	else if (extension == "avi")
+		mime = "video/x-msvideo";
+	else if (extension == "mpeg")
+		mime = "video/mpeg";
+	else if (extension == "txt")
+		mime = "text/plain";
+	return mime;
 }
 
 std::string Resource::buildAI(std::string uri, int port, std::string address, std::string resPath)
