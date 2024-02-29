@@ -55,6 +55,7 @@ std::string GetRequest::handle() {
 	//Resource resource("." + resPath);
 	Resource resource(dotPath);
 
+	std::map<std::string, std::string> headers;
 
 	/* if (autoindex)
 		response.set_body(resource.autoindex());  */
@@ -62,16 +63,15 @@ std::string GetRequest::handle() {
 	{
 		std::cout << "IN autoindex" << std::endl;
 		response.set_body(resource.buildAI(_uri, port, address, resPath));
+		headers.insert(std::make_pair("Content-Type", "text/html"));
 	}
 	else
 	{
 		std::cout << "IN NOT autoindex" << std::endl;
 		response.set_body(resource.load());
+		headers.insert(std::make_pair("Content-Type", resource.mime()));
 	}
 
-
-	std::map<std::string, std::string> headers;
-	headers.insert(std::make_pair("Content-Type", resource.mime()));
 	headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
 
 
