@@ -16,6 +16,7 @@ std::string GetRequest::handle() {
 	bool		autoindex = false;
 
 
+
 	if (dynamic_cast<Redirect*>(conf->getServer(port).location(_uri)))
 		return redirect();
 
@@ -35,6 +36,12 @@ std::string GetRequest::handle() {
 		std::cout << "*****autoindex: " << loc->autoindex() << std::endl;
 		std::cout << "*****cgi: " << loc->cgi() << std::endl;
 		resPath = loc->buildRealPath(_uri);
+		for (size_t i = 0; i < resPath.length() - 1; ++i) {
+        	if (resPath[i] == '/' && resPath[i + 1] == '/') {
+            	resPath.erase(i, 1);
+            	--i;  // Para volver a revisar el mismo índice después de la eliminación
+        	}
+    	}
 		std::cout << "*****realpath: " << resPath << std::endl << std::endl;
 	}
 	
@@ -44,15 +51,24 @@ std::string GetRequest::handle() {
 	Response response;
 
 	//Resource resource("." + _uri);
+	std::string dotPath = "." + resPath;
+	//Resource resource("." + resPath);
+	Resource resource(dotPath);
 
-	Resource resource("." + resPath);
 
 	/* if (autoindex)
 		response.set_body(resource.autoindex());  */
-	if (autoindex)
+	if (autoindex && Utils::isDirectory(dotPath.c_str()))
+	{
+		std::cout << "IN autoindex" << std::endl;
 		response.set_body(resource.buildAI(_uri, port, address, resPath));
+	}
 	else
+	{
+		std::cout << "IN NOT autoindex" << std::endl;
 		response.set_body(resource.load());
+	}
+
 
 	std::map<std::string, std::string> headers;
 	headers.insert(std::make_pair("Content-Type", "text/html"));

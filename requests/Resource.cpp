@@ -30,10 +30,22 @@ std::string Resource::status() const {
 
 std::string Resource::buildAI(std::string uri, int port, std::string address, std::string resPath)
 {
+    std::cout << "\n}}}}}}}Resource::buildAI() building autoindex" << std::endl;
+    std::cout << "uri: " << uri << std::endl;
+    std::cout << "port: " << port << std::endl;
+    std::cout << "address: " << address << std::endl;
+    std::cout << "resPath: " << resPath << std::endl;
+
+    
+    
     std::string result = "";
 	std::string host = "localhost:" + Utils::toString(port);
     resPath = "." + resPath;
 	
+    std::cout << "host: " << host << std::endl;
+    std::cout << "resPath: " << resPath << std::endl;
+
+
 	DIR *dir;
     struct dirent *ent;
 
@@ -44,18 +56,19 @@ std::string Resource::buildAI(std::string uri, int port, std::string address, st
 	result += "</h1>\n<ul>\n";
 
 	std::string prevUri = getPreviousUri(uri);
-    result += "<li>\n<a href=\"localhost" + prevUri + "\">" + ".." + "</a>\n</li>\n";
+    std::cout << "prevUri: " << prevUri << std::endl;
+
+    result += "<li>\n<a href=\"http://" + host + prevUri + "\">" + ".." + "</a>\n</li>\n";
 
     //std::string path = Utils::strReplace(_uri, _locName, _serverPath);
-    std::cout << resPath << std::endl;
     //if ((dir = opendir(resPath.c_str())) != NULL)
-    if (Utils::isDirectory(resPath.c_str()) && (dir = opendir(resPath.c_str())) != NULL)
+    if ((dir = opendir(resPath.c_str())) != NULL)
 	{
         while ((ent = readdir(dir)) != NULL) 
 		{
             std::string	file(ent->d_name);
 			if (file != "." && file != "..")
-				result += "<li>\n<a href=\"" + host + uri + "/" + file + "\">" + file + "</a>\n</li>\n";
+				result += "<li>\n<a href=\"http://" + host + uri + "/" + file + "\">" + file + "</a>\n</li>\n";
         }
         closedir(dir);
     }
@@ -66,7 +79,9 @@ std::string Resource::buildAI(std::string uri, int port, std::string address, st
     }
 	result += "</ul>\n</body>\n</html>\n";
 
-	std::cout << result << std::endl;
+	std::cout << "Result: " << result << std::endl << std::endl;
+
+    return (result);
 
 	return (result);
 }
