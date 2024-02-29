@@ -14,6 +14,7 @@ SRC_FILES = main.cpp \
 			./requests/Request.cpp \
 			./requests/Resource.cpp \
 			./requests/Response.cpp \
+			./cookies/Cookie.cpp \
 			./utils/Logger.cpp \
 			./utils/Utils.cpp \
 			Multiplexer.cpp
@@ -28,6 +29,7 @@ HEADER_FILES = 	./model/*.hpp \
 				./requests/Response.hpp \
 				./utils/Logger.hpp \
 				./utils/Utils.hpp \
+				./cookies/Cookie.hpp \
 				Multiplexer.hpp \
 				./utils/defaults.hpp
 

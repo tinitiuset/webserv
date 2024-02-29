@@ -1,5 +1,6 @@
 #include "Multiplexer.hpp"
 #include "utils/Logger.hpp"
+#include "utils/Utils.hpp"
 #include <unistd.h>
 #include <sys/_select.h>
 #include <csignal>
@@ -116,7 +117,7 @@ void Multiplexer::run()
 					if (request == NULL)
 						throw std::runtime_error("Request is not POST nor GET");
 					std::string response = request->handle();
-					Logger::debug("Multiplexer::run() sending response of size " + std::to_string(response.length()));
+					Logger::debug("Multiplexer::run() sending response of size " + Utils::toString(response.length()));
 					write(fd, response.c_str(), response.length());
 					delete request;
 
