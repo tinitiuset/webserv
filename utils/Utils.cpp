@@ -80,3 +80,10 @@ std::string  Utils::removeLastSlash(std::string str)
     }
 	return (str);
 }
+int Utils::toInt(const std::string &str)
+{
+    std::stringstream ss(str);
+    int num;
+    ss >> num;
+    return (num);
+}

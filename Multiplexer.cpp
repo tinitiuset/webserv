@@ -1,6 +1,17 @@
 #include "Multiplexer.hpp"
+#include "utils/Logger.hpp"
+#include <unistd.h>
+#include <sys/select.h>
+#include <csignal>
+#include <algorithm>
 
-Request* createRequest(const int &fd) {
+#include "requests/Request.hpp"
+#include "requests/GetRequest.hpp"
+#include "requests/PostRequest.hpp"
+
+//Request* createRequest(const int &fd, const std::list <Location*> locations) {
+Request* createRequest(const int &fd){
+	//Request temp (fd, locations);
 	Request temp;
 	temp.parseRequest(fd);
 
@@ -91,8 +102,9 @@ void Multiplexer::run()
 				}
 				else if (FD_ISSET(fd, &tmpWriteSet))
 				{
+					//Request* request = createRequest(fd, conf->getServer(0)._locations);
 					Request* request = createRequest(fd);
-					if (!request)
+					if (request == NULL)
 						throw std::runtime_error("Request is not POST nor GET");
 					std::string response = request->handle();
 					Logger::debug("Multiplexer::run() sending response of size " + Utils::toString(response.length()));

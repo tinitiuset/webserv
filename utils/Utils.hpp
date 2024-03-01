@@ -11,6 +11,7 @@ class Utils
 {
     public:
         static std::string  toString(const int &num);
+        static int toInt(const std::string &str);
         static std::string  strErase(std::string strBig, std::string strFind);
         static std::string  strReplace(std::string strBig, std::string strFind, std::string strReplace);
         static std::string  removeLastSlash(std::string str);

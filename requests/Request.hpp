@@ -5,18 +5,26 @@
 #include <string>
 #include "Response.hpp"
 #include "../utils/defaults.hpp"
+#include <vector>
 #include "../utils/Logger.hpp"
 #include "../utils/Utils.hpp"
 
 static std::string status(int code);
+#include "../model/Location.hpp"
+
+/* class VServer{
+	private:
+		std::vector<Location> _locations;
+}; */
 
 class Request {
-public:
+	public:
 
-	Request();
-	Request(const Request&);
-	Request& operator=(const Request&);
-	virtual ~Request();
+		Request();
+		Request(const Request&);
+		Request(const int &fd, const std::list <Location*> locations);
+		Request& operator=(const Request&);
+		virtual ~Request();
 
 	void parseRequest(const int &);
 	void printRequest() const;
@@ -25,14 +33,17 @@ public:
 	int	 getPort() const;
 	std::string getHost() const;
 
-	virtual std::string handle() {return NULL;};
-	std::string redirect();
+		virtual std::string handle() {return NULL;};
+		std::string redirect();
+		std::string getUri() const;
 
-protected:
-	std::string _method;
-	std::string _uri;
-	std::map<std::string, std::string> _headers;
-	std::string _body;
+	protected:
+		//void searchLocation(const std::string &path, const std::list <Location*> _locations);
+		std::string _method;
+		std::string _uri;
+		std::map<std::string, std::string> _headers;
+		std::string _body;
+		//Location *_location;
 };
 
 #endif
