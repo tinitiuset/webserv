@@ -36,47 +36,35 @@ std::string Resource::status() const {
 }
 
 std::string Resource::mime() const {
-	std::string extension = _path.substr(_path.find_last_of(".") + 1);
-	std::string mime = "text/plain";
-	if (extension == "html" || extension == "htm")
-		mime = "text/html";
-	else if (extension == "css")
-		mime = "text/css";
-	else if (extension == "js")
-		mime = "text/javascript";
-	else if (extension == "jpg" || extension == "jpeg")
-		mime = "image/jpeg";
-	else if (extension == "png")
-		mime = "image/png";
-	else if (extension == "gif")
-		mime = "image/gif";
-	else if (extension == "ico")
-		mime = "image/x-icon";
-	else if (extension == "svg")
-		mime = "image/svg+xml";
-	else if (extension == "pdf")
-		mime = "application/pdf";
-	else if (extension == "json")
-		mime = "application/json";
-	else if (extension == "xml")
-		mime = "application/xml";
-	else if (extension == "mp3")
-		mime = "audio/mpeg";
-	else if (extension == "mp4")
-		mime = "video/mp4";
-	else if (extension == "webm")
-		mime = "video/webm";
-	else if (extension == "ogg")
-		mime = "audio/ogg";
-	else if (extension == "wav")
-		mime = "audio/wav";
-	else if (extension == "avi")
-		mime = "video/x-msvideo";
-	else if (extension == "mpeg")
-		mime = "video/mpeg";
-	else if (extension == "txt")
-		mime = "text/plain";
-	return mime;
+
+	std::map<std::string, std::string> mimeTypes;
+
+	mimeTypes["html"] = "text/html";
+	mimeTypes["htm"] = "text/html";
+	mimeTypes["css"] = "text/css";
+	mimeTypes["js"] = "text/javascript";
+	mimeTypes["jpg"] = "image/jpeg";
+	mimeTypes["jpeg"] = "image/jpeg";
+	mimeTypes["png"] = "image/png";
+	mimeTypes["gif"] = "image/gif";
+	mimeTypes["ico"] = "image/x-icon";
+	mimeTypes["svg"] = "image/svg+xml";
+	mimeTypes["pdf"] = "application/pdf";
+	mimeTypes["json"] = "application/json";
+	mimeTypes["xml"] = "application/xml";
+	mimeTypes["mp3"] = "audio/mpeg";
+	mimeTypes["mp4"] = "video/mp4";
+	mimeTypes["webm"] = "video/webm";
+	mimeTypes["ogg"] = "audio/ogg";
+	mimeTypes["wav"] = "audio/wav";
+	mimeTypes["avi"] = "video/x-msvideo";
+	mimeTypes["mpeg"] = "video/mpeg";
+	mimeTypes["txt"] = "text/plain";
+
+	std::string extension = _path.substr(_path.find_last_of('.') + 1);
+	if (mimeTypes.find(extension) != mimeTypes.end())
+		return mimeTypes[extension];
+	return "text/plain";
 }
 
 std::string Resource::buildAI(std::string uri, int port, std::string address, std::string resPath)

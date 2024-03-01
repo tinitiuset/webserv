@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <dirent.h>
+#include <map>
 
 #include "../utils/Logger.hpp"
 #include "../utils/Utils.hpp"
