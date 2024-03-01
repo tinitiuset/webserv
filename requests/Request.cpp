@@ -34,8 +34,8 @@ Request& Request::operator=(const Request& request) {
 Request::~Request() {}
 
 void Request::parseRequest(const int &fd) {
-	char buffer[1024] = {0};
-	read(fd, buffer, 1024);
+	char buffer[10024] = {0};
+	read(fd, buffer, 10024);
 	std::string request(buffer);
 
 	Logger::debug("Raw request: " + request);

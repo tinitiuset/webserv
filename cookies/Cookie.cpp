@@ -35,7 +35,7 @@ void	Cookie::generateNewCookie()
 std::string	Cookie::getSetCookieValue()
 {
 	generateNewCookie();
-	std::string value = _newKey + "=" + _newValue + "\r\n";
+	std::string value = _newKey + "=" + _newValue;
 	return (value);
 }
 

@@ -51,7 +51,7 @@ std::string Response::format() const {
 		formatted_response += it->first + ": " + it->second + "\n";
 	}
 
-	formatted_response += _body;
+	formatted_response += "\n" + _body;
 
 	return formatted_response;
 }
