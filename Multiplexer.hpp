@@ -3,9 +3,14 @@
 
 #include <iostream>
 #include <vector>
+
 #include "utils/defaults.hpp"
 #include "utils/Logger.hpp"
 #include "utils/Utils.hpp"
+
+#include "requests/Request.hpp"
+#include "requests/GetRequest.hpp"
+#include "requests/PostRequest.hpp"
 
 class Multiplexer {
 
@@ -24,7 +29,7 @@ public:
 
 	size_t		getServerFdIdx(int fd) const;
 	size_t		getClientFdIdx(int fd) const;
-	void		setServerFdVec(std::vector<int>);
+	void		setServerFdVec(const std::vector<int>&);
 	
 };
 
