@@ -78,6 +78,16 @@ int Request::getPort() const
 		return (-1);
 }
 
+std::string Request::getReferer() const
+{
+	std::map<std::string, std::string>::const_iterator it = _headers.find("Referer");
+
+	if (it != _headers.end())
+		return (it->second);
+	else
+		return ("");
+}
+
 void Request::printRequest() const {
 	Logger::debug("Method: " + _method);
 	Logger::debug("URI: " + _uri);

@@ -14,15 +14,15 @@ std::string GetRequest::handle() {
 	int			port = getPort();
 	std::string address = conf->getServer(port).address();
 	bool		autoindex = false;
+	std::string referer = Utils::removeLastSlash(getReferer());
 
-
+	std::cout << "\n-------REFERER: " << referer << std::endl << std::endl;
 
 	if (dynamic_cast<Redirect*>(conf->getServer(port).location(_uri)))
 		return redirect();
 
 	if (Index* loc = dynamic_cast<Index*>(conf->getServer(port).bestLocation(_uri)))
 	{
-		//realpath
 		if (loc->file() == "" && loc->autoindex())
 		{
 			autoindex = true;
@@ -39,20 +39,17 @@ std::string GetRequest::handle() {
 		for (size_t i = 0; i < resPath.length() - 1; ++i) {
         	if (resPath[i] == '/' && resPath[i + 1] == '/') {
             	resPath.erase(i, 1);
-            	--i;  // Para volver a revisar el mismo índice después de la eliminación
+            	--i;
         	}
     	}
 		std::cout << "*****realpath: " << resPath << std::endl << std::endl;
 	}
 	
-
 	Logger::info("GetRequest::handle() handling GET request");
 
 	Response response;
 
-	//Resource resource("." + _uri);
 	std::string dotPath = "." + resPath;
-	//Resource resource("." + resPath);
 	Resource resource(dotPath);
 
 	std::map<std::string, std::string> headers;
@@ -62,7 +59,7 @@ std::string GetRequest::handle() {
 	if (autoindex && Utils::isDirectory(dotPath.c_str()))
 	{
 		std::cout << "IN autoindex" << std::endl;
-		response.set_body(resource.buildAI(_uri, port, address, resPath));
+		response.set_body(resource.buildAI(_uri, referer, resPath));
 		headers.insert(std::make_pair("Content-Type", "text/html"));
 	}
 	else

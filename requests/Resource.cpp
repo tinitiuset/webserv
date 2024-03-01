@@ -79,21 +79,16 @@ std::string Resource::mime() const {
 	return mime;
 }
 
-std::string Resource::buildAI(std::string uri, int port, std::string address, std::string resPath)
+std::string Resource::buildAI(std::string uri, std::string referer, std::string resPath)
 {
     std::cout << "\n}}}}}}}Resource::buildAI() building autoindex" << std::endl;
     std::cout << "uri: " << uri << std::endl;
-    std::cout << "port: " << port << std::endl;
-    std::cout << "address: " << address << std::endl;
+    std::cout << "referer: " << referer << std::endl;
     std::cout << "resPath: " << resPath << std::endl;
-
-    
     
     std::string result = "";
-	std::string host = "localhost:" + Utils::toString(port);
-    resPath = "." + resPath;
+	resPath = "." + resPath;
 	
-    std::cout << "host: " << host << std::endl;
     std::cout << "resPath: " << resPath << std::endl;
 
 
@@ -109,7 +104,7 @@ std::string Resource::buildAI(std::string uri, int port, std::string address, st
 	std::string prevUri = getPreviousUri(uri);
     std::cout << "prevUri: " << prevUri << std::endl;
 
-    result += "<li>\n<a href=\"http://" + host + prevUri + "\">" + ".." + "</a>\n</li>\n";
+    result += "<li>\n<a href=\"" + referer + prevUri + "\">" + ".." + "</a>\n</li>\n";
 
     //std::string path = Utils::strReplace(_uri, _locName, _serverPath);
     //if ((dir = opendir(resPath.c_str())) != NULL)
@@ -119,7 +114,7 @@ std::string Resource::buildAI(std::string uri, int port, std::string address, st
 		{
             std::string	file(ent->d_name);
 			if (file != "." && file != "..")
-				result += "<li>\n<a href=\"http://" + host + uri + "/" + file + "\">" + file + "</a>\n</li>\n";
+				result += "<li>\n<a href=\"" + referer + uri + "/" + file + "\">" + file + "</a>\n</li>\n";
         }
         closedir(dir);
     }
@@ -133,8 +128,6 @@ std::string Resource::buildAI(std::string uri, int port, std::string address, st
 	std::cout << "Result: " << result << std::endl << std::endl;
 
     return (result);
-
-	return (result);
 }
 
 /*
