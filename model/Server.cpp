@@ -1,5 +1,4 @@
 #include "Server.hpp"
-#include "../utils/Utils.hpp"
 
 void sanitize(std::string& serverBlock) {
 	std::string result;
@@ -61,7 +60,7 @@ Server::Server(std::string& serverBlock): _fd(-1) {
 	}
 }
 
-Server::Server(const Server& other): _server_name(other._server_name), _address(other._address), _port(other._port),
+Server::Server(const Server& other): _server_name(other._server_name), _address(other._address), _fd(other._fd), _port(other._port),
   _body_size(other._body_size), _root(other._root)
 {
 	for (std::list<Location*>::const_iterator it = other._locations.begin(); it != other._locations.end(); ++it) {
@@ -93,12 +92,12 @@ Location* Server::location(const std::string& path) const {
 			return location;
 	}
 	// Should be default location TBD
-	return nullptr;
+	return NULL;
 }
 
 Location* Server::bestLocation(const std::string& path) const {
 	std::size_t longestMatch = 0;
-	Location* bestLocation = nullptr;
+	Location* bestLocation = NULL;
 	for (std::list<Location*>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
 		Location* location = *it;
 	}
@@ -118,23 +117,23 @@ Location* Server::bestLocation(const std::string& path) const {
 
 void Server::bind() {
 
-  struct sockaddr_in servaddr = {};
-  servaddr.sin_family = AF_INET;
-  servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	sockaddr_in servaddr = {};
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-  try {
-    if (_port <= 0 || _port > 65535)
-      throw std::runtime_error("Invalid port number\n");
-    servaddr.sin_port = htons(_port);
-  } catch (std::exception &e) {
-    std::cout << e.what() << std::endl;
-  }
+	try {
+	if (_port <= 0 || _port > 65535)
+	  throw std::runtime_error("Invalid port number\n");
+	servaddr.sin_port = htons(_port);
+	} catch (std::exception &e) {
+	std::cout << e.what() << std::endl;
+	}
 
-  ((_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-      ? throw std::runtime_error("Socket creation failed\n")
-      : Logger::debug("Socket successfully created");
+	((_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+	  ? throw std::runtime_error("Socket creation failed\n")
+	  : Logger::debug("Socket successfully created");
 
-  // set socket as reusable
+	// set socket as reusable
 
 	int option = 1;
 	((setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option)) == -1))
@@ -160,4 +159,4 @@ void Server::bind() {
 		: Logger::debug("Socket setted to non blocking");
 
 	Logger::info("Server " + _server_name + " listening in port " + Utils::toString(_port));
-	}
+}
