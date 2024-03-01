@@ -79,19 +79,11 @@ std::string Resource::mime() const {
 	return mime;
 }
 
-std::string Resource::buildAI(std::string uri, std::string referer, std::string resPath)
+std::string Resource::buildAI(std::string uri, std::string host, std::string resPath)
 {
-    std::cout << "\n}}}}}}}Resource::buildAI() building autoindex" << std::endl;
-    std::cout << "uri: " << uri << std::endl;
-    std::cout << "referer: " << referer << std::endl;
-    std::cout << "resPath: " << resPath << std::endl;
-    
     std::string result = "";
 	resPath = "." + resPath;
 	
-    std::cout << "resPath: " << resPath << std::endl;
-
-
 	DIR *dir;
     struct dirent *ent;
 
@@ -102,19 +94,16 @@ std::string Resource::buildAI(std::string uri, std::string referer, std::string 
 	result += "</h1>\n<ul>\n";
 
 	std::string prevUri = getPreviousUri(uri);
-    std::cout << "prevUri: " << prevUri << std::endl;
 
-    result += "<li>\n<a href=\"" + referer + prevUri + "\">" + ".." + "</a>\n</li>\n";
+    result += "<li>\n<a href=\"http://" + host + prevUri + "\">" + ".." + "</a>\n</li>\n";
 
-    //std::string path = Utils::strReplace(_uri, _locName, _serverPath);
-    //if ((dir = opendir(resPath.c_str())) != NULL)
     if ((dir = opendir(resPath.c_str())) != NULL)
 	{
         while ((ent = readdir(dir)) != NULL) 
 		{
             std::string	file(ent->d_name);
 			if (file != "." && file != "..")
-				result += "<li>\n<a href=\"" + referer + uri + "/" + file + "\">" + file + "</a>\n</li>\n";
+				result += "<li>\n<a href=\"http://" + host + uri + "/" + file + "\">" + file + "</a>\n</li>\n";
         }
         closedir(dir);
     }

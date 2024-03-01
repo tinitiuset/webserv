@@ -78,9 +78,9 @@ int Request::getPort() const
 		return (-1);
 }
 
-std::string Request::getReferer() const
+std::string Request::getHost() const
 {
-	std::map<std::string, std::string>::const_iterator it = _headers.find("Referer");
+	std::map<std::string, std::string>::const_iterator it = _headers.find("Host");
 
 	if (it != _headers.end())
 		return (it->second);

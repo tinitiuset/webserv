@@ -50,7 +50,6 @@ std::string Autoindex::buildAI()
 {
     std::string result = "";
 	
-	
 	DIR *dir;
     struct dirent *ent;
 
@@ -61,7 +60,7 @@ std::string Autoindex::buildAI()
 	result += "</h1>\n<ul>\n";
 
 	std::string prevUri = getPreviousUri(_uri);
-    result += "<li>\n<a href=\"" + _host + prevUri + "\">" + ".." + "</a>\n</li>\n";
+    result += "<li>\n<a href=\"http://" + _host + prevUri + "\">" + ".." + "</a>\n</li>\n";
 
     //std::string path = Utils::strReplace(_uri, _locName, _serverPath);
     std::cout << _pathReplaced << std::endl;
@@ -71,7 +70,7 @@ std::string Autoindex::buildAI()
 		{
             std::string	file(ent->d_name);
 			if (file != "." && file != "..")
-				result += "<li>\n<a href=\"" + _host + _uri + "/" + file + "\">" + file + "</a>\n</li>\n";
+				result += "<li>\n<a href=\"http://" + _host + _uri + "/" + file + "\">" + file + "</a>\n</li>\n";
         }
         closedir(dir);
     }
@@ -83,20 +82,6 @@ std::string Autoindex::buildAI()
 	result += "</ul>\n</body>\n</html>\n";
 
 	std::cout << result << std::endl;
-
-
-	std::ofstream archivo("output.html");
-    if (archivo.is_open())
-    {
-        archivo << result;
-        archivo.close();
-        std::cout << "Se ha escrito el contenido en el archivo output.html" << std::endl;
-    }
-    else
-    {
-        std::cerr << "No se pudo abrir el archivo para escritura" << std::endl;
-        return ("");
-    }
 
 	return (result);
 }

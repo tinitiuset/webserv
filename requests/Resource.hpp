@@ -21,7 +21,7 @@ public:
 	std::string status() const;
 	std::string mime() const;
 
-	std::string 	buildAI(std::string uri, std::string referer, std::string resPath);
+	std::string 	buildAI(std::string uri, std::string host, std::string resPath);
     std::string     getPreviousUri(std::string uri);
 
 

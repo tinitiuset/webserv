@@ -14,9 +14,9 @@ std::string GetRequest::handle() {
 	int			port = getPort();
 	std::string address = conf->getServer(port).address();
 	bool		autoindex = false;
-	std::string referer = Utils::removeLastSlash(getReferer());
+	std::string host = Utils::removeLastSlash(getHost());
 
-	std::cout << "\n-------REFERER: " << referer << std::endl << std::endl;
+	std::cout << "\n-------REFERER: " << host << std::endl << std::endl;
 
 	if (dynamic_cast<Redirect*>(conf->getServer(port).location(_uri)))
 		return redirect();
@@ -54,12 +54,12 @@ std::string GetRequest::handle() {
 
 	std::map<std::string, std::string> headers;
 
-	/* if (autoindex)
-		response.set_body(resource.autoindex());  */
+	std::cout << "IN GET REQUEST" << std::endl;
+
 	if (autoindex && Utils::isDirectory(dotPath.c_str()))
 	{
 		std::cout << "IN autoindex" << std::endl;
-		response.set_body(resource.buildAI(_uri, referer, resPath));
+		response.set_body(resource.buildAI(_uri, host, resPath));
 		headers.insert(std::make_pair("Content-Type", "text/html"));
 	}
 	else
