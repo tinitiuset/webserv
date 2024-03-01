@@ -6,6 +6,7 @@
 
 /*
  * Usage:
+ * Logger::trace("This is a trace message");
  * Logger::debug("This is a debug message");
  * Logger::info("This is an info message");
  * Logger::warning("This is a warning message");
@@ -13,6 +14,7 @@
  */
 class Logger {
 public:
+	static void trace(const std::string&);
 	static void debug(const std::string&);
 	static void info(const std::string&);
 	static void warning(const std::string&);
