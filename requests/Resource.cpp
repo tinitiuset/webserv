@@ -19,16 +19,13 @@ Resource::~Resource() {}
 
 std::string Resource::load() const {
 	Logger::info("Resource::load() Loading resource from " + _path);
-	std::string extension = _path.substr(_path.find_last_of(".") + 1);
-	if (mime().find("text") == std::string::npos) {
-		std::ifstream file(_path, std::ios::binary);
-		std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-		return content;
-	} else {
-		std::ifstream file(_path);
-		std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-		return content;
-	}
+
+	std::ifstream file;
+
+	(mime().find("text") == std::string::npos) ?
+		file = std::ifstream(_path, std::ios::binary) : file = std::ifstream(_path);
+
+	return std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 }
 
 std::string Resource::status() const {
