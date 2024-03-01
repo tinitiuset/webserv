@@ -54,6 +54,7 @@ bool Cookie::isValidCookie(const std::map<std::string, std::string>& headers)
 	{
 		if (it->first == "Cookie")
 		{
+			std::cout << "Cookie: " << it->second << std::endl;
 			std::string cookieString = it->second;
 			size_t equalPos = cookieString.find('=');
 			if (equalPos != std::string::npos)
@@ -62,10 +63,15 @@ bool Cookie::isValidCookie(const std::map<std::string, std::string>& headers)
 				std::string value = cookieString.substr(equalPos + 1);
 				std::map<std::string, std::string>::iterator dbIt = _sessionDB.find(key);
 				if (dbIt != _sessionDB.end() && dbIt->second == value)
+				{
+
+					std::cout << "Cookie is valid" << std::endl;
 					return (true);
+				}
 			}
 		}
 	}
+	std::cout << "Cookie is not valid" << std::endl;
 	return (false);
 }
 
