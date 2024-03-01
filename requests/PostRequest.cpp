@@ -5,7 +5,7 @@
 
 PostRequest::PostRequest(const Request& request): Request(request) {
 	parse_type();
-	if (_headers["Content-Type"] == "multipart/form-data")
+	if (_headers["Content-Type"].find("multipart/form-data") != std::string::npos)
 		parse_multipart_body(_body);
 }
 
@@ -37,13 +37,14 @@ std::string PostRequest::handle() {
 	return response.format();
 }
 
+//Method to parse the type of the request if necessary
 void PostRequest::parse_type(void) {
 	std::string type = _headers["Content-Type"];
 	std::istringstream contStrm(type);
 	std::string value, key;
 
 	std::getline(contStrm, value, ';');
-	this->_headers["Content-Type"] = value.substr(1);
+	this->_headers["Content-Type"] = value;
 	while (std::getline(contStrm, key, '='))
 	{
 		std::getline(contStrm, value, ';');
@@ -58,12 +59,12 @@ void	PostRequest::parse_multipart_body(std::string body){
 	std::string delimiter_end = "--" + boundary + "--";
 	std::istringstream bodyStream(body);
 	std::string line;
-	std::string real_body;
-	bool isNotFirst = false;
 
 	std::getline(bodyStream, line);
+	line.erase(line.end() - 1, line.end()); // Remove trailing '\r'
 	if (line == delimiter) {
 		std::getline(bodyStream, line);
+		line.erase(line.end() - 1, line.end()); // Remove trailing '\r'
 		while (line != delimiter_end && line != "")
 		{
 			std::istringstream lineStream(line);
@@ -78,25 +79,24 @@ void	PostRequest::parse_multipart_body(std::string body){
 				_postHeaders[key.substr(1)] = value.substr(1).substr(0, value.length() - 2);
 			}
 			std::getline(bodyStream, line);
+			line.erase(line.end() - 1, line.end()); // Remove trailing '\r'
 		}
-		while (std::getline(bodyStream, line) && line != delimiter_end)
-		{
-			if (isNotFirst)
-				real_body += "\n";
-			else
-				isNotFirst = true;
-			real_body += line;
-			//std::getline(bodyStream, line);
-		}
-		_body = real_body;
+		int const start = bodyStream.tellg();
+        int const end = body.find(delimiter_end, start);
+
+        // Extract the image data
+        std::string const image_data = body.substr(start, end - start);
+
+		_body = image_data;
 	}
 }
 
+//Method to save the file in the server
 void	PostRequest::save_file(std::string body){
-	std::cout << body << std::endl;
-	std::string path = _uri + _postHeaders["filename"];
+	std::string path = ((Index*)_location)->file() + _uri + _postHeaders["filename"];
 	std::ofstream outfile(path, std::ios::out | std::ios::binary);
-	outfile << body << std::endl;
-	outfile.close();
 
+	outfile << body;
+	outfile.flush();
+	outfile.close();
 }

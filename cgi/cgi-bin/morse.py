@@ -1,8 +1,10 @@
+#!/usr/local/bin/python3
+
 import csv
 import sys
 
 def get_code():
-    file = open('cgi-bin/MORSE.csv',mode='r', encoding='latin-1')
+    file = open('cgi-bin/morse.csv',mode='r', encoding='latin-1')
     fd = file.read()
     file.close()
     raw = fd.replace('_', '-')
@@ -15,14 +17,12 @@ def get_code():
     del morse_code[next(iter(morse_code))]
     return(morse_code)
 
-morse_code = get_code()
+argument = input()
 
-
-if len(sys.argv) < 2:
-	print("Error")
+if argument == None or argument == "":
+	print("Input error")
 	exit()
 else:
-    argument = sys.argv[1]
     if ("=") in argument:
         argument = argument[(argument.find("=") + 1):]
         argument = argument.replace("+", " ")
@@ -30,6 +30,9 @@ else:
         print("Unexpected input")
         exit()
 input = argument.strip()
+
+morse_code = get_code()
+
 output = ""
 i = 0
 while i < len(input):
