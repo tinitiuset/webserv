@@ -30,19 +30,19 @@ class Request {
 		void printRequest() const;
 		bool isGetRequest() const;
 		bool isPostRequest() const;
-	int	 getPort() const;
+		int	 getPort() const;
 
 		virtual std::string handle() {return NULL;};
-	std::string redirect();
+		std::string redirect();
 		std::string getUri() const;
 
 	protected:
-		void searchLocation(const std::string &path, const std::list <Location*> _locations);
+		//void searchLocation(const std::string &path, const std::list <Location*> _locations);
 		std::string _method;
 		std::string _uri;
 		std::map<std::string, std::string> _headers;
 		std::string _body;
-		Location *_location;
+		//Location *_location;
 };
 
 #endif

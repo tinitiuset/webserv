@@ -23,12 +23,12 @@ Request::Request(const Request& request) {
 	_uri = request._uri;
 	_headers = request._headers;
 	_body = request._body;
-	_location = request._location;
+	//_location = request._location;
 }
 
 Request::Request(const int &fd, const std::list <Location*> locations) {
 	this->parseRequest(fd);
-	this->searchLocation(_uri, locations);
+	//this->searchLocation(_uri, locations);
 }
 
 Request& Request::operator=(const Request& request) {
@@ -124,7 +124,7 @@ std::string Request::redirect() {
 }
 
 
-void Request::searchLocation(const std::string &path, const std::list <Location*> locations) {
+/* void Request::searchLocation(const std::string &path, const std::list <Location*> locations) {
 	std::size_t longestMatch = 0;
 	for (std::list<Location*>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
 		if ((*it)->path().length() > longestMatch)
@@ -136,7 +136,7 @@ void Request::searchLocation(const std::string &path, const std::list <Location*
 			}
 		}
 	}
-}
+} */
 
 std::string Request::getUri() const {
 	return _uri;

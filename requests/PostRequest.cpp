@@ -93,7 +93,8 @@ void	PostRequest::parse_multipart_body(std::string body){
 
 //Method to save the file in the server
 void	PostRequest::save_file(std::string body){
-	std::string path = ((Index*)_location)->file() + _uri + _postHeaders["filename"];
+	Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
+	std::string path = loc->root() + "/" + _postHeaders["filename"];
 	std::ofstream outfile(path, std::ios::out | std::ios::binary);
 
 	outfile << body;
