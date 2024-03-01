@@ -22,7 +22,7 @@ public:
 	std::string status() const;
 	std::string mime() const;
 
-	std::string 	buildAI(std::string uri, int port, std::string address, std::string resPath);
+	std::string 	buildAI(std::string uri, std::string host, std::string resPath);
     std::string     getPreviousUri(std::string uri);
 
 
