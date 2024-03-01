@@ -4,12 +4,14 @@
 #include <string>
 #include <list>
 #include <sstream>
+#include "../utils/Utils.hpp"
 
 class Location {
 protected:
 	std::string _path;
 
 public:
+	Location();
 	virtual ~Location();
 	virtual Location* clone() const = 0;
 
@@ -24,6 +26,7 @@ private:
 
 public:
 	Redirect(std::string&);
+	Redirect(const Redirect& other);
 	~Redirect();
 
 	Redirect* clone() const { return new Redirect(*this); }
@@ -36,20 +39,26 @@ public:
 class Index: public Location {
 
 private:
+	std::string _root;
 	std::string _file;
 	bool _autoindex;
+	bool _cgi;
 	std::list<std::string> _methods;
 
 public:
-
 	Index(std::string&);
+	Index(const Index& other);
 	~Index();
 
 	Index* clone() const { return new Index(*this); }
 
+	std::string root();
 	std::string file();
 	bool autoindex();
+	bool cgi();
 	std::list<std::string> methods();
+	std::string buildRealPath(std::string &uri);
+
 };
 
 #endif

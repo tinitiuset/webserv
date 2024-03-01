@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "../utils/Utils.hpp"
 #include <algorithm>
 
 void sanitize(std::string& serverBlock) {
@@ -96,6 +97,26 @@ Location* Server::location(const std::string& path) const {
 	return nullptr;
 }
 
+Location* Server::bestLocation(const std::string& path) const {
+	std::size_t longestMatch = 0;
+	Location* bestLocation = nullptr;
+	for (std::list<Location*>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
+		Location* location = *it;
+	}
+	for (std::list<Location*>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
+		Location* location = *it;
+		if (location->path().length() > longestMatch) {
+			if (path.find(location->path()) == 0) {
+				bestLocation = location;
+				longestMatch = location->path().length();
+			}
+		}
+	}
+	return bestLocation;
+}
+
+
+
 void Server::bind() {
 
   struct sockaddr_in servaddr = {};
@@ -116,29 +137,28 @@ void Server::bind() {
 
   // set socket as reusable
 
-  int option = 1;
-  ((setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option)) == -1))
-      ? throw std::runtime_error("Setting to reusable failed\n")
-      : Logger::debug("Socket options successfully setted");
+	int option = 1;
+	((setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option)) == -1))
+		? throw std::runtime_error("Setting to reusable failed\n")
+		: Logger::debug("Socket options successfully setted");
 
-  // https://man7.org/linux/man-pages/man2/bind.2.html
-    (::bind(_fd, reinterpret_cast<struct sockaddr *>(&servaddr), sizeof(servaddr)) == -1)
-      ? throw std::runtime_error("Binding failed\n")
-      : Logger::debug("Socket successfully binded");
+	// https://man7.org/linux/man-pages/man2/bind.2.html
+	(::bind(_fd, reinterpret_cast<struct sockaddr *>(&servaddr), sizeof(servaddr)) == -1)
+		? throw std::runtime_error("Binding failed\n")
+		: Logger::debug("Socket successfully binded");
 
-  // https://man7.org/linux/man-pages/man2/listen.2.html
-  try {
-    listen(_fd, 256);
-    Logger::info("Server listening on port " + std::to_string(_port));
-  } catch (std::exception &e) {
-    std::cout << e.what() << std::endl;
-  }
+	// https://man7.org/linux/man-pages/man2/listen.2.html
+	try {
+		listen(_fd, 256);
+		Logger::info("Server listening on port " + Utils::toString(_port));
+	} catch (std::exception &e) {
+		std::cout << e.what() << std::endl;
+	}
 
-  // setting socket as non blocking
-  (fcntl(_fd, F_SETFL, O_NONBLOCK) == -1)
-      ? throw std::runtime_error("Setting to nonblocking failed")
-      : Logger::debug("Socket setted to non blocking");
+	// setting socket as non blocking
+	(fcntl(_fd, F_SETFL, O_NONBLOCK) == -1)
+		? throw std::runtime_error("Setting to nonblocking failed")
+		: Logger::debug("Socket setted to non blocking");
 
-  Logger::info("Server " + _server_name + " listening in port " + std::to_string(_port));
-
-}
+	Logger::info("Server " + _server_name + " listening in port " + Utils::toString(_port));
+	}

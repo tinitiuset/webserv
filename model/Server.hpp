@@ -36,6 +36,7 @@ public:
 	int body_size() const;
 	std::string root() const;
 	Location* location(const std::string& path) const;
+	Location* bestLocation(const std::string& path) const;
 
 	void bind();
 

@@ -31,8 +31,7 @@ Multiplexer::~Multiplexer() {}
 
 void Multiplexer::run()
 {
-	int	selectRes;
-	int max_fd = conf->getServerCount() + 2;
+	int max_fd = conf->serverCount() + 2;
 
 	fd_set	readSet;
 	fd_set	writeSet;
@@ -40,7 +39,7 @@ void Multiplexer::run()
 	FD_ZERO(&readSet);
 	FD_ZERO(&writeSet);
 
-	serverFdVec = conf->getServerSockets();
+	serverFdVec = conf->serverSockets();
 
 	for (size_t i = 0; i < serverFdVec.size(); ++i)
 		FD_SET(serverFdVec[i], &readSet);
@@ -50,7 +49,7 @@ void Multiplexer::run()
 		fd_set tmpReadSet = readSet;
 		fd_set tmpWriteSet = writeSet;
 
-		selectRes = select(max_fd + 1, &tmpReadSet, &tmpWriteSet, NULL, NULL);
+		const int selectRes = select(max_fd + 1, &tmpReadSet, &tmpWriteSet, NULL, NULL);
 
 		if (selectRes == 0)
 			std::cout << "Selection OK" << std::endl;
@@ -58,7 +57,6 @@ void Multiplexer::run()
 		{
 			if (!_endserver)
 				throw std::runtime_error("Select failed\n");
-			continue ;
 		}
 		else if (selectRes > 0)
 		{
@@ -66,19 +64,18 @@ void Multiplexer::run()
 
 			while (fd <= max_fd)
 			{
-				int	locReadVec = getServerFdIdx(fd);
-				int	locWriteVec = getClientFdIdx(fd);
+				const size_t locReadVec = getServerFdIdx(fd);
+				const size_t locWriteVec = getClientFdIdx(fd);
 
 				if (FD_ISSET(fd, &tmpReadSet))
 				{
 					if (locReadVec != -1)
 					{
-						// ACCEPT REQUEST
-						struct sockaddr 	cli;
+						sockaddr 	cli = {};
 						socklen_t	clilen = sizeof(cli);
 						int			cliFd;
 
-						cliFd = accept(fd, (struct sockaddr *)&cli, &clilen);
+						cliFd = accept(fd, &cli, &clilen);
 						cliFd == -1
 						? throw std::runtime_error("Failed to accept\n")
 						: Logger::debug("Client socket accepted by server\n");
@@ -89,12 +86,6 @@ void Multiplexer::run()
 
 						clientFdVec.push_back(cliFd);
 
-						/*
-						if any config data is needed here we can call
-						size_t *getSockFdCoords(int fd) and store result in int i and int j
-						i for server index
-						j for nested vectors index
-						*/
 						FD_SET(cliFd, &readSet);
 						if (cliFd > max_fd)
 							max_fd = cliFd;
@@ -103,10 +94,7 @@ void Multiplexer::run()
 					}
 					else if(locWriteVec != -1)
 					{
-						//READ REQUEST...
 						FD_CLR(clientFdVec[locWriteVec], &readSet);
-						//if se ha leido una solicitud y hay datos para enviar:
-							//FD_SET(clientFdVec[locWriteVec], &tmpWriteSet);
 						FD_SET(clientFdVec[locWriteVec], &writeSet);
 					}
 				}
@@ -116,7 +104,7 @@ void Multiplexer::run()
 					if (request == NULL)
 						throw std::runtime_error("Request is not POST nor GET");
 					std::string response = request->handle();
-					Logger::debug("Multiplexer::run() sending response of size " + std::to_string(response.length()));
+					Logger::debug("Multiplexer::run() sending response of size " + Utils::toString(response.length()));
 					write(fd, response.c_str(), response.length());
 					delete request;
 
@@ -130,13 +118,9 @@ void Multiplexer::run()
 			}
 		}
 	}
-	//close
 	for (int i = 0; i < max_fd; ++i)
 		close(i);
 }
-
-
-
 
 int	getMaxFd(std::vector<std::vector<int> > sockfd)
 {
@@ -162,7 +146,7 @@ void	Multiplexer::signalHandler(int signal)
 		_endserver = true;
 }
 
-size_t	Multiplexer::getServerFdIdx(int fd) const
+size_t	Multiplexer::getServerFdIdx(const int fd) const
 {
 	for (size_t i = 0; i < serverFdVec.size(); ++i)
 		if (fd == serverFdVec[i])
@@ -170,7 +154,7 @@ size_t	Multiplexer::getServerFdIdx(int fd) const
 	return (-1);
 }
 
-size_t	Multiplexer::getClientFdIdx(int fd) const
+size_t	Multiplexer::getClientFdIdx(const int fd) const
 {
 	for (size_t i = 0; i < clientFdVec.size(); ++i)
 		if (fd == clientFdVec[i])
@@ -178,10 +162,8 @@ size_t	Multiplexer::getClientFdIdx(int fd) const
 	return (-1);
 }
 
-void	Multiplexer::setServerFdVec(std::vector<int> sockfd)
+void	Multiplexer::setServerFdVec(const std::vector<int>& sockfd)
 {
 	for (size_t i = 0; i < sockfd.size(); ++i)
 		serverFdVec.push_back(sockfd[i]);
-
 }
-

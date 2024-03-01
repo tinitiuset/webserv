@@ -1,4 +1,6 @@
 #include "Response.hpp"
+#include <iostream>
+
 
 Response::Response() {}
 
@@ -42,14 +44,14 @@ void Response::set_body(const std::string& body) {
 }
 
 std::string Response::format() const {
-	std::string formatted_response = _start_line + "\r\n";
+	std::string formatted_response = _start_line + "\n";
 
 	std::map<std::string, std::string>::const_iterator it;
 	for (it = _headers.begin(); it != _headers.end(); ++it) {
-		formatted_response += it->first + ": " + it->second + "\r\n";
+		formatted_response += it->first + ": " + it->second + "\n";
 	}
 
-	formatted_response += "\r\n" + _body;
+	formatted_response += "\n" + _body;
 
 	return formatted_response;
 }

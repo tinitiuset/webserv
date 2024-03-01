@@ -20,9 +20,9 @@ public:
   void parse();
   void load();
 
-  Server getServer(int index);
-  int getServerCount();
-  std::vector<int> getServerSockets();
+  const Server& getServer(int port) const;
+  int serverCount();
+  std::vector<int> serverSockets();
 };
 
 #endif

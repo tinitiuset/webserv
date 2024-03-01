@@ -3,8 +3,13 @@
 
 #include <map>
 #include <string>
+#include "Response.hpp"
+#include "../utils/defaults.hpp"
 #include <vector>
 #include "../utils/Logger.hpp"
+#include "../utils/Utils.hpp"
+
+static std::string status(int code);
 #include "../model/Location.hpp"
 
 /* class VServer{
@@ -25,7 +30,10 @@ class Request {
 		void printRequest() const;
 		bool isGetRequest() const;
 		bool isPostRequest() const;
+	int	 getPort() const;
+
 		virtual std::string handle() {return NULL;};
+	std::string redirect();
 		std::string getUri() const;
 
 	protected:
