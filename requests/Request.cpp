@@ -116,6 +116,10 @@ bool Request::isPostRequest() const {
 	return _method == "POST";
 }
 
+bool Request::isDeleteRequest() const {
+	return _method == "DELETE";
+}
+
 std::string Request::redirect() {
 	Redirect* redirect = dynamic_cast<Redirect*>(conf->getServer(getPort()).location(_uri));
 

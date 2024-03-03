@@ -11,7 +11,8 @@ class DeleteRequest: public Request {
 		DeleteRequest(const Request&);
 		~DeleteRequest();
 		std::string handle();
-		void	delete_file(std::string path);
+		int	delete_file(std::string path);
+		int	delete_directory(std::string path);
 };
 
 #endif

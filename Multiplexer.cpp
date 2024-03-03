@@ -8,6 +8,7 @@
 #include "requests/Request.hpp"
 #include "requests/GetRequest.hpp"
 #include "requests/PostRequest.hpp"
+#include "requests/DeleteRequest.hpp"
 
 //Request* createRequest(const int &fd, const std::list <Location*> locations) {
 Request* createRequest(const int &fd){
@@ -19,6 +20,8 @@ Request* createRequest(const int &fd){
 		return new GetRequest(temp);
 	else if (temp.isPostRequest())
 		return new PostRequest(temp);
+	else if (temp.isDeleteRequest())
+		return new DeleteRequest(temp);
 
 	return NULL;
 }

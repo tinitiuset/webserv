@@ -18,6 +18,7 @@ class Utils
         static  int         findStrInVector(const std::vector<std::string> &vec, const std::string &target);
         static  bool        isDirectory(const char* path);
         static  bool        isFile(const char* path);
+        static int	ft_strcmp(const char *s1, const char *s2);
 };
 
 #endif

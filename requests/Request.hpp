@@ -30,6 +30,7 @@ class Request {
 	void printRequest() const;
 	bool isGetRequest() const;
 	bool isPostRequest() const;
+	bool isDeleteRequest() const;
 	int	 getPort() const;
 	std::string getHost() const;
 
