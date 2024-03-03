@@ -93,12 +93,12 @@ Location* Server::location(const std::string& path) const {
 			return location;
 	}
 	// Should be default location TBD
-	return nullptr;
+	return NULL;
 }
 
 Location* Server::bestLocation(const std::string& path) const {
 	std::size_t longestMatch = 0;
-	Location* bestLocation = nullptr;
+	Location* bestLocation = NULL;
 	for (std::list<Location*>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
 		Location* location = *it;
 	}

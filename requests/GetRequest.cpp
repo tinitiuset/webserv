@@ -60,8 +60,12 @@ std::string GetRequest::handle() {
 
 	if (!Cookie::isValidCookie(_headers))
 	{
-
-		headers["Set-Cookie"] = Cookie::getSetCookieValue();
+		std::string cookie = Cookie::getSetCookieValue();
+		headers["Set-Cookie"] = "webserv = " + cookie;
+		int fd = open("./cookies/cookies.txt", O_WRONLY | O_APPEND | O_CREAT, 0644);	
+		cookie += "\n";
+		write(fd, cookie.c_str(), cookie.length());
+		close(fd);		
 	}
 
 	response.set_headers(headers);
