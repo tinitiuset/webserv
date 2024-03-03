@@ -34,19 +34,17 @@ void	Cookie::generateNewCookie()
 
 std::string	Cookie::getSetCookieValue()
 {
-	generateNewCookie();
-	std::string value = _newKey + "=" + _newValue;
+	//create a random number of length 10 with seed time
+
+    unsigned int rNumb = 0;
+    for (int i = 0; i < 10; ++i) {
+        rNumb = rNumb * 10 + (std::rand() % 10);
+    }
+    rNumb = rNumb % 1000000000;
+	std::string value = Utils::toString(rNumb);
 	return (value);
 }
 
-std::string	Cookie::getCookieResponse()
-{
-	std::string cookieResponse = "HTTP/1.1 200 OK\r\n";
-	cookieResponse += "Content-Type: text/html\r\n";
-	cookieResponse += getSetCookieValue();
-	cookieResponse += "\r\n";
-	return (cookieResponse);
-}
 
 bool Cookie::isValidCookie(const std::map<std::string, std::string>& headers)
 {
@@ -54,21 +52,7 @@ bool Cookie::isValidCookie(const std::map<std::string, std::string>& headers)
 	{
 		if (it->first == "Cookie")
 		{
-			std::cout << "Cookie: " << it->second << std::endl;
-			std::string cookieString = it->second;
-			size_t equalPos = cookieString.find('=');
-			if (equalPos != std::string::npos)
-			{
-				std::string key = cookieString.substr(0, equalPos);
-				std::string value = cookieString.substr(equalPos + 1);
-				std::map<std::string, std::string>::iterator dbIt = _sessionDB.find(key);
-				if (dbIt != _sessionDB.end() && dbIt->second == value)
-				{
-
-					std::cout << "Cookie is valid" << std::endl;
-					return (true);
-				}
-			}
+			
 		}
 	}
 	std::cout << "Cookie is not valid" << std::endl;
