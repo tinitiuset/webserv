@@ -7,6 +7,8 @@
 #include "../model/Conf.hpp"
 #include "Logger.hpp"
 
+class Logger;
+
 extern Conf *conf;
 
 #endif

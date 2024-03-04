@@ -40,12 +40,14 @@ std::string GetRequest::handle() {
 
 	Response response;
 
-	std::string dotPath = "." + resPath;
-	Resource resource(dotPath);
+	//std::string dotPath = "." + resPath;
+	//std::string dotPath = resPath;
+
+	Resource resource(resPath);
 
 	std::map<std::string, std::string> headers;
 
-	if (autoindex && Utils::isDirectory(dotPath.c_str()))
+	if (autoindex && Utils::isDirectory(resPath.c_str()))
 	{
 		response.set_body(resource.buildAI(_uri, host, resPath));
 		headers.insert(std::make_pair("Content-Type", "text/html"));

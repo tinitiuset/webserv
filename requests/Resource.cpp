@@ -82,8 +82,7 @@ std::string Resource::mime() const {
 std::string Resource::buildAI(std::string uri, std::string host, std::string resPath)
 {
     std::string result = "";
-	resPath = "." + resPath;
-	
+		
 	DIR *dir;
     struct dirent *ent;
 
