@@ -66,8 +66,8 @@ void Request::parseRequest(const int &fd) {
 		std::getline(headerLineStream, value);
 		_headers[key] = value.substr(1);
 	}
-	std::string body_real(&buffer[requestStream.tellg()], Utils::toInt(_headers["Content-Length"]));
-	_body = body_real;
+	!_headers["Content-Length"].empty() ?
+		_body = std::string(&buffer[requestStream.tellg()], Utils::toInt(_headers["Content-Length"])) : _body = "";
 }
 
 
