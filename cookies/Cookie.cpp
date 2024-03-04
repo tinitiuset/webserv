@@ -71,6 +71,5 @@ bool Cookie::isValidCookie(const std::map<std::string, std::string>& headers)
 				if (headCookVals[i] == fileCookVals[j])
 					return (true);
 	}
-	std::cout << "+++ Cookie is not valid" << std::endl;
 	return (false);
 }
