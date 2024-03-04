@@ -5,6 +5,9 @@
 #include <iostream>
 #include <fstream>
 #include <dirent.h>
+#include <map>
+#include <signal.h>
+
 
 #include "../utils/defaults.hpp"
 #include "../utils/Logger.hpp"
