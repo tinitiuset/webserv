@@ -67,8 +67,7 @@ void Request::parseRequest(const int &fd) {
 		_headers[key] = value.substr(1);
 	}
 	!_headers["Content-Length"].empty() ?
-		_body = std::string(&buffer[requestStream.tellg()], Utils::toInt(_headers["Content-Length"])):_body = "";
-	//_body = body_real;
+		_body = std::string(&buffer[requestStream.tellg()], Utils::toInt(_headers["Content-Length"])) : _body = "";
 }
 
 
