@@ -13,8 +13,11 @@ std::string GetRequest::handle() {
 	std::string locat = "";
 	int			port = getPort();
 	std::string address = conf->getServer(port).address();
-	bool		autoindex = false;
 	std::string host = Utils::removeLastSlash(getHost());
+	
+	bool		autoindex = false;
+	bool		cgi = false;
+
 
 	if (dynamic_cast<Redirect*>(conf->getServer(port).location(_uri)))
 		return redirect();
@@ -24,6 +27,17 @@ std::string GetRequest::handle() {
 		if (loc->file() == "" && loc->autoindex())
 		{
 			autoindex = true;
+			root = loc->root();
+			locat = loc->path();
+		}
+		else if (loc->cgi() == true)
+		{
+			cgi = true;
+			root = loc->root();
+			locat = loc->path();
+		}
+		else
+		{
 			root = loc->root();
 			locat = loc->path();
 		}
@@ -43,7 +57,7 @@ std::string GetRequest::handle() {
 	//std::string dotPath = "." + resPath;
 	//std::string dotPath = resPath;
 
-	Resource resource(resPath);
+	Resource resource(resPath, _method);
 
 	std::map<std::string, std::string> headers;
 
@@ -51,6 +65,10 @@ std::string GetRequest::handle() {
 	{
 		response.set_body(resource.buildAI(_uri, host, resPath));
 		headers.insert(std::make_pair("Content-Type", "text/html"));
+	}
+	else if (cgi == true)
+	{
+		response.set_body(resource.buildCGI());
 	}
 	else
 	{

@@ -15,9 +15,8 @@ class Cgi
 		std::string		_cgi;
         std::string     _interpret;
         char            **_env;
-        int				_fd_parent_to_child[2];
-    	int 			_fd_child_to_parent[2];
-		std::string		_resp;
+        //int				_fd_parent_to_child[2];
+    	//int 			_fd_child_to_parent[2];
     
     public:
 
@@ -27,9 +26,8 @@ class Cgi
         std::string     initCgi();
         void            set4GETEnv();
         void            set4Post();
-        void			readChildOutput();
+        std::string		readChildOutput(int fd_child_to_parent);
 
 };
 
 #endif
-

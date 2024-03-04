@@ -1,9 +1,10 @@
 #include "Resource.hpp"
 
-Resource::Resource(std::string path) {
+Resource::Resource(std::string path, std::string method) {
 	Logger::debug("Resource::Resource() creating resource with path " + path);
 	_status = "HTTP/1.1 200 OK";
 	_path = path;
+	_method = method;
 }
 
 Resource::Resource(const Resource& resource) {
@@ -113,8 +114,6 @@ std::string Resource::buildAI(std::string uri, std::string host, std::string res
     }
 	result += "</ul>\n</body>\n</html>\n";
 
-	std::cout << "Result: " << result << std::endl << std::endl;
-
     return (result);
 }
 
@@ -143,4 +142,175 @@ std::string Resource::getPreviousUri(std::string uri)
         uri = "/";
 
     return (uri);
+}
+
+/* 
+	extract the name of the cgi script from the path until "?"
+	"/var/www/html/cgi-bin/hello.py?name=pepe" returns "hello.py"
+
+*/
+std::string Resource::extractCgi()
+{
+	size_t lastSlashPos = _path.rfind('/');
+    if (lastSlashPos == std::string::npos)
+        return "";
+
+    std::string cgiFileName = _path.substr(lastSlashPos + 1);
+
+    size_t questionMarkPos = cgiFileName.find('?');
+    if (questionMarkPos != std::string::npos)
+        cgiFileName = cgiFileName.substr(0, questionMarkPos);
+
+    return cgiFileName;
+}
+
+std::string Resource::extractQStr()
+{
+	size_t questionMarkPos = _path.find('?');
+	if (questionMarkPos == std::string::npos)
+		return "";
+
+	std::string qStr = _path.substr(questionMarkPos + 1);
+
+	return qStr;
+}
+
+std::string Resource::buildCGI()
+{
+	std::string cgiPath = extractCgi();
+	std::string qStr = extractQStr();
+	std::string interpret = "";
+	_env = NULL;
+	
+	if (cgiPath.substr(cgiPath.length() - 3) == ".py")
+        interpret = "/usr/local/bin/python3";
+    else if (_path.substr(_path.length() - 3) == ".pl")
+        interpret = "/usr/bin/perl";
+    else
+        throw std::runtime_error("invalid cgi script");
+
+	initCgi(cgiPath, interpret, qStr);
+}
+
+std::string    Resource::initCgi(std::string cgiPath, std::string interpret, std::string qStr)
+{
+	int	fd_parent_to_child[2];
+    int fd_child_to_parent[2];
+
+	if (pipe(fd_child_to_parent) == -1)
+        throw std::runtime_error("pipe error");
+    
+    if (_method == "GET") //also check if method is supported in config????
+        set4GETEnv(cgiPath, qStr);
+    else if (_method == "POST") //also check if method is supported in config????
+    {
+		if (pipe(fd_parent_to_child) == -1)
+			throw std::runtime_error("pipe error");
+		set4Post();
+	}
+    else
+    {
+        std::cerr << "method not supported" << std::endl;
+        return (""); //?
+    }
+
+    pid_t pid = fork();
+
+    if (pid == -1)
+        throw std::runtime_error("fork error");
+    else if (pid == 0) //child process
+    {
+        if (_method == "POST")
+		{
+			close(fd_parent_to_child[1]);
+			dup2(fd_parent_to_child[0], STDIN_FILENO);   
+		}
+		close(fd_child_to_parent[0]);
+		dup2(fd_child_to_parent[1], STDOUT_FILENO);
+		close(fd_child_to_parent[1]);
+		if (_method == "POST")
+			close(fd_parent_to_child[0]);
+
+        char *args[3];
+		args[0] = (char *)interpret.c_str();
+        args[1] = (char *)cgiPath.c_str();
+        args[2] = NULL;
+
+        if (execve(interpret.c_str(), args, _env) == -1)
+            throw std::runtime_error("execve error");    
+    }
+	//parent process
+	if (_method == "POST")
+	{
+		write(fd_parent_to_child[1], qStr.c_str(), qStr.length());
+		close(fd_parent_to_child[0]);
+		close(fd_parent_to_child[1]);
+	}
+	close(fd_child_to_parent[1]);
+	
+	std::time_t start_time = std::time(NULL);
+	int status;
+	while (waitpid(pid, &status, WNOHANG) == 0)
+	{
+		std::time_t current_time = std::time(NULL);
+		if (current_time - start_time > TIMEOUT)  // Ajusta el límite de tiempo según tus necesidades
+		{
+			std::cout << "Timeout. Killing child process" << std::endl;
+			kill(pid, SIGKILL);
+			return ("");
+		}
+		usleep(100000);  // (0.1 sec)
+	}
+	delete _env;
+	return (readChildOutput(fd_child_to_parent[0]));
+}
+
+std::string     Resource::readChildOutput(int fd_child_to_parent)
+{
+	char   buffer[4056];
+	std::string resp;
+	ssize_t bytes;
+	while ((bytes = read(fd_child_to_parent, buffer, sizeof(buffer))) > 0)
+	{
+		if (bytes < 0)
+			throw std::runtime_error("fd read error");
+		buffer[bytes] = '\0';
+		resp += buffer;
+	}
+	close(fd_child_to_parent);
+	return(resp);
+}
+
+void    Resource::set4GETEnv(std::string cgiPath, std::string qStr)
+{
+    _env = new char*[7];
+
+    std::vector<std::string>    envVect;
+
+    envVect.push_back("GATEWAY_INTERFACE=CGI/1.1");
+    envVect.push_back("SERVER_PROTOCOL=HTTP/1.1");
+    envVect.push_back("REQUEST_METHOD=" + _method);
+    if (access(cgiPath.c_str(), X_OK))
+        throw std::runtime_error("invalid script or not found");
+    envVect.push_back("SCRIPT_NAME=" + cgiPath);
+    envVect.push_back("QUERY_STRING=" + qStr);
+    envVect.push_back("CONTENT_LENGTH=1024");
+
+    for (int i = 0; i < 7; i++)
+        _env[i] = (char *)envVect[i].c_str();
+    _env[7] = NULL;
+}
+
+void    Resource::set4Post()
+{
+    _env = new char*[3];
+
+    std::vector<std::string>    envVect;
+
+    envVect.push_back("REQUEST_METHOD=" + _method);
+    envVect.push_back("CONTENT_LENGTH=1024");
+
+    for (int i = 0; i < 3; i++)
+        _env[i] = (char *)envVect[i].c_str();
+    _env[3] = NULL;
 }

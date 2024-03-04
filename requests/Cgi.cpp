@@ -12,7 +12,7 @@
 
 
 Cgi::Cgi(std::string method, std::string uri, std::string qustr):
-_method(method), _uri(uri), _quStr(qustr), _env(NULL), _resp("")
+_method(method), _uri(uri), _quStr(qustr), _env(NULL)
 {
     if (uri.substr(uri.length() - 3) == ".py")
 	{
@@ -29,6 +29,8 @@ _method(method), _uri(uri), _quStr(qustr), _env(NULL), _resp("")
 }
 
 
+
+
 Cgi::~Cgi()
 {
     delete _env;
@@ -36,14 +38,17 @@ Cgi::~Cgi()
 
 std::string    Cgi::initCgi()
 {
-    if (pipe(_fd_child_to_parent) == -1)
+	int	fd_parent_to_child[2];
+    int fd_child_to_parent[2];
+
+	if (pipe(fd_child_to_parent) == -1)
         throw std::runtime_error("pipe error");
     
     if (_method == "GET") //also check if method is supported in config????
         set4GETEnv();
     else if (_method == "POST") //also check if method is supported in config????
     {
-		if (pipe(_fd_parent_to_child) == -1)
+		if (pipe(fd_parent_to_child) == -1)
 			throw std::runtime_error("pipe error");
 		set4Post();
 	}
@@ -61,14 +66,14 @@ std::string    Cgi::initCgi()
     {
         if (_method == "POST")
 		{
-			close(_fd_parent_to_child[1]);
-			dup2(_fd_parent_to_child[0], STDIN_FILENO);   
+			close(fd_parent_to_child[1]);
+			dup2(fd_parent_to_child[0], STDIN_FILENO);   
 		}
-		close(_fd_child_to_parent[0]);
-		dup2(_fd_child_to_parent[1], STDOUT_FILENO);
-		close(_fd_child_to_parent[1]);
+		close(fd_child_to_parent[0]);
+		dup2(fd_child_to_parent[1], STDOUT_FILENO);
+		close(fd_child_to_parent[1]);
 		if (_method == "POST")
-			close(_fd_parent_to_child[0]);
+			close(fd_parent_to_child[0]);
 
         char *args[3];
 		args[0] = (char *)_cgi.c_str();
@@ -81,11 +86,11 @@ std::string    Cgi::initCgi()
 	//parent process
 	if (_method == "POST")
 	{
-		write(_fd_parent_to_child[1], _quStr.c_str(), _quStr.length());
-		close(_fd_parent_to_child[0]);
-		close(_fd_parent_to_child[1]);
+		write(fd_parent_to_child[1], _quStr.c_str(), _quStr.length());
+		close(fd_parent_to_child[0]);
+		close(fd_parent_to_child[1]);
 	}
-	close(_fd_child_to_parent[1]);
+	close(fd_child_to_parent[1]);
 	
 	std::time_t start_time = std::time(NULL);
 	int status;
@@ -96,12 +101,12 @@ std::string    Cgi::initCgi()
 		{
 			std::cout << "Timeout. Killing child process" << std::endl;
 			kill(pid, SIGKILL);
-			break;
+			return ("");
 		}
 		usleep(100000);  // (0.1 sec)
 	}
-	readChildOutput();
-	return (_resp);
+
+	return (readChildOutput(fd_child_to_parent[0]));
 }
 
 void    Cgi::set4GETEnv()
@@ -138,16 +143,18 @@ void    Cgi::set4Post()
     _env[3] = NULL;
 }
 
-void     Cgi::readChildOutput()
+std::string     Cgi::readChildOutput(int fd_child_to_parent)
 {
-	char   buffer[1024];
+	char   buffer[4056];
+	std::string resp;
 	ssize_t bytes;
-	while ((bytes = read(_fd_child_to_parent[0], buffer, sizeof(buffer))) > 0)
+	while ((bytes = read(fd_child_to_parent, buffer, sizeof(buffer))) > 0)
 	{
 		if (bytes < 0)
 			throw std::runtime_error("fd read error");
 		buffer[bytes] = '\0';
-		_resp += buffer;
+		resp += buffer;
 	}
-	close(_fd_child_to_parent[0]);
+	close(fd_child_to_parent);
+	return(resp);
 }
