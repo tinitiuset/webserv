@@ -88,7 +88,8 @@ std::string Request::getHost() const
 		return ("");
 }
 
-void Request::printRequest() const {
+void Request::printRequest() const 
+{
 	Logger::debug("Method: " + _method);
 	Logger::debug("URI: " + _uri);
 	Logger::debug("Headers:");

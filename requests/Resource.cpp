@@ -189,7 +189,7 @@ std::string Resource::buildCGI()
     else
         throw std::runtime_error("invalid cgi script");
 
-	initCgi(cgiPath, interpret, qStr);
+	return (initCgi(cgiPath, interpret, qStr));
 }
 
 std::string    Resource::initCgi(std::string cgiPath, std::string interpret, std::string qStr)

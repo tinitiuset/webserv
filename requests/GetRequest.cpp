@@ -8,6 +8,8 @@ GetRequest::~GetRequest() {}
 
 std::string GetRequest::handle() {
 
+	std::cout << ">>>>>>>>>>GET REQUEST" << std::endl;
+	
 	std::string resPath= _uri;
 	std::string root = "";
 	std::string locat = "";
@@ -17,12 +19,16 @@ std::string GetRequest::handle() {
 	
 	bool		autoindex = false;
 	bool		cgi = false;
+	Index*		loc;
 
+	std::cout << "**METHOD**" << _method << std::endl;
+	std::cout << "**URI**" << _uri << std::endl;
+	std::cout << "**BODY**" << _body << std::endl << std::endl;
 
 	if (dynamic_cast<Redirect*>(conf->getServer(port).location(_uri)))
 		return redirect();
 
-	if (Index* loc = dynamic_cast<Index*>(conf->getServer(port).bestLocation(_uri)))
+	if ((loc = dynamic_cast<Index*>(conf->getServer(port).bestLocation(_uri))))
 	{
 		if (loc->file() == "" && loc->autoindex())
 		{
@@ -68,6 +74,7 @@ std::string GetRequest::handle() {
 	}
 	else if (cgi == true)
 	{
+		std::cout << "CGI" << std::endl;
 		response.set_body(resource.buildCGI());
 	}
 	else

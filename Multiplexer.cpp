@@ -14,10 +14,12 @@ Request* createRequest(const int &fd) {
 	Request temp;
 	temp.parseRequest(fd);
 
-	if(temp.isGetRequest())
-		return new GetRequest(temp);
-	else if (temp.isPostRequest())
+	if(temp.isGetRequest()){
+		return (new GetRequest(temp));
+	}
+	else if (temp.isPostRequest()){
 		return new PostRequest(temp);
+	}
 
 	return NULL;
 }
