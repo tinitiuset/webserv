@@ -57,6 +57,7 @@ public:
 	bool autoindex();
 	bool cgi();
 	std::list<std::string> methods();
+	bool isMethodAllowed(std::string method);
 	std::string buildRealPath(std::string &uri);
 
 };

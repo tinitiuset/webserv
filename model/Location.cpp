@@ -67,3 +67,17 @@ std::string Index::buildRealPath(std::string &uri)
 	rootT += "/";
 	return (Utils::strReplace(uriT, locT, rootT));
 }
+
+bool Index::isMethodAllowed(std::string method)
+{
+	std::list<std::string>::iterator it = _methods.begin();
+	std::list<std::string>::iterator ite = _methods.end();
+
+	while (it != ite)
+	{
+		if (*it == method)
+			return (true);
+		it++;
+	}
+	return (false);
+}
