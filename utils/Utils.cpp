@@ -80,3 +80,26 @@ std::string  Utils::removeLastSlash(std::string str)
     }
 	return (str);
 }
+int Utils::toInt(const std::string &str)
+{
+    std::stringstream ss(str);
+    int num;
+    ss >> num;
+    return (num);
+}
+
+int	Utils::ft_strcmp(const char *s1, const char *s2)
+{
+	unsigned int	i;
+
+	i = 0;
+	while (s1[i] && s2[i])
+	{
+		if (s1[i] != s2[i])
+			return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+		i++;
+	}
+	if (s1[i] != s2[i])
+		return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+	return (0);
+}

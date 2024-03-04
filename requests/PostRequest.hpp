@@ -2,13 +2,18 @@
 #define POSTREQUEST_HPP
 
 #include "Request.hpp"
+#include "Response.hpp"
 
 class PostRequest: public Request {
-
-public:
-	PostRequest(const Request&);
-	~PostRequest();
-
+	private:
+		std::map<std::string, std::string> _postHeaders;
+	public:
+		PostRequest(const Request&);
+		~PostRequest();
+		std::string handle();
+		void	parse_multipart_body(std::string body);
+		void	parse_type();
+		void	save_file(std::string body);
 };
 
 #endif

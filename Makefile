@@ -1,7 +1,7 @@
 NAME = webserv
 
 COMPILER =	c++
-STANDARD =	-std=c++98
+STANDARD =	-std=c++11
 DEBUG =		-g3	-fsanitize=address # 0, 1, 2, 3 DEBUG INFORMATION LEVELS
 FLAGS =		#-Wall -Werror -Wextra
 
@@ -11,6 +11,7 @@ SRC_FILES = main.cpp \
 			./model/Server.cpp \
 			./requests/GetRequest.cpp \
 			./requests/PostRequest.cpp \
+			./requests/DeleteRequest.cpp \
 			./requests/Request.cpp \
 			./requests/Resource.cpp \
 			./requests/Response.cpp \
@@ -24,6 +25,7 @@ HEADER_FILES = 	./model/*.hpp \
 				./model/Server.hpp \
 				./requests/GetRequest.hpp \
 				./requests/PostRequest.hpp \
+				./requests/DeleteRequest.hpp \
 				./requests/Request.hpp \
 				./requests/Resource.hpp \
 				./requests/Response.hpp \

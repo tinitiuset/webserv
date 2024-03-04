@@ -1,5 +1,7 @@
 #include "Request.hpp"
 #include "../utils/Utils.hpp"
+#include <sstream>
+#include <unistd.h>
 
 static std::string status(int code) {
 	switch (code) {
@@ -21,6 +23,12 @@ Request::Request(const Request& request) {
 	_uri = request._uri;
 	_headers = request._headers;
 	_body = request._body;
+	//_location = request._location;
+}
+
+Request::Request(const int &fd, const std::list <Location*> locations) {
+	this->parseRequest(fd);
+	//this->searchLocation(_uri, locations);
 }
 
 Request& Request::operator=(const Request& request) {
@@ -34,10 +42,10 @@ Request& Request::operator=(const Request& request) {
 Request::~Request() {}
 
 void Request::parseRequest(const int &fd) {
-	char buffer[10024] = {0};
-	read(fd, buffer, 10024);
+	char buffer[99999] = {0};
+	read(fd, buffer, 99999);
 	std::string request(buffer);
-
+	std::cout << request.size() << "----" << request.length() << std::endl;
 	Logger::debug("Raw request: " + request);
 
 	std::istringstream requestStream(request);
@@ -50,7 +58,7 @@ void Request::parseRequest(const int &fd) {
 
 	std::string headerLine;
 	while (std::getline(requestStream, headerLine) && headerLine != "\r") {
-		headerLine.erase(std::remove(headerLine.end() - 1, headerLine.end(), '\r'), headerLine.end()); // Remove trailing '\r'
+		headerLine.erase(headerLine.end() - 1, headerLine.end()); // Remove trailing '\r'
 		std::istringstream headerLineStream(headerLine);
 		std::string key;
 		std::getline(headerLineStream, key, ':');
@@ -58,6 +66,8 @@ void Request::parseRequest(const int &fd) {
 		std::getline(headerLineStream, value);
 		_headers[key] = value.substr(1);
 	}
+	std::string body_real(&buffer[requestStream.tellg()], Utils::toInt(_headers["Content-Length"]));
+	_body = body_real;
 }
 
 
@@ -107,6 +117,10 @@ bool Request::isPostRequest() const {
 	return _method == "POST";
 }
 
+bool Request::isDeleteRequest() const {
+	return _method == "DELETE";
+}
+
 std::string Request::redirect() {
 	Redirect* redirect = dynamic_cast<Redirect*>(conf->getServer(getPort()).location(_uri));
 
@@ -122,4 +136,23 @@ std::string Request::redirect() {
 	Logger::debug("Request::redirect() returning response -> " + response.format());
 
 	return response.format();
+}
+
+
+/* void Request::searchLocation(const std::string &path, const std::list <Location*> locations) {
+	std::size_t longestMatch = 0;
+	for (std::list<Location*>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
+		if ((*it)->path().length() > longestMatch)
+		{
+			if (path.find((*it)->path()) == 0)
+			{
+				_location = *it;
+				longestMatch = (*it)->path().length();
+			}
+		}
+	}
+} */
+
+std::string Request::getUri() const {
+	return _uri;
 }
