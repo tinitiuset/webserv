@@ -66,8 +66,9 @@ void Request::parseRequest(const int &fd) {
 		std::getline(headerLineStream, value);
 		_headers[key] = value.substr(1);
 	}
-	std::string body_real(&buffer[requestStream.tellg()], Utils::toInt(_headers["Content-Length"]));
-	_body = body_real;
+	!_headers["Content-Length"].empty() ?
+		_body = std::string(&buffer[requestStream.tellg()], Utils::toInt(_headers["Content-Length"])):_body = "";
+	//_body = body_real;
 }
 
 
@@ -137,20 +138,6 @@ std::string Request::redirect() {
 	return response.format();
 }
 
-
-/* void Request::searchLocation(const std::string &path, const std::list <Location*> locations) {
-	std::size_t longestMatch = 0;
-	for (std::list<Location*>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
-		if ((*it)->path().length() > longestMatch)
-		{
-			if (path.find((*it)->path()) == 0)
-			{
-				_location = *it;
-				longestMatch = (*it)->path().length();
-			}
-		}
-	}
-} */
 
 std::string Request::getUri() const {
 	return _uri;
