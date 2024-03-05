@@ -160,12 +160,13 @@ std::string Resource::extractQStr()
 	return qStr;
 }
 
-std::string Resource::buildCGI()
+std::string Resource::buildCGI(std::string qStr)
 {
 	std::string cgiPath = extractCgi();
-	std::string qStr = extractQStr();
 	std::string interpret = "";
 	_env = NULL;
+
+	std::cout << "--------CGI PATH: " << cgiPath << std::endl;
 	
 	if (cgiPath.substr(cgiPath.length() - 3) == ".py")
         interpret = "/usr/local/bin/python3";
@@ -173,6 +174,13 @@ std::string Resource::buildCGI()
         interpret = "/usr/bin/perl";
     else
         throw std::runtime_error("invalid cgi script");
+
+	//print everything
+	std::cout << "CGI PATH: " << cgiPath << std::endl;
+	std::cout << "INTERPRET: " << interpret << std::endl;
+	std::cout << "QSTR: " << qStr << std::endl;
+	std::cout << "METHOD: " << _method << std::endl;
+	std::cout << "PATH: " << _path << std::endl;
 
 	return (initCgi(cgiPath, interpret, qStr));
 }
@@ -186,7 +194,7 @@ std::string    Resource::initCgi(std::string cgiPath, std::string interpret, std
         throw std::runtime_error("pipe error");
     
     if (_method == "GET") //also check if method is supported in config????
-        set4GETEnv(cgiPath, qStr);
+        set4GETEnv(_path, qStr);
     else if (_method == "POST") //also check if method is supported in config????
     {
 		if (pipe(fd_parent_to_child) == -1)
@@ -218,7 +226,7 @@ std::string    Resource::initCgi(std::string cgiPath, std::string interpret, std
 
         char *args[3];
 		args[0] = (char *)interpret.c_str();
-        args[1] = (char *)cgiPath.c_str();
+        args[1] = (char *)_path.c_str();
         args[2] = NULL;
 
         if (execve(interpret.c_str(), args, _env) == -1)
@@ -238,7 +246,7 @@ std::string    Resource::initCgi(std::string cgiPath, std::string interpret, std
 	while (waitpid(pid, &status, WNOHANG) == 0)
 	{
 		std::time_t current_time = std::time(NULL);
-		if (current_time - start_time > TIMEOUT)  // Ajusta el límite de tiempo según tus necesidades
+		if (current_time - start_time > TIMEOUT)
 		{
 			std::cout << "Timeout. Killing child process" << std::endl;
 			kill(pid, SIGKILL);
@@ -270,20 +278,26 @@ void    Resource::set4GETEnv(std::string cgiPath, std::string qStr)
 {
     _env = new char*[7];
 
+	std::cout << "CGI PATH: " << cgiPath << std::endl;
+	std::cout << "QSTR: " << qStr << std::endl;
+	std::cout << "PATH: " << _path << std::endl;
+
     std::vector<std::string>    envVect;
 
     envVect.push_back("GATEWAY_INTERFACE=CGI/1.1");
     envVect.push_back("SERVER_PROTOCOL=HTTP/1.1");
     envVect.push_back("REQUEST_METHOD=" + _method);
-    if (access(cgiPath.c_str(), X_OK))
+    if (access(_path.c_str(), X_OK))
         throw std::runtime_error("invalid script or not found");
     envVect.push_back("SCRIPT_NAME=" + cgiPath);
     envVect.push_back("QUERY_STRING=" + qStr);
     envVect.push_back("CONTENT_LENGTH=1024");
 
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < 6; i++){
+		std::cout << "envVect[" << i << "]: " << envVect[i] << std::endl;
         _env[i] = (char *)envVect[i].c_str();
-    _env[7] = NULL;
+	}
+    _env[6] = NULL;
 }
 
 void    Resource::set4Post()
@@ -295,7 +309,7 @@ void    Resource::set4Post()
     envVect.push_back("REQUEST_METHOD=" + _method);
     envVect.push_back("CONTENT_LENGTH=1024");
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 2; i++)
         _env[i] = (char *)envVect[i].c_str();
-    _env[3] = NULL;
+    _env[2] = NULL;
 }
