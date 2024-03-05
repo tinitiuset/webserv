@@ -115,6 +115,7 @@ Location* Server::bestLocation(const std::string& path) const {
 
 
 
+
 void Server::bind() {
 
 	sockaddr_in servaddr = {};

@@ -11,13 +11,14 @@
 #include "requests/DeleteRequest.hpp"
 
 //Request* createRequest(const int &fd, const std::list <Location*> locations) {
-Request* createRequest(const int &fd){
+Request* createRequest(const int &fd)
+{
 	//Request temp (fd, locations);
 	Request temp;
 	temp.parseRequest(fd);
 
 	if(temp.isGetRequest())
-		return new GetRequest(temp);
+		return (new GetRequest(temp));
 	else if (temp.isPostRequest())
 		return new PostRequest(temp);
 	else if (temp.isDeleteRequest())
