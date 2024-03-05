@@ -166,21 +166,12 @@ std::string Resource::buildCGI(std::string qStr)
 	std::string interpret = "";
 	_env = NULL;
 
-	std::cout << "--------CGI PATH: " << cgiPath << std::endl;
-	
 	if (cgiPath.substr(cgiPath.length() - 3) == ".py")
         interpret = "/usr/local/bin/python3";
     else if (_path.substr(_path.length() - 3) == ".pl")
         interpret = "/usr/bin/perl";
     else
         throw std::runtime_error("invalid cgi script");
-
-	//print everything
-	std::cout << "CGI PATH: " << cgiPath << std::endl;
-	std::cout << "INTERPRET: " << interpret << std::endl;
-	std::cout << "QSTR: " << qStr << std::endl;
-	std::cout << "METHOD: " << _method << std::endl;
-	std::cout << "PATH: " << _path << std::endl;
 
 	return (initCgi(cgiPath, interpret, qStr));
 }
@@ -277,10 +268,6 @@ std::string     Resource::readChildOutput(int fd_child_to_parent)
 void    Resource::set4GETEnv(std::string cgiPath, std::string qStr)
 {
     _env = new char*[7];
-
-	std::cout << "CGI PATH: " << cgiPath << std::endl;
-	std::cout << "QSTR: " << qStr << std::endl;
-	std::cout << "PATH: " << _path << std::endl;
 
     std::vector<std::string>    envVect;
 

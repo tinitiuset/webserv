@@ -16,6 +16,8 @@ std::string GetRequest::handle()
 
 	Index*		loc;
 
+	Logger::info("GetRequest::handle() handling GET request");
+
 	if (dynamic_cast<Redirect*>(conf->getServer(port).location(_uri)))
 		return redirect();
 
@@ -24,8 +26,6 @@ std::string GetRequest::handle()
 		//return (Response::notFound().format());
 		return ("");
 	}
-
-	std::cout << "++++++ LOC: " << loc->path() << std::endl;
 
 	resPath = loc->buildRealPath(resPath);
 	for (size_t i = 0; i < resPath.length() - 1; ++i) 
@@ -36,7 +36,6 @@ std::string GetRequest::handle()
 		}
 	}
 
-	Logger::info("GetRequest::handle() handling GET request");
 
 	Response response;
 
@@ -44,21 +43,13 @@ std::string GetRequest::handle()
 
 	std::map<std::string, std::string> headers;
 
-	printf("RES PATH: %s\n", resPath.c_str());
-
-	std::cout << "CGI: " << loc->cgi() << std::endl;
-	std::cout << "EXT: " << resPath.substr(resPath.length() - 3) << std::endl;
-
 	if (loc->file() == "" && loc->autoindex() && Utils::isDirectory(resPath.c_str()))
 	{
 		response.set_body(resource.buildAI(_uri, host, resPath));
 		headers.insert(std::make_pair("Content-Type", "text/html"));
 	}
 	else if (loc->cgi() == true && (resPath.substr(resPath.length() - 3) == ".py" || resPath.substr(resPath.length() - 3) == ".pl"))
-	{
-		std::cout << "CGI" << std::endl;
 		response.set_body(resource.buildCGI(qStr));
-	}
 	else
 	{
 		response.set_body(resource.load());
