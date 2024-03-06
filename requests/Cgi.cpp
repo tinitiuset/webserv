@@ -6,7 +6,6 @@
 #include "Utils.hpp"
 #include <ctime>
 #include <signal.h>
-//#include <string>
 
 //CHECK ERROR MANAGEMENT
 
@@ -44,9 +43,9 @@ std::string    Cgi::initCgi()
 	if (pipe(fd_child_to_parent) == -1)
         throw std::runtime_error("pipe error");
     
-    if (_method == "GET") //also check if method is supported in config????
+    if (_method == "GET")
         set4GETEnv();
-    else if (_method == "POST") //also check if method is supported in config????
+    else if (_method == "POST")
     {
 		if (pipe(fd_parent_to_child) == -1)
 			throw std::runtime_error("pipe error");
@@ -62,7 +61,7 @@ std::string    Cgi::initCgi()
 
     if (pid == -1)
         throw std::runtime_error("fork error");
-    else if (pid == 0) //child process
+    else if (pid == 0)
     {
         if (_method == "POST")
 		{
@@ -97,7 +96,7 @@ std::string    Cgi::initCgi()
 	while (waitpid(pid, &status, WNOHANG) == 0)
 	{
 		std::time_t current_time = std::time(NULL);
-		if (current_time - start_time > TIMEOUT)  // Ajusta el límite de tiempo según tus necesidades
+		if (current_time - start_time > TIMEOUT)
 		{
 			std::cout << "Timeout. Killing child process" << std::endl;
 			kill(pid, SIGKILL);
@@ -145,7 +144,7 @@ void    Cgi::set4Post()
 
 std::string     Cgi::readChildOutput(int fd_child_to_parent)
 {
-	char   buffer[4056];
+	char   buffer[9056];
 	std::string resp;
 	ssize_t bytes;
 	while ((bytes = read(fd_child_to_parent, buffer, sizeof(buffer))) > 0)
