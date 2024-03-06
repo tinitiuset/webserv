@@ -25,16 +25,14 @@ class Request {
 		Request(const int &fd, const std::list <Location*> locations);
 		Request& operator=(const Request&);
 		virtual ~Request();
-
-	void parseRequest(const int &);
-	void printRequest() const;
-	bool isGetRequest() const;
-	bool isPostRequest() const;
-	bool isDeleteRequest() const;
-	int	 getPort() const;
-	std::string getHost() const;
-
-		virtual std::string handle() {return NULL;};
+		void parseRequest(const int &);
+		void printRequest() const;
+		bool isGetRequest() const;
+		bool isPostRequest() const;
+		bool isDeleteRequest() const;
+		int	 getPort() const;
+		std::string getHost() const;
+		virtual std::string handle();
 		std::string redirect();
 		std::string getUri() const;
 

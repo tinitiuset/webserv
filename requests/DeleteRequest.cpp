@@ -40,32 +40,28 @@ DeleteRequest::DeleteRequest(const Request& request): Request(request) {
 }
 
 DeleteRequest::~DeleteRequest() {}
+
 std::string DeleteRequest::handle() {
 
-	// AddToList
-	// UploadFile
-	// SetCookie
-	// deChunck
+	Response response;
+
+    if (Request::handle() != "")
+        return (response.format());
 
 	Logger::debug("DeleteRequest::handle() called");
     Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
     std::string path;
-	Response response;
     
     if ((loc->path()).back() == '/')
         path = _uri.replace(0, loc->path().length() - 1, loc->root());
     else
         path = _uri.replace(0, loc->path().length(), loc->root());
-    if (loc->isMethodAllowed("delete") == false)
-        return (response.format());//Here should respond with error code
-    else
-    {
+    
         //Check the DELETE target and decide if it is a file or a directory
-        if (_uri.back() == '/')
-            delete_directory(path);
-        else
-            delete_file(path);
-    }
+    if (_uri.back() == '/')
+        delete_directory(path);
+    else
+        delete_file(path);
 
 
 	response.set_body("File/Directory correctly deleted!");

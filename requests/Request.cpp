@@ -141,3 +141,15 @@ std::string Request::redirect() {
 std::string Request::getUri() const {
 	return _uri;
 }
+
+std::string Request::handle(){
+	Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
+
+	if (this->isGetRequest() && loc->isMethodAllowed("get") == false)
+		return ("Error on get permissions");
+	else if (this->isPostRequest() && loc->isMethodAllowed("post") == false)
+		return ("Error on post permissions");
+	else if (this->isDeleteRequest() && loc->isMethodAllowed("delete") == false)
+		return ("Error on delete permissions");
+	return ("");	
+}
