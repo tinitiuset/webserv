@@ -45,7 +45,6 @@ void Request::parseRequest(const int &fd) {
 	char buffer[99999] = {0};
 	read(fd, buffer, 99999);
 	std::string request(buffer);
-	std::cout << request.size() << "----" << request.length() << std::endl;
 	Logger::debug("Raw request: " + request);
 
 	std::istringstream requestStream(request);
@@ -58,7 +57,7 @@ void Request::parseRequest(const int &fd) {
 
 	std::string headerLine;
 	while (std::getline(requestStream, headerLine) && headerLine != "\r") {
-		headerLine.erase(headerLine.end() - 1, headerLine.end()); // Remove trailing '\r'
+		headerLine.erase(headerLine.end() - 1, headerLine.end());
 		std::istringstream headerLineStream(headerLine);
 		std::string key;
 		std::getline(headerLineStream, key, ':');
@@ -137,21 +136,6 @@ std::string Request::redirect() {
 
 	return response.format();
 }
-
-
-/* void Request::searchLocation(const std::string &path, const std::list <Location*> locations) {
-	std::size_t longestMatch = 0;
-	for (std::list<Location*>::const_iterator it = locations.begin(); it != locations.end(); ++it) {
-		if ((*it)->path().length() > longestMatch)
-		{
-			if (path.find((*it)->path()) == 0)
-			{
-				_location = *it;
-				longestMatch = (*it)->path().length();
-			}
-		}
-	}
-} */
 
 std::string Request::getUri() const {
 	return _uri;
