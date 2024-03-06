@@ -46,14 +46,18 @@ void Response::set_body(const std::string& body) {
 std::string Response::format() const {
 	std::string formatted_response = _start_line + "\n";
 
+	std::cout << "Formatted response:\n" << _start_line + "\n" << std::endl;
+
 	std::map<std::string, std::string>::const_iterator it;
-	for (it = _headers.begin(); it != _headers.end(); ++it) {
+	for (it = _headers.begin(); it != _headers.end(); ++it)
+	{
 		formatted_response += it->first + ": " + it->second + "\n";
+		std::cout << it->first + ": " + it->second + "\n" << std::endl;
 	}
 
 	formatted_response += "\n" + _body;
 
-	std::cout << "Formatted response:\n" << formatted_response << std::endl;
+	//std::cout << "Formatted response:\n" << formatted_response << std::endl;
 
 	return formatted_response;
 }
