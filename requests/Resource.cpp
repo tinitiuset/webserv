@@ -267,36 +267,35 @@ std::string     Resource::readChildOutput(int fd_child_to_parent)
 
 void    Resource::set4GETEnv(std::string cgiPath, std::string qStr)
 {
-    _env = new char*[7];
+    _env = new char*[8];
 
     std::vector<std::string>    envVect;
 
     envVect.push_back("GATEWAY_INTERFACE=CGI/1.1");
     envVect.push_back("SERVER_PROTOCOL=HTTP/1.1");
     envVect.push_back("REQUEST_METHOD=" + _method);
+	envVect.push_back("PATH_INFO=" + cgiPath);
     if (access(_path.c_str(), X_OK))
         throw std::runtime_error("invalid script or not found");
     envVect.push_back("SCRIPT_NAME=" + cgiPath);
     envVect.push_back("QUERY_STRING=" + qStr);
     envVect.push_back("CONTENT_LENGTH=1024");
 
-    for (int i = 0; i < 6; i++){
-		std::cout << "envVect[" << i << "]: " << envVect[i] << std::endl;
+    for (int i = 0; i < 7; i++)
         _env[i] = (char *)envVect[i].c_str();
-	}
-    _env[6] = NULL;
+    _env[7] = NULL;
 }
 
 void    Resource::set4Post()
 {
-    _env = new char*[3];
+    _env = new char*[4];
 
     std::vector<std::string>    envVect;
 
     envVect.push_back("REQUEST_METHOD=" + _method);
     envVect.push_back("CONTENT_LENGTH=1024");
-
-    for (int i = 0; i < 2; i++)
+	envVect.push_back("PATH_INFO=" + _path);
+    for (int i = 0; i < 3; i++)
         _env[i] = (char *)envVect[i].c_str();
-    _env[2] = NULL;
+    _env[3] = NULL;
 }
