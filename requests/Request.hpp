@@ -1,16 +1,16 @@
 #ifndef REQUEST_HPP
-#define REQUEST_HPP
+# define REQUEST_HPP
 
-#include <map>
-#include <string>
-#include "Response.hpp"
-#include "../utils/defaults.hpp"
-#include <vector>
-#include "../utils/Logger.hpp"
-#include "../utils/Utils.hpp"
+# include <map>
+# include <string>
+# include "Response.hpp"
+# include "../utils/defaults.hpp"
+# include <vector>
+# include "../utils/Logger.hpp"
+# include "../utils/Utils.hpp"
+# include "../model/Location.hpp"
 
 static std::string status(int code);
-#include "../model/Location.hpp"
 
 /* class VServer{
 	private:

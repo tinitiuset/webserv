@@ -17,7 +17,7 @@ public:
   Conf(const std::string &file);
   ~Conf();
 
-  void parse();
+  bool parse();
   void load();
 
   const Server& getServer(int port) const;

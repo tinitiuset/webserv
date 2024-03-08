@@ -4,15 +4,25 @@
 
 Conf* conf;
 
-int main() {
+int main(int argc, char **argv)
+{
+	if (argc == 1)
+    	conf = new Conf("./config/default.conf");
+  	else if (argc == 2)
+    	conf = new Conf(argv[1]);
+  	else
+  	{
+		std::cerr << "Usage: " << argv[0] << " [config_file]" << std::endl;
+		return 1;
+	}
+	
+	if (!conf->parse())
+		return (delete conf, 1);
 
-  conf = new Conf("./config/webserv.conf");
-  
-  conf->parse();
-  conf->load();
+	conf->load();
 
-  Multiplexer().run();
+	Multiplexer().run();
 
-  delete conf;
-  return 0;
+	delete conf;
+	return 0;
 }

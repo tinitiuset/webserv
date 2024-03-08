@@ -1,9 +1,9 @@
 #ifndef POSTREQUEST_HPP
-#define POSTREQUEST_HPP
+# define POSTREQUEST_HPP
 
-#include "Request.hpp"
-#include "Response.hpp"
-#include "Resource.hpp"
+# include "Request.hpp"
+# include "Response.hpp"
+# include "Resource.hpp"
 
 
 class PostRequest: public Request {

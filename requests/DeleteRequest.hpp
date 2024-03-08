@@ -1,9 +1,9 @@
 #ifndef DELETEREQUEST_HPP
-#define DELETEREQUEST_HPP
+# define DELETEREQUEST_HPP
 
-#include "Request.hpp"
-#include "Response.hpp"
-#include <cstdio>
+# include "Request.hpp"
+# include "Response.hpp"
+# include <cstdio>
 
 class DeleteRequest: public Request {
 	private:

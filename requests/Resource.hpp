@@ -1,17 +1,16 @@
 #ifndef RESOURCE_HPP
-#define RESOURCE_HPP
+# define RESOURCE_HPP
 
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <dirent.h>
-#include <map>
-#include <signal.h>
+# include <string>
+# include <iostream>
+# include <fstream>
+# include <dirent.h>
+# include <map>
+# include <signal.h>
 
-
-#include "../utils/defaults.hpp"
-#include "../utils/Logger.hpp"
-#include "../utils/Utils.hpp"
+# include "../utils/defaults.hpp"
+# include "../utils/Logger.hpp"
+# include "../utils/Utils.hpp"
 
 class Resource {
 
