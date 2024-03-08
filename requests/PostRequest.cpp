@@ -2,6 +2,7 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include "../cookies/Cookie.hpp"
 
 PostRequest::PostRequest(const Request& request): Request(request) {
 	parse_type();
@@ -10,30 +11,61 @@ PostRequest::PostRequest(const Request& request): Request(request) {
 }
 
 PostRequest::~PostRequest() {}
+
+
 std::string PostRequest::handle() {
 
 	// AddToList
 	// UploadFile
 	// SetCookie
 	// deChunck
+	std::string resPath = Utils::extractFilePath(_uri);
+	std::string qStr = _body;
+	
+	Logger::info("PostRequest::handle() handling Post request");
 
-	Logger::debug("PostRequest::handle() called");
+	Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
 
-	save_file(_body);
+	resPath = loc->buildRealPath(resPath);
+	for (size_t i = 0; i < resPath.length() - 1; ++i) 
+	{
+		if (resPath[i] == '/' && resPath[i + 1] == '/') {
+			resPath.erase(i, 1);
+			--i;
+		}
+	}
 
 	Response response;
 
-	response.set_body("File correctly uploaded!");
+	Resource resource(resPath, _method);
 
+	if (loc->cgi() == true && (resPath.substr(resPath.length() - 3) == ".py" || resPath.substr(resPath.length() - 3) == ".pl"))
+		response.set_body(resource.buildCGI(qStr));
+	else
+	{
+		save_file(_body, loc->root() + "/" + _postHeaders["filename"]);
+
+		response.set_body("File correctly uploaded!");
+	}
+	
 	std::map<std::string, std::string> headers;
-	headers.insert(std::make_pair("Content-Type", "text/plain"));
-	headers.insert(std::make_pair("Content-Length", std::to_string(response.body().length())));
+	if (!Cookie::isValidCookie(_headers))
+	{
+		std::string cookie = Cookie::getSetCookieValue();
+		headers["Set-Cookie"] = "webserv = " + cookie;
+		int fd = open("./cookies/cookies.txt", O_WRONLY | O_APPEND | O_CREAT, 0644);	
+		cookie += "\n";
+		write(fd, cookie.c_str(), cookie.length());
+		close(fd);		
+	}
 
+	headers.insert(std::make_pair("Content-Type", "text/plain"));
+	headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
 
 	response.set_headers(headers);
-
 	response.set_start_line("HTTP/1.1 200 OK");
 
+	Logger::info("GetRequest::handle() returning response -> " + response.start_line());
 	return response.format();
 }
 

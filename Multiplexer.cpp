@@ -11,19 +11,24 @@
 #include "requests/DeleteRequest.hpp"
 
 //Request* createRequest(const int &fd, const std::list <Location*> locations) {
-Request* createRequest(const int &fd){
+Request* createRequest(const int &fd)
+{
 	//Request temp (fd, locations);
 	Request temp;
 	temp.parseRequest(fd);
 
 	if(temp.isGetRequest())
-		return new GetRequest(temp);
+		return (new GetRequest(temp));
 	else if (temp.isPostRequest())
 		return new PostRequest(temp);
 	else if (temp.isDeleteRequest())
 		return new DeleteRequest(temp);
+	else
+	{
+		temp.printRequest();
+		return NULL; //
+	}
 
-	return NULL;
 }
 
 Multiplexer::Multiplexer()
@@ -107,12 +112,14 @@ void Multiplexer::run()
 				{
 					//Request* request = createRequest(fd, conf->getServer(0)._locations);
 					Request* request = createRequest(fd);
-					if (request == NULL)
-						throw std::runtime_error("Request is not POST nor GET");
-					std::string response = request->handle();
-					Logger::debug("Multiplexer::run() sending response of size " + Utils::toString(response.length()));
-					write(fd, response.c_str(), response.length());
-					delete request;
+					if (request != NULL)
+					{
+						std::string response = request->handle();
+						Logger::debug("Multiplexer::run() sending response of size " + Utils::toString(response.length()));
+						write(fd, response.c_str(), response.length());
+						delete request;
+					}
+
 
 					close(clientFdVec[locWriteVec]);
 					if (clientFdVec[locWriteVec] == max_fd)

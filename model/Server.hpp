@@ -37,6 +37,7 @@ public:
 	std::string root() const;
 	Location* location(const std::string& path) const;
 	Location* bestLocation(const std::string& path) const;
+	in_addr_t custom_inet_addr(const std::string& ip_str);
 
 	void bind();
 

@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include "arpa/inet.h"
 
 void sanitize(std::string& serverBlock) {
 	std::string result;
@@ -113,20 +114,53 @@ Location* Server::bestLocation(const std::string& path) const {
 	return bestLocation;
 }
 
+in_addr_t Server::custom_inet_addr(const std::string& ip_str)
+{
+    std::stringstream ss(ip_str);
+
+    int octets[4];
+    char dot;
+
+    for (int i = 0; i < 4; ++i)
+    {
+        ss >> octets[i];
+        if (i < 3) {
+            ss >> dot;
+            if (dot != '.') {
+                std::cerr << "Error: Separator not '.'\n";
+                return 0;
+            }
+        }
+    }
+
+    in_addr_t ip_address = 0;
+    for (int j = 0; j < 4; ++j) {
+        if (octets[j] < 0 || octets[j] > 255) {
+            std::cerr << "Error: Invalid octet values\n";
+            return 0;
+        }
+        ip_address |= (static_cast<in_addr_t>(octets[j]) << (8 * (3 - j)));
+    }
+
+    return ip_address;
+} 
 
 
 void Server::bind() {
 
 	sockaddr_in servaddr = {};
 	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	std::cout << "Address: " << _address << std::endl;
+	//servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	servaddr.sin_addr.s_addr = htonl(custom_inet_addr(_address));
 
 	try {
-	if (_port <= 0 || _port > 65535)
-	  throw std::runtime_error("Invalid port number\n");
-	servaddr.sin_port = htons(_port);
-	} catch (std::exception &e) {
-	std::cout << e.what() << std::endl;
+		if (_port <= 0 || _port > 65535)
+			throw std::runtime_error("Invalid port number\n");
+		servaddr.sin_port = htons(_port);
+	}
+	catch (std::exception &e) {
+		std::cout << e.what() << std::endl;
 	}
 
 	((_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)

@@ -1,8 +1,8 @@
 #ifndef RESPONSE_HPP
-#define RESPONSE_HPP
+# define RESPONSE_HPP
 
-#include <map>
-#include <string>
+# include <map>
+# include <string>
 
 class Response {
 
@@ -10,6 +10,8 @@ private:
 	std::string _start_line;
 	std::map<std::string, std::string> _headers;
 	std::string _body;
+
+	
 
 public:
 	Response();

@@ -103,3 +103,23 @@ int	Utils::ft_strcmp(const char *s1, const char *s2)
 		return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 	return (0);
 }
+
+//extracts the path whithout the query string from the uri 
+std::string Utils::extractFilePath(const std::string uri)
+{
+	size_t questionMarkPos = uri.find('?');
+	if (questionMarkPos == std::string::npos)
+		return (uri);
+	return (uri.substr(0, questionMarkPos));
+}
+
+std::string Utils::extractQStr(const std::string uri)
+{
+	size_t questionMarkPos = uri.find('?');
+	if (questionMarkPos == std::string::npos)
+		return "";
+
+	std::string qStr = uri.substr(questionMarkPos + 1);
+
+	return (qStr);
+}

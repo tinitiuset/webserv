@@ -1,46 +1,28 @@
-/* #include "Multiplexer.hpp"
-#include "Server.hpp"
-#include "Request.hpp"
-#include "Location.hpp"
-#include "PostRequest.hpp"
-
-#include <stdlib.h>
-#include <fcntl.h>
-#include <vector> */
-
-/* int main() {
-    std::vector<Location> locations;
-
-    locations.push_back(Location("/test"));
-    locations.push_back(Location("/home"));
-    locations.push_back(Location("/test/www"));
-    locations.push_back(Location("/test/www/html"));
-    locations.push_back(Location("/"));
-
-    int fd = open("test.txt", O_RDWR | O_CREAT, 0666);
-    Request req(fd, locations);
-    Request *postReq = new PostRequest(req);
-    postReq->handle();
-    cllo
-    delete (postReq);
-    return 0;
-} */
-
 #include "Multiplexer.hpp"
 #include "utils/defaults.hpp"
 #include <string>
 
 Conf* conf;
 
-int main() {
+int main(int argc, char **argv)
+{
+	if (argc == 1)
+    	conf = new Conf("./config/default.conf");
+  	else if (argc == 2)
+    	conf = new Conf(argv[1]);
+  	else
+  	{
+		std::cerr << "Usage: " << argv[0] << " [config_file]" << std::endl;
+		return 1;
+	}
+	
+	if (!conf->parse())
+		return (delete conf, 1);
 
-  conf = new Conf("./config/webserv.conf");
-  
-  conf->parse();
-  conf->load();
+	conf->load();
 
-  Multiplexer().run();
+	Multiplexer().run();
 
-  delete conf;
-  return 0;
+	delete conf;
+	return 0;
 }

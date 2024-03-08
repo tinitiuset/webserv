@@ -1,8 +1,10 @@
 #ifndef POSTREQUEST_HPP
-#define POSTREQUEST_HPP
+# define POSTREQUEST_HPP
 
-#include "Request.hpp"
-#include "Response.hpp"
+# include "Request.hpp"
+# include "Response.hpp"
+# include "Resource.hpp"
+
 
 class PostRequest: public Request {
 	private:
@@ -11,9 +13,9 @@ class PostRequest: public Request {
 		PostRequest(const Request&);
 		~PostRequest();
 		std::string handle();
-		void	parse_multipart_body(std::string body);
-		void	parse_type();
-		void	save_file(std::string body);
+		void		parse_multipart_body(std::string body);
+		void		parse_type();
+		void		save_file(std::string body, std::string path);
 };
 
 #endif

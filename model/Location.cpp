@@ -61,7 +61,7 @@ std::string Index::buildRealPath(std::string &uri)
 	std::string locT = Utils::removeLastSlash(path());
 	std::string rootT = Utils::removeLastSlash(root());
 	std::string uriT = Utils::removeLastSlash(uri);
-
+	
 	if (uriT == locT)
 		return (rootT + "/" + file());
 	rootT += "/";

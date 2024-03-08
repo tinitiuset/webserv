@@ -1,72 +1,75 @@
 #include "Cookie.hpp"
 #include "../utils/Utils.hpp"
 
-int	Cookie::_sesId = 1;
-
-std::map<std::string, std::string> 	Cookie::_sessionDB;
-int									Cookie::_hash;
-std::string							Cookie::_newKey;
-std::string							Cookie::_newValue;
-
-int	Cookie::generateHash()
-{
-	int	hashValue;
-	
-	std::string	op = Utils::toString(_sesId * 4242);
-	const char *str = op.c_str();
-
-	while (*str)
-        hashValue = (hashValue << 5) + *str++;
-
-	return (hashValue);
-}
-
-void	Cookie::generateNewCookie()
-{
-	std::cout << "Generating new cookie" << std::endl;
-	
-	_newKey = Utils::toString(_sesId); 
-	_newValue = Utils::toString(generateHash());
-
-	_sessionDB[_newKey] = _newValue;
-	_sesId++;
-}
-
 std::string	Cookie::getSetCookieValue()
 {
-	generateNewCookie();
-	std::string value = _newKey + "=" + _newValue;
-	return (value);
+	std::srand(static_cast<unsigned int>(std::time(0)));
+
+    unsigned int rNumb = 0;
+    for (int i = 0; i < 10; ++i) {
+        rNumb = rNumb * 10 + (std::rand() % 10);
+    }
+    rNumb = rNumb % 1000000000;
+    std::string value = Utils::toString(rNumb);
+
+    return value;
 }
 
-std::string	Cookie::getCookieResponse()
+
+void Cookie::removeNlCr(std::string &line) 
 {
-	std::string cookieResponse = "HTTP/1.1 200 OK\r\n";
-	cookieResponse += "Content-Type: text/html\r\n";
-	cookieResponse += getSetCookieValue();
-	cookieResponse += "\r\n";
-	return (cookieResponse);
+    size_t found;    
+    while ((found = line.find('\n')) != std::string::npos) {
+        line.erase(found, 1);
+    }
+    while ((found = line.find('\r')) != std::string::npos) {
+        line.erase(found, 1);
+    }
+}
+
+std::vector<std::string> Cookie::extractCookieValues(const std::string &input)
+{
+    std::vector<std::string> webServValues;
+    std::istringstream iss(input);
+    std::string token;
+
+    while (std::getline(iss, token, ';'))
+	{
+        size_t found = token.find("webserv=");
+        if (found != std::string::npos)
+            webServValues.push_back(token.substr(found + 8));
+    }
+
+    return (webServValues);
 }
 
 bool Cookie::isValidCookie(const std::map<std::string, std::string>& headers)
 {
-	for (std::map<std::string, std::string>::const_iterator it = headers.begin(); it != headers.end(); ++it)
+	std::vector<std::string> fileCookVals;
+	std::vector<std::string> headCookVals;
+
+	std::ifstream file("./cookies/cookies.txt");
+	if (!file.is_open())
+		return (false);
+
+	std::string line;
+	while (std::getline(file, line))
 	{
-		if (it->first == "Cookie")
-		{
-			std::string cookieString = it->second;
-			size_t equalPos = cookieString.find('=');
-			if (equalPos != std::string::npos)
-			{
-				std::string key = cookieString.substr(0, equalPos);
-				std::string value = cookieString.substr(equalPos + 1);
-				std::map<std::string, std::string>::iterator dbIt = _sessionDB.find(key);
-				if (dbIt != _sessionDB.end() && dbIt->second == value)
+		removeNlCr(line);
+		fileCookVals.push_back(line);
+	}
+	file.close();
+	
+	std::map<std::string, std::string>::const_iterator it = headers.find("Cookie");
+
+    if (it != headers.end())
+	{
+		headCookVals = extractCookieValues(it->second);
+		//compare each headCookVals with all fileCookVals
+		for (size_t i = 0; i < headCookVals.size(); i++)
+			for (size_t j = 0; j < fileCookVals.size(); j++)
+				if (headCookVals[i] == fileCookVals[j])
 					return (true);
-			}
-		}
 	}
 	return (false);
 }
-
-int		Cookie::getSesId() {return(_sesId);}

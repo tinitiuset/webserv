@@ -4,11 +4,11 @@ Conf::Conf(const std::string& file): _file(file) {}
 
 Conf::~Conf() {}
 
-void Conf::parse() {
+bool Conf::parse() {
 	std::ifstream file(_file);
 	if (!file.is_open()) {
 		std::cerr << "Failed to open file: " << _file << std::endl;
-		return;
+		return false;
 	}
 
 	std::string line;
@@ -39,6 +39,7 @@ void Conf::parse() {
 		}
 	}
 	file.close();
+	return true;
 }
 
 void Conf::load() {
