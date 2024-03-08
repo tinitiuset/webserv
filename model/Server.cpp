@@ -42,7 +42,8 @@ Server::Server(std::string& serverBlock): _fd(-1) {
 	pos = serverBlock.find("listen");
 	if (pos != std::string::npos) {
 		_address = serverBlock.substr(pos + 7, serverBlock.find(':', pos) - pos - 7);
-		_port = std::stoi(serverBlock.substr(serverBlock.find(':', pos) + 1, serverBlock.find(';', pos) - serverBlock.find(':', pos) - 1));
+		//_port = std::stoi(serverBlock.substr(serverBlock.find(':', pos) + 1, serverBlock.find(';', pos) - serverBlock.find(':', pos) - 1));
+		_port = Utils::toInt(serverBlock.substr(serverBlock.find(':', pos) + 1, serverBlock.find(';', pos) - serverBlock.find(':', pos) - 1));
 	}
 
 	pos = serverBlock.find("server_name");
@@ -52,7 +53,8 @@ Server::Server(std::string& serverBlock): _fd(-1) {
 
 	pos = serverBlock.find("body_size");
 	if (pos != std::string::npos) {
-		_body_size = std::stoi(serverBlock.substr(pos + 10, serverBlock.find(';', pos) - pos - 10));
+		//_body_size = std::stoi(serverBlock.substr(pos + 10, serverBlock.find(';', pos) - pos - 10));
+		_body_size = Utils::toInt(serverBlock.substr(pos + 10, serverBlock.find(';', pos) - pos - 10));
 	}
 
 	pos = serverBlock.find("root");

@@ -15,7 +15,7 @@ class PostRequest: public Request {
 		std::string handle();
 		void		parse_multipart_body(std::string body);
 		void		parse_type();
-		void		save_file(std::string body, std::string path);
+		void		save_file(std::string body);
 };
 
 #endif

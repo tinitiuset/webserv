@@ -16,7 +16,10 @@ Resource& Resource::operator=(const Resource& resource) {
 	return *this;
 }
 
-Resource::~Resource() {}
+Resource::~Resource() {
+	if (_env)
+		delete _env;
+}
 
 std::string Resource::load() const {
 	Logger::info("Resource::load() Loading resource from " + _path);
@@ -24,8 +27,8 @@ std::string Resource::load() const {
 	std::ifstream file;
 
 	(mime().find("text") == std::string::npos) ?
-		file = std::ifstream(_path, std::ios::binary) : file = std::ifstream(_path);
-
+		//file = std::ifstream(_path.c_str(), std::ios::binary) : file = std::ifstream(_path.c_str());
+		file.open(_path.c_str(), std::ios::binary) : file.open(_path.c_str());
 	return std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 }
 

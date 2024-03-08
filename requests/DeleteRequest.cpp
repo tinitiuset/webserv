@@ -52,13 +52,15 @@ std::string DeleteRequest::handle() {
     Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
     std::string path;
     
-    if ((loc->path()).back() == '/')
+    //if ((loc->path()).back() == '/')
+    if ((loc->path())[(loc->path()).length() - 1] == '/')
         path = _uri.replace(0, loc->path().length() - 1, loc->root());
     else
         path = _uri.replace(0, loc->path().length(), loc->root());
     
         //Check the DELETE target and decide if it is a file or a directory
-    if (_uri.back() == '/')
+    //if (_uri.back() == '/')
+    if (_uri[_uri.length() - 1] == '/')
         delete_directory(path);
     else
         delete_file(path);
@@ -68,7 +70,7 @@ std::string DeleteRequest::handle() {
 
 	std::map<std::string, std::string> headers;
 	headers.insert(std::make_pair("Content-Type", "text/plain"));
-	headers.insert(std::make_pair("Content-Length", std::to_string(response.body().length())));
+	headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
 
 
 	response.set_headers(headers);

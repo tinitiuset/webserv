@@ -43,7 +43,7 @@ std::string PostRequest::handle() {
 		response.set_body(resource.buildCGI(qStr));
 	else
 	{
-		save_file(_body, loc->root() + "/" + _postHeaders["filename"]);
+		save_file(_body);
 
 		response.set_body("File correctly uploaded!");
 	}
@@ -127,7 +127,7 @@ void	PostRequest::parse_multipart_body(std::string body){
 void	PostRequest::save_file(std::string body){
 	Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
 	std::string path = loc->root() + _uri + "/" + _postHeaders["filename"];
-	std::ofstream outfile(path, std::ios::out | std::ios::binary);
+	std::ofstream outfile(path.c_str(), std::ios::out | std::ios::binary);
 
 	outfile << body;
 	outfile.flush();

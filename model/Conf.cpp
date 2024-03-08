@@ -5,7 +5,7 @@ Conf::Conf(const std::string& file): _file(file) {}
 Conf::~Conf() {}
 
 bool Conf::parse() {
-	std::ifstream file(_file);
+	std::ifstream file(_file.c_str());
 	if (!file.is_open()) {
 		std::cerr << "Failed to open file: " << _file << std::endl;
 		return false;

@@ -7,6 +7,8 @@
 # include <dirent.h>
 # include <map>
 # include <signal.h>
+# include <ctime>
+# include <sys/wait.h>
 
 # include "../utils/defaults.hpp"
 # include "../utils/Logger.hpp"
