@@ -13,6 +13,8 @@
 # include "../utils/defaults.hpp"
 # include "../utils/Logger.hpp"
 # include "../utils/Utils.hpp"
+# include "../utils/Codes.hpp"
+# include "../dynamicpages/ErrorPage.hpp"
 
 class Resource {
 
@@ -22,7 +24,7 @@ public:
 	Resource& operator=(const Resource&);
 	~Resource();
 
-	std::string load() const;
+	std::string load();
 	std::string status() const;
 	std::string mime() const;
 
@@ -41,11 +43,9 @@ public:
 
 private:
 	std::string _path;
-	std::string _status;
+	int _status;
 	std::string _method;
 	char**		_env;
-
-	//cgi
 
 };
 

@@ -1,20 +1,4 @@
 #include "Request.hpp"
-#include "../utils/Utils.hpp"
-#include <sstream>
-#include <unistd.h>
-
-static std::string status(int code) {
-	switch (code) {
-		case 301:
-			return("Moved Permanently");
-		break;
-		case 302:
-			return("Found");
-		break;
-		default:
-			return("OK");
-	}
-}
 
 Request::Request() {}
 
@@ -125,7 +109,7 @@ std::string Request::redirect() {
 
 	Response response;
 
-	std::string startLine = "HTTP/1.1 " + Utils::toString(redirect->code()) + " " + status(redirect->code());
+	std::string startLine = Codes::status(redirect->code());
 
 	response.set_start_line(startLine);
 	std::map<std::string, std::string> headers;

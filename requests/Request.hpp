@@ -6,6 +6,7 @@
 # include "Response.hpp"
 # include "../utils/defaults.hpp"
 # include <vector>
+# include "../utils/Codes.hpp"
 # include "../utils/Logger.hpp"
 # include "../utils/Utils.hpp"
 # include "../model/Location.hpp"
