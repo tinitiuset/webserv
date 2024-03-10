@@ -31,7 +31,7 @@ std::string Resource::load() {
 		if (!file.is_open()) {
 			_status = 404;
 			_path = "error" + Utils::toString(_status) + ".html";
-			return ErrorPage::build(404, "Not Found");
+			return ErrorPage::build(_status);
 		}
 
 		std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
@@ -41,12 +41,12 @@ std::string Resource::load() {
 		Logger::error("Resource::load() Error loading resource: " + std::string(e.what()));
 		_status = 500;
 		_path = "error" + Utils::toString(_status) + ".html";
-		return ErrorPage::build(500, "Internal Server Error");
+		return ErrorPage::build(_status);
 	}
 }
 
 std::string Resource::status() const {
-	return Codes::status(_status);
+	return "HTTP/1.1 " + Codes::status(_status);
 }
 
 std::string Resource::mime() const {

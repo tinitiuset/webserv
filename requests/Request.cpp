@@ -109,7 +109,7 @@ std::string Request::redirect() {
 
 	Response response;
 
-	std::string startLine = Codes::status(redirect->code());
+	std::string startLine = "HTTP/1.1 " + Codes::status(redirect->code());
 
 	response.set_start_line(startLine);
 	std::map<std::string, std::string> headers;
