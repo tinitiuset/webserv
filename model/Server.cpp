@@ -61,6 +61,15 @@ Server::Server(std::string& serverBlock): _fd(-1) {
 	if (pos != std::string::npos) {
 		_root = serverBlock.substr(pos + 5, serverBlock.find(';', pos) - pos - 5);
 	}
+
+	// Parse error pages with format "error_page <code> <path>;"
+	pos = 0;
+	while ((pos = serverBlock.find("error_page", pos)) != std::string::npos) {
+		int code = std::stoi(serverBlock.substr(pos + 11, serverBlock.find(' ', pos + 11) - pos - 11));
+		std::string path = serverBlock.substr(serverBlock.find(' ', pos + 11) + 1, serverBlock.find(';', pos) - serverBlock.find(' ', pos + 11) - 1);
+		_error_pages[code] = path;
+		pos = serverBlock.find(';', pos);
+	}
 }
 
 Server::Server(const Server& other): _server_name(other._server_name), _address(other._address), _fd(other._fd), _port(other._port),
@@ -68,6 +77,9 @@ Server::Server(const Server& other): _server_name(other._server_name), _address(
 {
 	for (std::list<Location*>::const_iterator it = other._locations.begin(); it != other._locations.end(); ++it) {
 		_locations.push_back((*it)->clone());
+	}
+	for (std::map<int, std::string>::const_iterator it = other._error_pages.begin(); it != other._error_pages.end(); ++it) {
+		_error_pages[it->first] = it->second;
 	}
 }
 
@@ -147,6 +159,13 @@ in_addr_t Server::custom_inet_addr(const std::string& ip_str)
     return ip_address;
 } 
 
+
+std::string Server::errorPage(int code) const {
+	std::map<int, std::string>::const_iterator it = _error_pages.find(code);
+	if (it != _error_pages.end())
+		return it->second;
+	return "";
+}
 
 void Server::bind() {
 
