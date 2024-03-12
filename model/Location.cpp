@@ -21,13 +21,14 @@ int Redirect::code() const { return _code; }
 std::string Redirect::redirect() const { return _redirect; }
 
 Index::Index(std::string& loc): Location(), _autoindex(false), _cgi(false), _methods() {
+		
 	if (loc.find("location") != std::string::npos)
 		_path = loc.substr(loc.find("location") + 9, loc.find('{') - loc.find("location") - 10);
 	if (loc.find("root") != std::string::npos)
 		_root = loc.substr(loc.find("root") + 5, loc.find(';', loc.find("root")) - loc.find("root") - 5);
 	if (loc.find("file") != std::string::npos)
 		_file = loc.substr(loc.find("file") + 5, loc.find(';', loc.find("file")) - loc.find("file") - 5);
-	if (loc.find("autoindex on") != std::string::npos)
+	if (loc.find("autoindex on;") != std::string::npos)
 		_autoindex = true;
 	if (loc.find("cgi on") != std::string::npos)
 		_cgi = true;

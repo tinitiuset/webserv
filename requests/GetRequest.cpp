@@ -36,7 +36,6 @@ std::string GetRequest::handle()
 		}
 	}
 
-
 	Response response;
 
 	Resource resource(resPath, _method);

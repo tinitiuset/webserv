@@ -5,6 +5,7 @@ void sanitize(std::string& serverBlock) {
 	std::string result;
 	char prevChar = 0;
 	for (size_t i = 0; i < serverBlock.size(); ++i) {
+		
 		if (serverBlock[i] == ' ' && prevChar == '\n') {
 			continue;
 		} else {
@@ -59,6 +60,8 @@ Server::Server(std::string& serverBlock): _fd(-1) {
 	if (pos != std::string::npos) {
 		_root = serverBlock.substr(pos + 5, serverBlock.find(';', pos) - pos - 5);
 	}
+
+	std::cout << "EN SERVER, buscando las cosas de server y metiendolas en su sitio" << std::endl;
 }
 
 Server::Server(const Server& other): _server_name(other._server_name), _address(other._address), _fd(other._fd), _port(other._port),
@@ -114,7 +117,7 @@ Location* Server::bestLocation(const std::string& path) const {
 	return bestLocation;
 }
 
-in_addr_t Server::custom_inet_addr(const std::string& ip_str)
+in_addr_t	Server::custom_inet_addr(const std::string &ip_str)
 {
     std::stringstream ss(ip_str);
 
@@ -150,7 +153,6 @@ void Server::bind() {
 
 	sockaddr_in servaddr = {};
 	servaddr.sin_family = AF_INET;
-	std::cout << "Address: " << _address << std::endl;
 	//servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	servaddr.sin_addr.s_addr = htonl(custom_inet_addr(_address));
 
