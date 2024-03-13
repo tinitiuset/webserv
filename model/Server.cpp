@@ -60,8 +60,6 @@ Server::Server(std::string& serverBlock): _fd(-1) {
 	if (pos != std::string::npos) {
 		_root = serverBlock.substr(pos + 5, serverBlock.find(';', pos) - pos - 5);
 	}
-
-	std::cout << "EN SERVER, buscando las cosas de server y metiendolas en su sitio" << std::endl;
 }
 
 Server::Server(const Server& other): _server_name(other._server_name), _address(other._address), _fd(other._fd), _port(other._port),

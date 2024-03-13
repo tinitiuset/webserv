@@ -38,15 +38,6 @@ bool Conf::parse() {
 			}
 		}
 	}
-	//print servers with info
-	for (size_t i = 0; i < _servers.size(); ++i)
-	{
-		std::cout << _servers[i].address() << ":" << _servers[i].port() << " Server name: " << _servers[i].server_name() << std::endl;
-		std::cout << "Body size: " << _servers[i].body_size() << " Root: " << _servers[i].root() << std::endl;
-	}
-	std::cout << std::endl;
-
-
 
 	file.close();
 	return true;
