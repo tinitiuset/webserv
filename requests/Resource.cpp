@@ -109,10 +109,7 @@ std::string Resource::buildAI(std::string uri, std::string host, std::string res
         closedir(dir);
     }
 	else
-	{
-        std::cerr << "No se pudo abrir el directorio" << std::endl;
-        return ("");
-    }
+		return (ErrorPage::build(500));
 	result += "</ul>\n</body>\n</html>\n";
 
     return (result);
@@ -148,13 +145,12 @@ std::string Resource::getPreviousUri(std::string uri)
 /* 
 	extract the name of the cgi script from the path until "?"
 	"/var/www/html/cgi-bin/hello.py?name=pepe" returns "hello.py"
-
 */
 std::string Resource::extractCgi()
 {
 	size_t lastSlashPos = _path.rfind('/');
     if (lastSlashPos == std::string::npos)
-        return "";
+        return ErrorPage::build(400);
 
     std::string cgiFileName = _path.substr(lastSlashPos + 1);
 
@@ -169,8 +165,7 @@ std::string Resource::extractQStr()
 {
 	size_t questionMarkPos = _path.find('?');
 	if (questionMarkPos == std::string::npos)
-		return "";
-
+		return (ErrorPage::build(400));
 	std::string qStr = _path.substr(questionMarkPos + 1);
 
 	return qStr;
@@ -182,12 +177,15 @@ std::string Resource::buildCGI(std::string qStr)
 	std::string interpret = "";
 	_env = NULL;
 
+	if (access(_path.c_str(), X_OK))
+		return (ErrorPage::build(403));
+
 	if (cgiPath.substr(cgiPath.length() - 3) == ".py")
         interpret = "/usr/local/bin/python3";
     else if (_path.substr(_path.length() - 3) == ".pl")
         interpret = "/usr/bin/perl";
     else
-        throw std::runtime_error("invalid cgi script");
+        return (ErrorPage::build(403));
 
 	return (initCgi(cgiPath, interpret, qStr));
 }
@@ -209,10 +207,7 @@ std::string    Resource::initCgi(std::string cgiPath, std::string interpret, std
 		set4Post();
 	}
     else
-    {
-        std::cerr << "method not supported" << std::endl;
-        return (""); //?
-    }
+        return (ErrorPage::build(405));
 
     pid_t pid = fork();
 
@@ -257,7 +252,8 @@ std::string    Resource::initCgi(std::string cgiPath, std::string interpret, std
 		{
 			std::cout << "Timeout. Killing child process" << std::endl;
 			kill(pid, SIGKILL);
-			return ("");
+			delete _env;
+			return (ErrorPage::build(408));
 		}
 		usleep(100000);  // (0.1 sec)
 	}
@@ -287,12 +283,10 @@ void    Resource::set4GETEnv(std::string cgiPath, std::string qStr)
 
     std::vector<std::string>    envVect;
 
-    envVect.push_back("GATEWAY_INTERFACE=CGI/1.1");
+	envVect.push_back("GATEWAY_INTERFACE=CGI/1.1");
     envVect.push_back("SERVER_PROTOCOL=HTTP/1.1");
     envVect.push_back("REQUEST_METHOD=" + _method);
 	envVect.push_back("PATH_INFO=" + cgiPath);
-    if (access(_path.c_str(), X_OK))
-        throw std::runtime_error("invalid script or not found");
     envVect.push_back("SCRIPT_NAME=" + cgiPath);
     envVect.push_back("QUERY_STRING=" + qStr);
     envVect.push_back("CONTENT_LENGTH=1024");
