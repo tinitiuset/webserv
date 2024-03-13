@@ -14,6 +14,7 @@
 # include "../utils/Logger.hpp"
 # include "../utils/Utils.hpp"
 # include "../utils/Codes.hpp"
+# include "../exceptions/RequestException.hpp"
 # include "../dynamicpages/ErrorPage.hpp"
 
 class Resource {

@@ -39,6 +39,7 @@ std::string GetRequest::handle()
 
 	Response response;
 
+	try {
 	Resource resource(resPath, _method);
 
 	std::map<std::string, std::string> headers;
@@ -70,6 +71,16 @@ std::string GetRequest::handle()
 
 	response.set_headers(headers);
 	response.set_start_line(resource.status());
+
+	} catch (const RequestException& exception) {
+
+		response.set_start_line("HTTP/1.1 " + Codes::status(exception.status()));
+		response.set_body(ErrorPage::build(exception.status()));
+		std::map<std::string, std::string> headers;
+		headers.insert(std::make_pair("Content-Type", "text/html"));
+		headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
+		response.set_headers(headers);
+	}
 
 	Logger::info("GetRequest::handle() returning response -> " + response.start_line());
 	return response.format();
