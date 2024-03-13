@@ -2,7 +2,7 @@
 
 Resource::Resource(std::string path, std::string method) {
 	Logger::debug("Resource::Resource() creating resource with path " + path);
-	_status = "HTTP/1.1 200 OK";
+	_status = 501;
 	_path = path;
 	_method = method;
 }
@@ -16,21 +16,37 @@ Resource& Resource::operator=(const Resource& resource) {
 	return *this;
 }
 
-Resource::~Resource() {}
+Resource::~Resource() {
+}
 
-std::string Resource::load() const {
-	Logger::info("Resource::load() Loading resource from " + _path);
+std::string Resource::load() {
+	try {
+		Logger::info("Resource::load() Loading resource from " + _path);
 
-	std::ifstream file;
+		std::ifstream file;
 
-	(mime().find("text") == std::string::npos) ?
-		file = std::ifstream(_path, std::ios::binary) : file = std::ifstream(_path);
+		(mime().find("text") == std::string::npos) ?
+			file.open(_path.c_str(), std::ios::binary) : file.open(_path.c_str());
 
-	return std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+		if (!file.is_open()) {
+			_status = 404;
+			_path = "error" + Utils::toString(_status) + ".html";
+			return ErrorPage::build(_status);
+		}
+
+		std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+		_status = 200;
+		return content;
+	} catch (const std::exception& e) {
+		Logger::error("Resource::load() Error loading resource: " + std::string(e.what()));
+		_status = 500;
+		_path = "error" + Utils::toString(_status) + ".html";
+		return ErrorPage::build(_status);
+	}
 }
 
 std::string Resource::status() const {
-	return _status;
+	return "HTTP/1.1 " + Codes::status(_status);
 }
 
 std::string Resource::mime() const {

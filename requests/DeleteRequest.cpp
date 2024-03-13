@@ -40,39 +40,37 @@ DeleteRequest::DeleteRequest(const Request& request): Request(request) {
 }
 
 DeleteRequest::~DeleteRequest() {}
+
 std::string DeleteRequest::handle() {
 
-	// AddToList
-	// UploadFile
-	// SetCookie
-	// deChunck
+	Response response;
+
+    if (Request::handle() != "")
+        return (response.format());
 
 	Logger::debug("DeleteRequest::handle() called");
     Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
     std::string path;
-	Response response;
     
-    if ((loc->path()).back() == '/')
+    //if ((loc->path()).back() == '/')
+    if ((loc->path())[(loc->path()).length() - 1] == '/')
         path = _uri.replace(0, loc->path().length() - 1, loc->root());
     else
         path = _uri.replace(0, loc->path().length(), loc->root());
-    if (loc->isMethodAllowed("delete") == false)
-        return (response.format());//Here should respond with error code
-    else
-    {
+    
         //Check the DELETE target and decide if it is a file or a directory
-        if (_uri.back() == '/')
-            delete_directory(path);
-        else
-            delete_file(path);
-    }
+    //if (_uri.back() == '/')
+    if (_uri[_uri.length() - 1] == '/')
+        delete_directory(path);
+    else
+        delete_file(path);
 
 
 	response.set_body("File/Directory correctly deleted!");
 
 	std::map<std::string, std::string> headers;
 	headers.insert(std::make_pair("Content-Type", "text/plain"));
-	headers.insert(std::make_pair("Content-Length", std::to_string(response.body().length())));
+	headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
 
 
 	response.set_headers(headers);

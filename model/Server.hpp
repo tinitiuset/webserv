@@ -8,6 +8,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <fcntl.h>
+#include <map>
 #include <vector>
 #include "../utils/Logger.hpp"
 
@@ -22,9 +23,10 @@ private:
 	int _port;
 	int _body_size;
 	std::string _root;
+	std::list <Location*> _locations;
+	std::map<int, std::string> _error_pages;
 
 public:
-	std::list <Location*> _locations;
 	Server(std::string&);
 	Server(const Server& other);
 	~Server();
@@ -37,6 +39,7 @@ public:
 	std::string root() const;
 	Location* location(const std::string& path) const;
 	Location* bestLocation(const std::string& path) const;
+	std::string errorPage(int code) const;
 	in_addr_t custom_inet_addr(const std::string& ip_str);
 
 	void bind();

@@ -8,7 +8,8 @@ std::string Location::path() const { return _path; }
 
 Redirect::Redirect(std::string& loc): Location() {
 	_path = loc.substr(loc.find("location") + 9, loc.find('{') - loc.find("location") - 10);
-	_code = std::stoi(loc.substr(loc.find("{redirect") + 10, loc.find(';', loc.find("{redirect")) - loc.find("{redirect") - 10));
+	//_code = std::stoi(loc.substr(loc.find("{redirect") + 10, loc.find(';', loc.find("{redirect")) - loc.find("{redirect") - 10));
+	_code = Utils::toInt(loc.substr(loc.find("{redirect") + 10, loc.find(';', loc.find("{redirect")) - loc.find("{redirect") - 10));
 	_redirect = loc.substr(loc.find_last_of(' ') + 1, loc.find(';', loc.find_last_of(' ')) - loc.find_last_of(' ') - 1);
 }
 
