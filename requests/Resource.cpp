@@ -20,28 +20,22 @@ Resource::~Resource() {
 }
 
 std::string Resource::load() {
+	Logger::info("Resource::load() Loading resource from " + _path);
+
+	std::ifstream file;
+
+	(mime().find("text") == std::string::npos) ?
+		file.open(_path.c_str(), std::ios::binary) : file.open(_path.c_str());
+
+	if (!file.is_open())
+		throw RequestException(404);
+
 	try {
-		Logger::info("Resource::load() Loading resource from " + _path);
-
-		std::ifstream file;
-
-		(mime().find("text") == std::string::npos) ?
-			file.open(_path.c_str(), std::ios::binary) : file.open(_path.c_str());
-
-		if (!file.is_open()) {
-			_status = 404;
-			_path = "error" + Utils::toString(_status) + ".html";
-			return ErrorPage::build(_status);
-		}
-
 		std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 		_status = 200;
 		return content;
 	} catch (const std::exception& e) {
-		Logger::error("Resource::load() Error loading resource: " + std::string(e.what()));
-		_status = 500;
-		_path = "error" + Utils::toString(_status) + ".html";
-		return ErrorPage::build(_status);
+		throw RequestException(500);
 	}
 }
 
