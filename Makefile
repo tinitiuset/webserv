@@ -20,6 +20,7 @@ SRC_FILES = main.cpp \
 			./utils/Logger.cpp \
 			./utils/Codes.cpp \
 			./utils/Utils.cpp \
+			./exceptions/RequestException.cpp \
 			Multiplexer.cpp
 HEADER_FILES = 	./model/*.hpp \
 				./model/Conf.hpp \
@@ -36,6 +37,7 @@ HEADER_FILES = 	./model/*.hpp \
 				./utils/Utils.hpp \
 				./cookies/Cookie.hpp \
 				./dynamicpages/ErrorPage.hpp \
+				./exceptions/RequestException.hpp \
 				Multiplexer.hpp \
 				./utils/defaults.hpp
 
