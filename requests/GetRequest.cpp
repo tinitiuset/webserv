@@ -25,6 +25,7 @@ std::string GetRequest::handle()
 	{
 		//return (Response::notFound().format());
 		return ("");
+		//throw RequestException(404);
 	}
 
 	resPath = loc->buildRealPath(resPath);

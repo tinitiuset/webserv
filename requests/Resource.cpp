@@ -103,7 +103,8 @@ std::string Resource::buildAI(std::string uri, std::string host, std::string res
         closedir(dir);
     }
 	else
-		return (ErrorPage::build(500));
+		throw RequestException(500);;
+	
 	result += "</ul>\n</body>\n</html>\n";
 
     return (result);
@@ -144,7 +145,7 @@ std::string Resource::extractCgi()
 {
 	size_t lastSlashPos = _path.rfind('/');
     if (lastSlashPos == std::string::npos)
-        return ErrorPage::build(400);
+        throw RequestException(400);;
 
     std::string cgiFileName = _path.substr(lastSlashPos + 1);
 
@@ -159,7 +160,7 @@ std::string Resource::extractQStr()
 {
 	size_t questionMarkPos = _path.find('?');
 	if (questionMarkPos == std::string::npos)
-		return (ErrorPage::build(400));
+		throw RequestException(400);;
 	std::string qStr = _path.substr(questionMarkPos + 1);
 
 	return qStr;
@@ -172,14 +173,15 @@ std::string Resource::buildCGI(std::string qStr)
 	_env = NULL;
 
 	if (access(_path.c_str(), X_OK))
-		return (ErrorPage::build(403));
+		throw RequestException(403);
+		//return (ErrorPage::build(403));
 
 	if (cgiPath.substr(cgiPath.length() - 3) == ".py")
         interpret = "/usr/local/bin/python3";
     else if (_path.substr(_path.length() - 3) == ".pl")
-        interpret = "/usr/bin/perl";
+        interpret = "/usrt/bin/perl";
     else
-        return (ErrorPage::build(403));
+		throw RequestException(403);
 
 	return (initCgi(cgiPath, interpret, qStr));
 }
@@ -190,23 +192,24 @@ std::string    Resource::initCgi(std::string cgiPath, std::string interpret, std
     int fd_child_to_parent[2];
 
 	if (pipe(fd_child_to_parent) == -1)
-        throw std::runtime_error("pipe error");
+        throw RequestException(500);
     
     if (_method == "GET") //also check if method is supported in config????
         set4GETEnv(_path, qStr);
     else if (_method == "POST") //also check if method is supported in config????
     {
 		if (pipe(fd_parent_to_child) == -1)
-			throw std::runtime_error("pipe error");
+			throw RequestException(500);
 		set4Post();
 	}
     else
-        return (ErrorPage::build(405));
+		throw RequestException(405);
 
     pid_t pid = fork();
 
     if (pid == -1)
-        throw std::runtime_error("fork error");
+		throw RequestException(500);
+
     else if (pid == 0) //child process
     {
         if (_method == "POST")
@@ -226,7 +229,10 @@ std::string    Resource::initCgi(std::string cgiPath, std::string interpret, std
         args[2] = NULL;
 
         if (execve(interpret.c_str(), args, _env) == -1)
-            throw std::runtime_error("execve error");    
+		{
+			delete _env;
+            throw RequestException(500);    
+		}
     }
 	//parent process
 	if (_method == "POST")
@@ -247,7 +253,7 @@ std::string    Resource::initCgi(std::string cgiPath, std::string interpret, std
 			std::cout << "Timeout. Killing child process" << std::endl;
 			kill(pid, SIGKILL);
 			delete _env;
-			return (ErrorPage::build(408));
+			throw RequestException(408);
 		}
 		usleep(100000);  // (0.1 sec)
 	}
@@ -263,7 +269,7 @@ std::string     Resource::readChildOutput(int fd_child_to_parent)
 	while ((bytes = read(fd_child_to_parent, buffer, sizeof(buffer))) > 0)
 	{
 		if (bytes < 0)
-			throw std::runtime_error("fd read error");
+			throw RequestException(500);
 		buffer[bytes] = '\0';
 		resp += buffer;
 	}
