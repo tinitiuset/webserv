@@ -15,7 +15,7 @@ std::string GetRequest::handle()
 	std::string host = Utils::removeLastSlash(getHost());
 
 	//prints
-git a
+
 	Index*		loc;
 
 	Logger::info("GetRequest::handle() handling GET request");
