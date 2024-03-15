@@ -114,27 +114,11 @@ void Multiplexer::run()
 					Request* request = createRequest(fd);
 					if (request != NULL)
 					{
-						try{
-							std::string response = request->handle();
-							Logger::debug("Multiplexer::run() sending response of size " + Utils::toString(response.length()));
-							write(fd, response.c_str(), response.length());
-						}
-						catch (const std::exception& e)
-						{
-							std::stringstream response;
-							std::string errorMessage = "<html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1><p>The requested URL was not found on this server.</p></body></html>";
-							response << "HTTP/1.1 " << "404" << " " << "Not Found" << "\r\n";
-							response << "Content-Type: text/html\r\n";
-							response << "Content-Length: " << errorMessage.length() << "\r\n";
-							response << "\r\n"; 
-							response << errorMessage;
-							std::string resp = response.str();
-							write(fd, resp.c_str(), resp.length());
-						}
+						std::string response = request->handle();
+						Logger::debug("Multiplexer::run() sending response of size " + Utils::toString(response.length()));
+						write(fd, response.c_str(), response.length());
 						delete request;
 					}
-
-
 					close(clientFdVec[locWriteVec]);
 					if (clientFdVec[locWriteVec] == max_fd)
 						max_fd--;

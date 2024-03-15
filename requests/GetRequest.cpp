@@ -8,41 +8,38 @@ GetRequest::~GetRequest() {}
 
 std::string GetRequest::handle()
 {
-	std::string resPath = Utils::extractFilePath(_uri);
-	std::string qStr = Utils::extractQStr(_uri);
-	int			port = getPort();
-	std::string address = conf->getServer(port).address();
-	std::string host = Utils::removeLastSlash(getHost());
-
-	//prints
-
-	Index*		loc;
-
-	Logger::info("GetRequest::handle() handling GET request");
-
-	if (dynamic_cast<Redirect*>(conf->getServer(port).location(_uri)))
-		return redirect();
-
-	if (!(loc = dynamic_cast<Index*>(conf->getServer(port).bestLocation(_uri))))
-	{
-		resPath == "/" ? 
-			throw RequestException(404):
-			resPath = conf->getServer(port).root() + resPath;
-	}
-	else
-		resPath = loc->buildRealPath(resPath);
-	
-	for (size_t i = 0; i < resPath.length() - 1; ++i) 
-	{
-		if (resPath[i] == '/' && resPath[i + 1] == '/') {
-			resPath.erase(i, 1);
-			--i;
-		}
-	}
-
 	Response response;
 
 	try {
+
+		//Request::handle();
+
+		std::string resPath = Utils::extractFilePath(_uri);
+		std::string qStr = Utils::extractQStr(_uri);
+		int			port = getPort();
+		std::string address = conf->getServer(port).address();
+		std::string host = Utils::removeLastSlash(getHost());
+
+		Index*		loc;
+
+		Logger::info("GetRequest::handle() handling GET request");
+
+		if (dynamic_cast<Redirect*>(conf->getServer(port).location(_uri)))
+			return redirect();
+
+		if (!(loc = dynamic_cast<Index*>(conf->getServer(port).bestLocation(_uri))))
+			throw RequestException(404);
+
+		resPath = loc->buildRealPath(resPath);
+		for (size_t i = 0; i < resPath.length() - 1; ++i)
+		{
+			if (resPath[i] == '/' && resPath[i + 1] == '/') {
+				resPath.erase(i, 1);
+				--i;
+			}
+		}
+
+
 		Resource resource(resPath, _method);
 
 		std::map<std::string, std::string> headers;
