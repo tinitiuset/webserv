@@ -103,7 +103,10 @@ std::string Resource::buildAI(std::string uri, std::string host, std::string res
         closedir(dir);
     }
 	else
+	{
+		Logger::error("Resource::buildAI() opendir() failed");
 		throw RequestException(500);;
+	}
 	
 	result += "</ul>\n</body>\n</html>\n";
 
@@ -145,7 +148,10 @@ std::string Resource::extractCgi()
 {
 	size_t lastSlashPos = _path.rfind('/');
     if (lastSlashPos == std::string::npos)
-        throw RequestException(400);;
+	{
+        Logger::error("Resource::extractCgi() / not found in extractCgi method");
+		throw RequestException(400);;
+	}
 
     std::string cgiFileName = _path.substr(lastSlashPos + 1);
 
@@ -160,7 +166,10 @@ std::string Resource::extractQStr()
 {
 	size_t questionMarkPos = _path.find('?');
 	if (questionMarkPos == std::string::npos)
+	{
+		Logger::error("Resource::extractQStr() ? not found in extractQStr method");
 		throw RequestException(400);;
+	}
 	std::string qStr = _path.substr(questionMarkPos + 1);
 
 	return qStr;
@@ -173,15 +182,21 @@ std::string Resource::buildCGI(std::string qStr)
 	_env = NULL;
 
 	if (access(_path.c_str(), X_OK))
+	{
+		Logger::info("Resource::buildCGI() access() failed");
 		throw RequestException(403);
+	}
 		//return (ErrorPage::build(403));
 
 	if (cgiPath.substr(cgiPath.length() - 3) == ".py")
         interpret = "/usr/local/bin/python3";
     else if (_path.substr(_path.length() - 3) == ".pl")
-        interpret = "/usrt/bin/perl";
+        interpret = "/usr/bin/perl";
     else
+	{
+		Logger::info("Resource::buildCGI() invalid file extension");
 		throw RequestException(403);
+	}
 
 	return (initCgi(cgiPath, interpret, qStr));
 }
@@ -192,14 +207,20 @@ std::string    Resource::initCgi(std::string cgiPath, std::string interpret, std
     int fd_child_to_parent[2];
 
 	if (pipe(fd_child_to_parent) == -1)
+	{
+		Logger::error("Resource::initCgi() pipe() failed");
         throw RequestException(500);
+	}
     
     if (_method == "GET") //also check if method is supported in config????
         set4GETEnv(_path, qStr);
     else if (_method == "POST") //also check if method is supported in config????
     {
 		if (pipe(fd_parent_to_child) == -1)
+		{
+			Logger::error("Resource::initCgi() pipe() failed");
 			throw RequestException(500);
+		}
 		set4Post();
 	}
     else
@@ -208,17 +229,28 @@ std::string    Resource::initCgi(std::string cgiPath, std::string interpret, std
     pid_t pid = fork();
 
     if (pid == -1)
+	{
+		Logger::error("Resource::initCgi() fork() failed");
 		throw RequestException(500);
+	}
 
     else if (pid == 0) //child process
     {
         if (_method == "POST")
 		{
 			close(fd_parent_to_child[1]);
-			dup2(fd_parent_to_child[0], STDIN_FILENO);   
+			if (dup2(fd_parent_to_child[0], STDIN_FILENO) == -1)
+			{
+				Logger::error("Resource::initCgi() dup2() failed");
+				throw RequestException(500);
+			}
 		}
 		close(fd_child_to_parent[0]);
-		dup2(fd_child_to_parent[1], STDOUT_FILENO);
+		if (dup2(fd_child_to_parent[1], STDOUT_FILENO) == -1)
+		{
+			Logger::error("Resource::initCgi() dup2() failed");
+			throw RequestException(500);
+		}
 		close(fd_child_to_parent[1]);
 		if (_method == "POST")
 			close(fd_parent_to_child[0]);
@@ -228,9 +260,10 @@ std::string    Resource::initCgi(std::string cgiPath, std::string interpret, std
         args[1] = (char *)_path.c_str();
         args[2] = NULL;
 
-        if (execve(interpret.c_str(), args, _env) == -1)
+	    if (execve(interpret.c_str(), args, _env) == -1)
 		{
 			delete _env;
+			Logger::error("Resource::initCgi() execve() failed");
             throw RequestException(500);    
 		}
     }
@@ -250,7 +283,7 @@ std::string    Resource::initCgi(std::string cgiPath, std::string interpret, std
 		std::time_t current_time = std::time(NULL);
 		if (current_time - start_time > TIMEOUT)
 		{
-			std::cout << "Timeout. Killing child process" << std::endl;
+			Logger::error("Resource::initCgi() Timeout. Killing child process");
 			kill(pid, SIGKILL);
 			delete _env;
 			throw RequestException(408);
@@ -269,7 +302,10 @@ std::string     Resource::readChildOutput(int fd_child_to_parent)
 	while ((bytes = read(fd_child_to_parent, buffer, sizeof(buffer))) > 0)
 	{
 		if (bytes < 0)
+		{
+			Logger::error("Resource::readChildOutput() read() failed");
 			throw RequestException(500);
+		}
 		buffer[bytes] = '\0';
 		resp += buffer;
 	}

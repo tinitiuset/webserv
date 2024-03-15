@@ -21,7 +21,7 @@ public:
 class Redirect: public Location {
 
 private:
-	int _code;
+	int 		_code;
 	std::string _redirect;
 
 public:
@@ -41,8 +41,8 @@ class Index: public Location {
 private:
 	std::string _root;
 	std::string _file;
-	bool _autoindex;
-	bool _cgi;
+	bool 		_autoindex;
+	bool 		_cgi;
 	std::list<std::string> _methods;
 
 public:

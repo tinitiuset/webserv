@@ -17,5 +17,5 @@ void Logger::warning(const std::string& msg) {
 }
 
 void Logger::error(const std::string& msg) {
-	std::cout << "\033[1;31m[ERROR] " << msg << "\033[0m" << std::endl;
+	std::cerr << "\033[1;31m[ERROR] " << msg << "\033[0m" << std::endl;
 }
