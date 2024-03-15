@@ -43,39 +43,46 @@ DeleteRequest::~DeleteRequest() {}
 
 std::string DeleteRequest::handle() {
 
-	Response response;
 
-    if (Request::handle() != "")
-        return (response.format());
+    Request::handle();
 
 	Logger::debug("DeleteRequest::handle() called");
     Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
     std::string path;
     
-    //if ((loc->path()).back() == '/')
-    if ((loc->path())[(loc->path()).length() - 1] == '/')
-        path = _uri.replace(0, loc->path().length() - 1, loc->root());
-    else
-        path = _uri.replace(0, loc->path().length(), loc->root());
-    
-        //Check the DELETE target and decide if it is a file or a directory
-    //if (_uri.back() == '/')
-    if (_uri[_uri.length() - 1] == '/')
-        delete_directory(path);
-    else
-        delete_file(path);
+	Response response;
+    try{
+        //if ((loc->path()).back() == '/')
+        if ((loc->path())[(loc->path()).length() - 1] == '/')
+            path = _uri.replace(0, loc->path().length() - 1, loc->root());
+        else
+            path = _uri.replace(0, loc->path().length(), loc->root());
+        
+            //Check the DELETE target and decide if it is a file or a directory
+        //if (_uri.back() == '/')
+        if (_uri[_uri.length() - 1] == '/')
+            delete_directory(path);
+        else
+            delete_file(path);
 
 
-	response.set_body("File/Directory correctly deleted!");
+        response.set_body("File/Directory correctly deleted!");
 
-	std::map<std::string, std::string> headers;
-	headers.insert(std::make_pair("Content-Type", "text/plain"));
-	headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
+        std::map<std::string, std::string> headers;
+        headers.insert(std::make_pair("Content-Type", "text/plain"));
+        headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
 
 
-	response.set_headers(headers);
+        response.set_headers(headers);
 
-	response.set_start_line("HTTP/1.1 200 OK");
-
+        response.set_start_line("HTTP/1.1 200 OK");
+    } catch (const RequestException& exception) {
+        response.set_start_line("HTTP/1.1 " + Codes::status(exception.status()));
+		response.set_body(ErrorPage::build(exception.status()));
+		std::map<std::string, std::string> headers;
+		headers.insert(std::make_pair("Content-Type", "text/html"));
+		headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
+		response.set_headers(headers);
+    }
 	return response.format();
 }

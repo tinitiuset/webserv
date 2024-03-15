@@ -10,6 +10,7 @@
 # include "../utils/Logger.hpp"
 # include "../utils/Utils.hpp"
 # include "../model/Location.hpp"
+# include "../exceptions/RequestException.hpp"
 
 static std::string status(int code);
 
