@@ -65,7 +65,7 @@ Server::Server(std::string& serverBlock): _fd(-1) {
 	// Parse error pages with format "error_page <code> <path>;"
 	pos = 0;
 	while ((pos = serverBlock.find("error_page", pos)) != std::string::npos) {
-		int code = std::stoi(serverBlock.substr(pos + 11, serverBlock.find(' ', pos + 11) - pos - 11));
+		int code = Utils::toInt(serverBlock.substr(pos + 11, serverBlock.find(' ', pos + 11) - pos - 11));
 		std::string path = serverBlock.substr(serverBlock.find(' ', pos + 11) + 1, serverBlock.find(';', pos) - serverBlock.find(' ', pos + 11) - 1);
 		_error_pages[code] = path;
 		pos = serverBlock.find(';', pos);
