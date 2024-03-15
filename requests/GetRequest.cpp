@@ -24,8 +24,8 @@ std::string GetRequest::handle()
 	if (!(loc = dynamic_cast<Index*>(conf->getServer(port).bestLocation(_uri))))
 	{
 		//return (Response::notFound().format());
-		return ("");
-		//throw RequestException(404);
+		//return ("");
+		throw RequestException(404);
 	}
 
 	resPath = loc->buildRealPath(resPath);
@@ -40,37 +40,37 @@ std::string GetRequest::handle()
 	Response response;
 
 	try {
-	Resource resource(resPath, _method);
+		Resource resource(resPath, _method);
 
-	std::map<std::string, std::string> headers;
+		std::map<std::string, std::string> headers;
 
-	if (loc->file() == "" && loc->autoindex() && Utils::isDirectory(resPath.c_str()))
-	{
-		response.set_body(resource.buildAI(_uri, host, resPath));
-		headers.insert(std::make_pair("Content-Type", "text/html"));
-	}
-	else if (loc->cgi() == true && (resPath.substr(resPath.length() - 3) == ".py" || resPath.substr(resPath.length() - 3) == ".pl"))
-		response.set_body(resource.buildCGI(qStr));
-	else
-	{
-		response.set_body(resource.load());
-		headers.insert(std::make_pair("Content-Type", resource.mime()));
-	}
+		if (loc->file() == "" && loc->autoindex() && Utils::isDirectory(resPath.c_str()))
+		{
+			response.set_body(resource.buildAI(_uri, host, resPath));
+			headers.insert(std::make_pair("Content-Type", "text/html"));
+		}
+		else if (loc->cgi() == true && (resPath.substr(resPath.length() - 3) == ".py" || resPath.substr(resPath.length() - 3) == ".pl"))
+			response.set_body(resource.buildCGI(qStr));
+		else
+		{
+			response.set_body(resource.load());
+			headers.insert(std::make_pair("Content-Type", resource.mime()));
+		}
 
-	headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
+		headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
 
-	if (!Cookie::isValidCookie(_headers))
-	{
-		std::string cookie = Cookie::getSetCookieValue();
-		headers["Set-Cookie"] = "webserv = " + cookie;
-		int fd = open("./cookies/cookies.txt", O_WRONLY | O_APPEND | O_CREAT, 0644);	
-		cookie += "\n";
-		write(fd, cookie.c_str(), cookie.length());
-		close(fd);		
-	}
+		if (!Cookie::isValidCookie(_headers))
+		{
+			std::string cookie = Cookie::getSetCookieValue();
+			headers["Set-Cookie"] = "webserv = " + cookie;
+			int fd = open("./cookies/cookies.txt", O_WRONLY | O_APPEND | O_CREAT, 0644);	
+			cookie += "\n";
+			write(fd, cookie.c_str(), cookie.length());
+			close(fd);		
+		}
 
-	response.set_headers(headers);
-	response.set_start_line(resource.status());
+		response.set_headers(headers);
+		response.set_start_line(resource.status());
 
 	} catch (const RequestException& exception) {
 

@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "arpa/inet.h"
+#include "../exceptions/RequestException.hpp"
 
 void sanitize(std::string& serverBlock) {
 	std::string result;
@@ -178,8 +179,7 @@ void Server::bind() {
 			throw std::runtime_error("Invalid port number\n");
 		servaddr.sin_port = htons(_port);
 	}
-	catch (std::exception &e) {
-		std::cout << e.what() << std::endl;
+	catch (const RequestException& exception) {
 	}
 
 	((_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)

@@ -81,6 +81,24 @@ std::string Request::getHost() const
 		return ("");
 }
 
+std::map<std::string, std::string> Request::getHeaders() const {
+	return _headers;
+}
+
+bool Request::checkHostServName() const
+{
+	std::map<std::string, std::string>::const_iterator it = _headers.find("Host");
+
+	if (it != _headers.end())
+	{
+		std::string host = it->second;
+		std::string server_name = conf->getServer(getPort()).server_name();
+		if (host.find(server_name) != std::string::npos)
+			return (true);
+	}
+	return (false);
+}
+
 void Request::printRequest() const 
 {
 	Logger::debug("Method: " + _method);
@@ -126,6 +144,7 @@ std::string Request::getUri() const {
 }
 
 std::string Request::handle(){
+	
 	Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
 
 	if (this->isGetRequest() && loc->isMethodAllowed("get") == false)

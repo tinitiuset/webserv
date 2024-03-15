@@ -32,10 +32,12 @@ class Request {
 		bool isPostRequest() const;
 		bool isDeleteRequest() const;
 		int	 getPort() const;
+		std::map<std::string, std::string> getHeaders() const;
 		std::string getHost() const;
 		virtual std::string handle();
 		std::string redirect();
 		std::string getUri() const;
+		bool checkHostServName() const;
 
 	protected:
 		//void searchLocation(const std::string &path, const std::list <Location*> _locations);
