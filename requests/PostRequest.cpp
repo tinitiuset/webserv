@@ -22,6 +22,7 @@ std::string PostRequest::handle() {
 	std::string resPath = Utils::extractFilePath(_uri);
 	std::string qStr = _body;
 	
+	
 	Logger::info("PostRequest::handle() handling Post request");
 
 	Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
@@ -36,36 +37,46 @@ std::string PostRequest::handle() {
 	}
 
 	Response response;
+	try{
+		Request::handle();
+		Resource resource(resPath, _method);
 
-	Resource resource(resPath, _method);
+		if (loc->cgi() == true && (resPath.substr(resPath.length() - 3) == ".py" || resPath.substr(resPath.length() - 3) == ".pl"))
+			response.set_body(resource.buildCGI(qStr));
+		else
+		{
+			save_file(_body);
 
-	if (loc->cgi() == true && (resPath.substr(resPath.length() - 3) == ".py" || resPath.substr(resPath.length() - 3) == ".pl"))
-		response.set_body(resource.buildCGI(qStr));
-	else
-	{
-		save_file(_body);
+			response.set_body("File correctly uploaded!");
+		}
+		std::map<std::string, std::string> headers;
+		if (!Cookie::isValidCookie(_headers))
+		{
+			std::string cookie = Cookie::getSetCookieValue();
+			headers["Set-Cookie"] = "webserv = " + cookie;
+			int fd = open("./cookies/cookies.txt", O_WRONLY | O_APPEND | O_CREAT, 0644);	
+			cookie += "\n";
+			write(fd, cookie.c_str(), cookie.length());
+			close(fd);		
+		}
 
-		response.set_body("File correctly uploaded!");
+		headers.insert(std::make_pair("Content-Type", "text/plain"));
+		headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
+
+		response.set_headers(headers);
+		response.set_start_line("HTTP/1.1 200 OK");
+
+	}
+	catch (const RequestException& exception) {
+		response.set_start_line("HTTP/1.1 " + Codes::status(exception.status()));
+		response.set_body(ErrorPage::build(exception.status()));
+		std::map<std::string, std::string> headers;
+		headers.insert(std::make_pair("Content-Type", "text/html"));
+		headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
+		response.set_headers(headers);
 	}
 	
-	std::map<std::string, std::string> headers;
-	if (!Cookie::isValidCookie(_headers))
-	{
-		std::string cookie = Cookie::getSetCookieValue();
-		headers["Set-Cookie"] = "webserv = " + cookie;
-		int fd = open("./cookies/cookies.txt", O_WRONLY | O_APPEND | O_CREAT, 0644);	
-		cookie += "\n";
-		write(fd, cookie.c_str(), cookie.length());
-		close(fd);		
-	}
-
-	headers.insert(std::make_pair("Content-Type", "text/plain"));
-	headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
-
-	response.set_headers(headers);
-	response.set_start_line("HTTP/1.1 200 OK");
-
-	Logger::info("GetRequest::handle() returning response -> " + response.start_line());
+	Logger::info("PostRequest::handle() returning response -> " + response.start_line());
 	return response.format();
 }
 
@@ -92,6 +103,7 @@ void	PostRequest::parse_multipart_body(std::string body){
 	std::istringstream bodyStream(body);
 	std::string line;
 
+	std::cout << body << std::endl;
 	std::getline(bodyStream, line);
 	line.erase(line.end() - 1, line.end()); // Remove trailing '\r'
 	if (line == delimiter) {
@@ -127,8 +139,14 @@ void	PostRequest::parse_multipart_body(std::string body){
 void	PostRequest::save_file(std::string body){
 	Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
 	std::string path = loc->root() + _uri + "/" + _postHeaders["filename"];
+	std::cout << path << std::endl;
 	std::ofstream outfile(path.c_str(), std::ios::out | std::ios::binary);
 
+	if (!outfile.is_open())
+	{
+		outfile.close();
+		throw RequestException(403);
+	}
 	outfile << body;
 	outfile.flush();
 	outfile.close();

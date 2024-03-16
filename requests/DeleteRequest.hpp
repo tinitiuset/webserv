@@ -3,7 +3,9 @@
 
 # include "Request.hpp"
 # include "Response.hpp"
+# include "Resource.hpp"
 # include <cstdio>
+# include <unistd.h>
 
 class DeleteRequest: public Request {
 	private:
@@ -11,8 +13,8 @@ class DeleteRequest: public Request {
 		DeleteRequest(const Request&);
 		~DeleteRequest();
 		std::string handle();
-		int	delete_file(std::string path);
-		int	delete_directory(std::string path);
+		void	delete_file(std::string path);
+		void	delete_directory(std::string path);
 };
 
 #endif

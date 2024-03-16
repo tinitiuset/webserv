@@ -148,10 +148,10 @@ std::string Request::handle(){
 	Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
 
 	if (this->isGetRequest() && loc->isMethodAllowed("get") == false)
-		return ("Error on get permissions");
+		throw RequestException(405);
 	else if (this->isPostRequest() && loc->isMethodAllowed("post") == false)
-		return ("Error on post permissions");
+		throw RequestException(405);
 	else if (this->isDeleteRequest() && loc->isMethodAllowed("delete") == false)
-		return ("Error on delete permissions");
-	return ("");	
+		throw RequestException(405);
+	return ("");
 }
