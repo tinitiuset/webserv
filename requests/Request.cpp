@@ -1,21 +1,16 @@
 #include "Request.hpp"
 
-Request::Request() {}
+Request::Request() {
+}
 
-Request::Request(const Request& request) {
+Request::Request(const Request&request) {
 	_method = request._method;
 	_uri = request._uri;
 	_headers = request._headers;
 	_body = request._body;
-	//_location = request._location;
 }
 
-Request::Request(const int &fd, const std::list <Location*> locations) {
-	this->parseRequest(fd);
-	//this->searchLocation(_uri, locations);
-}
-
-Request& Request::operator=(const Request& request) {
+Request& Request::operator=(const Request&request) {
 	_method = request._method;
 	_uri = request._uri;
 	_headers = request._headers;
@@ -23,9 +18,10 @@ Request& Request::operator=(const Request& request) {
 	return *this;
 }
 
-Request::~Request() {}
+Request::~Request() {
+}
 
-void Request::parseRequest(const int &fd) {
+void Request::parseRequest(const int&fd) {
 	char buffer[99999] = {0};
 	read(fd, buffer, 99999);
 	std::string request(buffer);
@@ -49,58 +45,42 @@ void Request::parseRequest(const int &fd) {
 		std::getline(headerLineStream, value);
 		_headers[key] = value.substr(1);
 	}
-	!_headers["Content-Length"].empty() ?
-		_body = std::string(&buffer[requestStream.tellg()], Utils::toInt(_headers["Content-Length"])) : _body = "";
+	!_headers["Content-Length"].empty()
+		? _body = std::string(&buffer[requestStream.tellg()], Utils::toInt(_headers["Content-Length"]))
+		: _body = "";
 }
 
-
-
-int Request::getPort() const
-{
+int Request::getPort() const {
 	std::map<std::string, std::string>::const_iterator it = _headers.find("Host");
 
-	if (it != _headers.end())
-	{
+	if (it != _headers.end()) {
 		size_t pos = it->second.find(":");
-		if ( pos == std::string::npos)
+		if (pos == std::string::npos)
 			return (-1);
-		else
-			return(std::atoi(it->second.substr(pos + 1).c_str()));
+		return (std::atoi(it->second.substr(pos + 1).c_str()));
 	}
-	else
-		return (-1);
+	return (-1);
 }
 
-std::string Request::getHost() const
-{
+std::string Request::getHost() const {
 	std::map<std::string, std::string>::const_iterator it = _headers.find("Host");
 
 	if (it != _headers.end())
 		return (it->second);
-	else
-		return ("");
+	return ("");
 }
 
 std::map<std::string, std::string> Request::getHeaders() const {
 	return _headers;
 }
 
-bool Request::checkHostServName() const
-{
-	std::map<std::string, std::string>::const_iterator it = _headers.find("Host");
-
-	if (it != _headers.end())
-	{
-		std::string host = it->second;
-		std::string server_name = conf->getServer(getPort()).server_name();
-		if (host.find(server_name) != std::string::npos)
-			return (true);
-	}
-	return (false);
+bool Request::checkHostServName() const {
+	if (getHost() == conf->getServer(getPort()).server_name())
+		return true;
+	return false;
 }
 
-void Request::printRequest() const 
-{
+void Request::printRequest() const {
 	Logger::debug("Method: " + _method);
 	Logger::debug("URI: " + _uri);
 	Logger::debug("Headers:");
@@ -122,14 +102,12 @@ bool Request::isDeleteRequest() const {
 	return _method == "DELETE";
 }
 
-std::string Request::redirect() {
-	Redirect* redirect = dynamic_cast<Redirect*>(conf->getServer(getPort()).location(_uri));
+std::string Request::redirect() const {
+	Redirect* redirect = dynamic_cast<Redirect *>(conf->getServer(getPort()).location(_uri));
 
 	Response response;
 
-	std::string startLine = "HTTP/1.1 " + Codes::status(redirect->code());
-
-	response.set_start_line(startLine);
+	response.set_start_line("HTTP/1.1 " + Codes::status(redirect->code()));
 	std::map<std::string, std::string> headers;
 	headers.insert(std::make_pair("Location", redirect->redirect()));
 	response.set_headers(headers);
@@ -143,15 +121,17 @@ std::string Request::getUri() const {
 	return _uri;
 }
 
-std::string Request::handle(){
-	
-	Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
+std::string Request::handle() {
+	return NULL;
+}
+
+void Request::methodAllowed() const {
+	Index* loc = dynamic_cast<Index *>(conf->getServer(getPort()).bestLocation(_uri));
 
 	if (this->isGetRequest() && loc->isMethodAllowed("get") == false)
 		throw RequestException(405);
-	else if (this->isPostRequest() && loc->isMethodAllowed("post") == false)
+	if (this->isPostRequest() && loc->isMethodAllowed("post") == false)
 		throw RequestException(405);
-	else if (this->isDeleteRequest() && loc->isMethodAllowed("delete") == false)
+	if (this->isDeleteRequest() && loc->isMethodAllowed("delete") == false)
 		throw RequestException(405);
-	return ("");
 }
