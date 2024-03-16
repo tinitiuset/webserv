@@ -22,7 +22,6 @@ std::string PostRequest::handle() {
 	std::string resPath = Utils::extractFilePath(_uri);
 	std::string qStr = _body;
 	
-	Request::handle();
 	
 	Logger::info("PostRequest::handle() handling Post request");
 
@@ -39,6 +38,7 @@ std::string PostRequest::handle() {
 
 	Response response;
 	try{
+		Request::handle();
 		Resource resource(resPath, _method);
 
 		if (loc->cgi() == true && (resPath.substr(resPath.length() - 3) == ".py" || resPath.substr(resPath.length() - 3) == ".pl"))

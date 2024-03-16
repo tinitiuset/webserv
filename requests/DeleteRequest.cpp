@@ -6,20 +6,30 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-int DeleteRequest::delete_file(std::string path){
+void DeleteRequest::delete_file(std::string path){
+    if (access(path.c_str(), F_OK) != 0)
+    {
+        throw RequestException(404);
+        return;
+    }
     if (remove(path.c_str()) != 0)
-        return (-1);
+    {
+        throw RequestException(403);
+        return;
+    }
     std::cout << "File deleted" << std::endl;
-    return (0);    
+    return;    
 }
 
-int DeleteRequest::delete_directory(std::string path) {
+void DeleteRequest::delete_directory(std::string path) {
     DIR* dir = opendir(path.c_str());
+    if (!dir)
+    {
+        throw RequestException(404);
+        return;
+    }
     struct dirent* entry;
     char filepath[1024];
-
-    if (!dir)
-        return (-1);
     while ((entry = readdir(dir)) != NULL) {
         if (entry->d_type == DT_DIR) {
             if (Utils::ft_strcmp(entry->d_name, ".") == 0 || Utils::ft_strcmp(entry->d_name, "..") == 0)
@@ -28,12 +38,12 @@ int DeleteRequest::delete_directory(std::string path) {
             delete_directory(filepath);
         } else {
             snprintf(filepath, sizeof(filepath), "%s/%s", path.c_str(), entry->d_name);
-            remove(filepath);
+            DeleteRequest::delete_file(filepath);
         }
     }
     closedir(dir);
     remove(path.c_str());
-    return (0);
+    return;
 }
 
 DeleteRequest::DeleteRequest(const Request& request): Request(request) {
@@ -44,7 +54,6 @@ DeleteRequest::~DeleteRequest() {}
 std::string DeleteRequest::handle() {
 
 
-    Request::handle();
 
 	Logger::debug("DeleteRequest::handle() called");
     Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
@@ -52,14 +61,13 @@ std::string DeleteRequest::handle() {
     
 	Response response;
     try{
-        //if ((loc->path()).back() == '/')
+        Request::handle();
         if ((loc->path())[(loc->path()).length() - 1] == '/')
             path = _uri.replace(0, loc->path().length() - 1, loc->root());
         else
             path = _uri.replace(0, loc->path().length(), loc->root());
         
-            //Check the DELETE target and decide if it is a file or a directory
-        //if (_uri.back() == '/')
+        //Check the DELETE target and decide if it is a file or a directory
         if (_uri[_uri.length() - 1] == '/')
             delete_directory(path);
         else
