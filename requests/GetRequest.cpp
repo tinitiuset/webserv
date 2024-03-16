@@ -70,7 +70,16 @@ std::string GetRequest::handle() {
 	}
 	catch (const RequestException&exception) {
 		response.set_start_line("HTTP/1.1 " + Codes::status(exception.status()));
-		response.set_body(ErrorPage::build(exception.status()));
+		Server server = conf->getServer(getPort());
+		if (!server.errorPage(exception.status()).empty()) {
+			Logger::info("GetRequest::handle() loading error page from " + server.root() + server.errorPage(exception.status()));
+			std::ifstream file(server.root() + "/" + server.errorPage(exception.status()).c_str());
+			response.set_body(std::string(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()));
+		}
+		else {
+			Logger::debug("GetRequest::handle() building default error page for status " + Utils::toString(exception.status()));
+			response.set_body(ErrorPage::build(exception.status()));
+		}
 		std::map<std::string, std::string> headers;
 		headers.insert(std::make_pair("Content-Type", "text/html"));
 		headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
