@@ -26,6 +26,7 @@ public:
 	bool isPostRequest() const;
 	bool isDeleteRequest() const;
 	void methodAllowed() const;
+	void hostnameAllowed() const;
 
 	virtual std::string handle();
 

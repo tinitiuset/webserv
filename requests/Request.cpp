@@ -135,3 +135,9 @@ void Request::methodAllowed() const {
 	if (this->isDeleteRequest() && loc->isMethodAllowed("delete") == false)
 		throw RequestException(405);
 }
+
+void Request::hostnameAllowed() const {
+	Server server = conf->getServer(getPort());
+	if (std::string(server.server_name() + ":" + Utils::toString(server.port())) != getHost())
+		throw RequestException(400);
+}

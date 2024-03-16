@@ -16,6 +16,7 @@ std::string GetRequest::handle() {
 			return redirect();
 
 		Request::methodAllowed();
+		Request::hostnameAllowed();
 
 		std::string resPath = Utils::extractFilePath(_uri);
 		std::string qStr = Utils::extractQStr(_uri);

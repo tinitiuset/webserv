@@ -4,14 +4,12 @@ Request* createRequest(const int&fd) {
 	Request temp;
 	temp.parseRequest(fd);
 
-	if (temp.checkHostServName()) {
-		if (temp.isGetRequest())
-			return (new GetRequest(temp));
-		else if (temp.isPostRequest())
-			return new PostRequest(temp);
-		else if (temp.isDeleteRequest())
-			return new DeleteRequest(temp);
-	}
+	if (temp.isGetRequest())
+		return (new GetRequest(temp));
+	else if (temp.isPostRequest())
+		return new PostRequest(temp);
+	else if (temp.isDeleteRequest())
+		return new DeleteRequest(temp);
 
 	return NULL;
 }
@@ -108,7 +106,7 @@ void Multiplexer::run() {
 		close(i);
 }
 
-int getMaxFd(std::vector<std::vector<int>> sockfd) {
+int getMaxFd(std::vector<std::vector<int> > sockfd) {
 	int max_fd = 0;
 
 	for (size_t i = 0; i < sockfd.size(); ++i) {
