@@ -15,30 +15,36 @@ PostRequest::~PostRequest() {}
 
 std::string PostRequest::handle() {
 
-	// AddToList
-	// UploadFile
-	// SetCookie
-	// deChunck
-	std::string resPath = Utils::extractFilePath(_uri);
-	std::string qStr = _body;
-	
-	
-	Logger::info("PostRequest::handle() handling Post request");
-
-	Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
-
-	resPath = loc->buildRealPath(resPath);
-	for (size_t i = 0; i < resPath.length() - 1; ++i) 
-	{
-		if (resPath[i] == '/' && resPath[i + 1] == '/') {
-			resPath.erase(i, 1);
-			--i;
-		}
-	}
-
 	Response response;
-	try{
-		Request::handle();
+
+	try {
+		if (dynamic_cast<Redirect *>(conf->getServer(getPort()).location(_uri)))
+			return redirect();
+
+		Request::methodAllowed();
+		Request::hostnameAllowed();
+
+		// AddToList
+		// UploadFile
+		// SetCookie
+		// deChunck
+		std::string resPath = Utils::extractFilePath(_uri);
+		std::string qStr = _body;
+
+
+		Logger::info("PostRequest::handle() handling Post request");
+
+		Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
+
+		resPath = loc->buildRealPath(resPath);
+		for (size_t i = 0; i < resPath.length() - 1; ++i)
+		{
+			if (resPath[i] == '/' && resPath[i + 1] == '/') {
+				resPath.erase(i, 1);
+				--i;
+			}
+		}
+
 		Resource resource(resPath, _method);
 
 		if (loc->cgi() == true && (resPath.substr(resPath.length() - 3) == ".py" || resPath.substr(resPath.length() - 3) == ".pl"))
@@ -67,9 +73,18 @@ std::string PostRequest::handle() {
 		response.set_start_line("HTTP/1.1 200 OK");
 
 	}
-	catch (const RequestException& exception) {
+	catch (const RequestException&exception) {
 		response.set_start_line("HTTP/1.1 " + Codes::status(exception.status()));
-		response.set_body(ErrorPage::build(exception.status()));
+		Server server = conf->getServer(getPort());
+		if (!server.errorPage(exception.status()).empty()) {
+			Logger::info("GetRequest::handle() loading error page from " + server.root() + server.errorPage(exception.status()));
+			std::ifstream file(server.root() + "/" + server.errorPage(exception.status()).c_str());
+			response.set_body(std::string(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()));
+		}
+		else {
+			Logger::debug("GetRequest::handle() building default error page for status " + Utils::toString(exception.status()));
+			response.set_body(ErrorPage::build(exception.status()));
+		}
 		std::map<std::string, std::string> headers;
 		headers.insert(std::make_pair("Content-Type", "text/html"));
 		headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
