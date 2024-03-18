@@ -1,5 +1,8 @@
 #include "Request.hpp"
 
+#include <sys/ioctl.h>
+#include <unistd.h>
+
 Request::Request() {
 }
 
@@ -22,9 +25,20 @@ Request::~Request() {
 }
 
 void Request::parseRequest(const int&fd) {
-	char buffer[99999] = {0};
-	read(fd, buffer, 99999);
-	std::string request(buffer);
+	char buffer[99999];
+	std::string request;
+	ssize_t bytesReceived;
+
+	do {
+		memset(buffer, 0, sizeof(buffer));
+		bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
+		if (bytesReceived == -1) {
+			throw std::runtime_error("recv failed");
+			break;
+		}
+		request.append(buffer, bytesReceived);
+	} while (bytesReceived == sizeof(buffer) - 1);
+
 	Logger::debug("Raw request: " + request);
 
 	std::istringstream requestStream(request);
@@ -45,9 +59,7 @@ void Request::parseRequest(const int&fd) {
 		std::getline(headerLineStream, value);
 		_headers[key] = value.substr(1);
 	}
-	!_headers["Content-Length"].empty()
-		? _body = std::string(&buffer[requestStream.tellg()], Utils::toInt(_headers["Content-Length"]))
-		: _body = "";
+	std::getline(requestStream, _body, '\0');
 }
 
 int Request::getPort() const {
