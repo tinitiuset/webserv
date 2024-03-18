@@ -15,8 +15,8 @@ std::string GetRequest::handle() {
 		if (dynamic_cast<Redirect *>(conf->getServer(getPort()).location(_uri)))
 			return redirect();
 
-		Request::methodAllowed();
 		Request::hostnameAllowed();
+		Request::methodAllowed();
 
 		std::string resPath = Utils::extractFilePath(_uri);
 		std::string qStr = Utils::extractQStr(_uri);

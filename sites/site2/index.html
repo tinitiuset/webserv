@@ -1,14 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Web Page</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webserv Checks</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-image: url('bg.jpg'); /* Ruta de la imagen local */
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+    .overlay {
+      background-color: rgba(255, 255, 255, 0.4); /* Ajusta el nivel de transparencia aquí */
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
+      width: 17%; /* Ajusta el ancho de la ventana aquí */
+      margin: 75px auto; /* Ajusta la posición vertical de la ventana aquí */
+    }
+    .container {
+      max-width: 250px; /* Ajusta el ancho máximo del contenido aquí */
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #d0dad0; /* Cambia el color del título */
+      font-size: 24px; /* Cambia el tamaño de la fuente del título */
+      text-transform: uppercase; /* Convierte el texto en mayúsculas */
+      letter-spacing: 2px; /* Aumenta el espacio entre letras */
+      font-weight: bold; /* Hace que el título sea más audaz */
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 2.9); /* Añade un efecto de sombra al texto */
+    }
+    .button {
+      display: block;
+      width: 100%;
+      padding: 15px 0;
+      margin-bottom: 10px;
+      text-align: center;
+      background-color: #142417;
+      color: #b8bab7;
+      text-decoration: none;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.8s;
+    }
+    .button:hover {
+      background-color: #1e3f1f;
+    }
+    .button:last-child {
+      margin-bottom: 0;
+    }
+    .button-description {
+      text-align: center;
+      color: #000000;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-    <h1>¡Bienvenido a mi página web!</h1>
-    <p>THIS IS SITE 2 💩</p>
-    <img src="2/sample2.png" alt="Descripción de la imagen">
-    <img src="2/sample2.png" alt="Descripción de la imagen">
+  <div class="overlay">
+    <div class="container">
+      <h1>Webserv Checks</h1> 
+      <a href="/py" class="button">CGI Python</a>
+      <p class="button-description">Execute CGI Python</p>
+      <a href="/pl" class="button">CGI Pearl</a>
+      <p class="button-description">Execute CGI Pearl</p>
+      <a href="/ai" class="button">Autoindex</a>
+      <p class="button-description">Server Folder Navigation</p>
+      <a href="/upload" class="button">Upload</a>
+      <p class="button-description">Upload a File</p>
+      <a href="/upfolder" class="button">Upload Folder</a>
+      <p class="button-description">Upload Files Navigation</p>
+    </div>
+  </div>
 </body>
 </html>

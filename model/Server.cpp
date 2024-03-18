@@ -139,7 +139,7 @@ in_addr_t	Server::custom_inet_addr(const std::string &ip_str)
         if (i < 3) {
             ss >> dot;
             if (dot != '.') {
-                std::cerr << "Error: Separator not '.'\n";
+				throw std::runtime_error("Error: Separator not '.'\n");
                 return 0;
             }
         }
@@ -148,7 +148,7 @@ in_addr_t	Server::custom_inet_addr(const std::string &ip_str)
     in_addr_t ip_address = 0;
     for (int j = 0; j < 4; ++j) {
         if (octets[j] < 0 || octets[j] > 255) {
-            std::cerr << "Error: Invalid octet values\n";
+			throw std::runtime_error("Error: Invalid octet values\n");
             return 0;
         }
         ip_address |= (static_cast<in_addr_t>(octets[j]) << (8 * (3 - j)));

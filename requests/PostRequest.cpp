@@ -21,8 +21,8 @@ std::string PostRequest::handle() {
 		if (dynamic_cast<Redirect *>(conf->getServer(getPort()).location(_uri)))
 			return redirect();
 
-		Request::methodAllowed();
 		Request::hostnameAllowed();
+		Request::methodAllowed();
 
 		// AddToList
 		// UploadFile
