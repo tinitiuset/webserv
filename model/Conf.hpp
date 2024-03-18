@@ -19,6 +19,7 @@ public:
 
   bool parse();
   void load();
+  void validate() const;
 
   const Server& getServer(int port) const;
   int serverCount();

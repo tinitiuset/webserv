@@ -6,56 +6,79 @@ Location::~Location() {}
 
 std::string Location::path() const { return _path; }
 
+void Location::validate() const {
+	_path.empty() ? throw std::runtime_error("Location path is empty") : 0;
+}
+
 Redirect::Redirect(std::string& loc): Location() {
-	_path = loc.substr(loc.find("location") + 9, loc.find('{') - loc.find("location") - 10);
-	_code = Utils::toInt(loc.substr(loc.find("{redirect") + 10, loc.find(';', loc.find("{redirect")) - loc.find("{redirect") - 10));
-	_redirect = loc.substr(loc.find_last_of(' ') + 1, loc.find(';', loc.find_last_of(' ')) - loc.find_last_of(' ') - 1);
-	std::cout << "**Redirect: " << _path << "-" << _code << "-" << _redirect << std::endl;
+	std::stringstream ss(loc);
+
+	std::string line;
+	std::getline(ss, line);
+	_path = line.substr(line.find("location") + 9, line.find('{') - line.find("location") - 10);
+
+	while (std::getline(ss, line)) {
+		if (line.find("redirect") != std::string::npos) {
+			_redirect = line.substr(line.find(' ', line.find("redirect")) + 1, line.find(';', line.find("redirect")) - line.find(' ', line.find("redirect")) - 1);
+			_code = Utils::toInt(_redirect.substr(0,3));
+			_redirect = _redirect.substr(_redirect.find_last_of(' ') + 1, _redirect.length());
+		}
+	}
 }
 
 Redirect::Redirect(const Redirect& other): Location(other), _code(other._code), _redirect(other._redirect) {}
 
 Redirect::~Redirect() {}
 
+void Redirect::validate() const {
+	Location::validate();
+	_code < 300 || _code > 308 ? throw std::runtime_error("Redirect code is invalid") : 0;
+	_redirect.empty() ? throw std::runtime_error("Redirect redirect is empty") : 0;
+}
+
 int Redirect::code() const { return _code; }
 
 std::string Redirect::redirect() const { return _redirect; }
 
 Index::Index(std::string& loc): Location(), _autoindex(false), _cgi(false), _methods() {
-		
-	if (loc.find("location") != std::string::npos)
-	{
-		_path = loc.substr(loc.find("location") + 9, loc.find('{') - loc.find("location") - 10);
-		_path.erase(std::remove(_path.begin(), _path.end(), ' '), _path.end());
-	}
-	if (loc.find("root") != std::string::npos)
-	{
-		_root = loc.substr(loc.find("root") + 5, loc.find(';', loc.find("root")) - loc.find("root") - 5);
-		_root.erase(std::remove(_root.begin(), _root.end(), ' '), _root.end());
-	}
-	if (loc.find("file") != std::string::npos)
-	{
-		_file = loc.substr(loc.find("file") + 5, loc.find(';', loc.find("file")) - loc.find("file") - 5);
-		_file.erase(std::remove(_file.begin(), _file.end(), ' '), _file.end());
-	}
-	if (loc.find("autoindex on;") != std::string::npos)
-		_autoindex = true;
-	if (loc.find("cgi on") != std::string::npos)
-		_cgi = true;
+	std::stringstream ss(loc);
 
-	if (loc.find("methods") != std::string::npos) {
-		std::string methods = loc.substr(loc.find("methods") + 8, loc.find(';', loc.find("methods")) - loc.find("methods") - 8);
-		std::stringstream ss(methods);
-		std::string method;
+	std::string line;
+	std::getline(ss, line);
+	_path = line.substr(line.find("location") + 9, line.find('{') - line.find("location") - 10);
 
-		while (std::getline(ss, method, ' '))
-			_methods.push_back(method);
+	while (std::getline(ss, line)) {
+		if (line.find("root") != std::string::npos)
+			_root = line.substr(line.find("root") + 5, line.find(';', line.find("root")) - line.find("root") - 5);
+		if (line.find("file") != std::string::npos)
+			_file = line.substr(line.find("file") + 5, line.find(';', line.find("file")) - line.find("file") - 5);
+		if (line.find("autoindex on;") != std::string::npos)
+			_autoindex = true;
+		if (line.find("autoindex off;") != std::string::npos)
+			_autoindex = false;
+		if (line.find("cgi on") != std::string::npos)
+			_cgi = true;
+		if (line.find("cgi off") != std::string::npos)
+			_cgi = false;
+		if (line.find("methods") != std::string::npos) {
+			std::string methods = line.substr(line.find("methods") + 8, line.find(';', line.find("methods")) - line.find("methods") - 8);
+			std::stringstream ss(methods);
+			std::string method;
+
+			while (std::getline(ss, method, ' '))
+				_methods.push_back(method);
+		}
 	}
 }
 
 Index::Index(const Index& other): Location(other), _root(other._root), _file(other._file), _autoindex(other._autoindex), _cgi(other._cgi),_methods(other._methods) {}
 
 Index::~Index() {}
+
+void Index::validate() const {
+	Location::validate();
+	_root.empty() ? throw std::runtime_error("Index root is empty") : 0;
+}
 
 std::string Index::root() {	return _root; }
 

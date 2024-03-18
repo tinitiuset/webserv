@@ -48,6 +48,11 @@ void Conf::load() {
 		_servers[i].bind();
 }
 
+void Conf::validate() const {
+	for (size_t i = 0; i < _servers.size(); ++i)
+		_servers[i].validate();
+}
+
 const Server& Conf::getServer(int port) const
 {
 	size_t i;

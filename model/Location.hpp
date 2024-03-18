@@ -16,6 +16,7 @@ public:
 	virtual Location* clone() const = 0;
 
 	std::string path() const;
+	virtual void validate() const;
 };
 
 class Redirect: public Location {
@@ -30,6 +31,8 @@ public:
 	~Redirect();
 
 	Redirect* clone() const { return new Redirect(*this); }
+
+	void validate() const;
 
 	int code() const;
 	std::string redirect() const;
@@ -51,6 +54,8 @@ public:
 	~Index();
 
 	Index* clone() const { return new Index(*this); }
+
+	void validate() const;
 
 	std::string root();
 	std::string file();

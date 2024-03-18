@@ -14,7 +14,7 @@ void sanitize(std::string&serverBlock) {
 	}
 	serverBlock = result;
 
-	serverBlock.erase(std::remove(serverBlock.begin(), serverBlock.end(), '\n'), serverBlock.end());
+	//serverBlock.erase(std::remove(serverBlock.begin(), serverBlock.end(), '\n'), serverBlock.end());
 }
 
 Server::Server(std::string&serverBlock): _fd(-1), _port(-1), _body_size(0) {
@@ -86,6 +86,16 @@ Server::Server(const Server&other): _server_name(other._server_name), _address(o
 Server::~Server() {
 	for (std::list<Location *>::iterator it = _locations.begin(); it != _locations.end(); ++it)
 		delete *it;
+}
+
+void Server::validate() const {
+	_server_name.empty() ? throw std::runtime_error("Server name is empty") : 0;
+	_address.empty() ? throw std::runtime_error("Server address is empty") : 0;
+	_port == -1 ? throw std::runtime_error("Server port is invalid") : 0;
+	_body_size < 0 ? throw std::runtime_error("Server body size is invalid") : 0;
+	_root.empty() ? throw std::runtime_error("Server root is empty") : 0;
+	for (std::list<Location *>::const_iterator it = _locations.begin(); it != _locations.end(); ++it)
+		(*it)->validate();
 }
 
 std::string Server::server_name() const { return _server_name; }

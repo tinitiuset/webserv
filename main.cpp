@@ -13,6 +13,7 @@ int main(int argc, char **argv)
 	try {
 		conf->parse();
 		conf->load();
+		conf->validate();
 		Multiplexer().run();
 	}
 	catch (std::runtime_error &e) {

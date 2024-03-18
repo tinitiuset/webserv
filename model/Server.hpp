@@ -31,6 +31,8 @@ public:
 	Server(const Server& other);
 	~Server();
 
+	void validate() const;
+
 	std::string server_name() const;
 	std::string address() const;
 	int fd() const;
