@@ -50,7 +50,7 @@ void Conf::load() {
 
 const Server& Conf::getServer(int port) const
 {
-	int i;
+	size_t i;
 	for (i = 0; i < _servers.size(); ++i)
 		if (_servers[i].port() == port)
 			return (_servers[i]);

@@ -113,9 +113,7 @@ Location* Server::location(const std::string& path) const {
 Location* Server::bestLocation(const std::string& path) const {
 	std::size_t longestMatch = 0;
 	Location* bestLocation = NULL;
-	for (std::list<Location*>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
-		Location* location = *it;
-	}
+
 	for (std::list<Location*>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
 		Location* location = *it;
 		if (location->path().length() > longestMatch) {

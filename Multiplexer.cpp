@@ -52,8 +52,8 @@ void Multiplexer::run() {
 			int fd = 3;
 
 			while (fd <= max_fd) {
-				const size_t locReadVec = getServerFdIdx(fd);
-				const size_t locWriteVec = getClientFdIdx(fd);
+				const int locReadVec = getServerFdIdx(fd);
+				const int locWriteVec = getClientFdIdx(fd);
 
 				if (FD_ISSET(fd, &tmpReadSet)) {
 					if (locReadVec != -1) {

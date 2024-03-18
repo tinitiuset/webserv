@@ -198,10 +198,10 @@ std::string Resource::buildCGI(std::string qStr)
 		throw RequestException(403);
 	}
 
-	return (initCgi(cgiPath, interpret, qStr));
+	return (initCgi(interpret, qStr));
 }
 
-std::string    Resource::initCgi(std::string cgiPath, std::string interpret, std::string qStr)
+std::string    Resource::initCgi(std::string interpret, std::string qStr)
 {
 	int	fd_parent_to_child[2];
     int fd_child_to_parent[2];
@@ -291,6 +291,7 @@ std::string    Resource::initCgi(std::string cgiPath, std::string interpret, std
 		usleep(100000);  // (0.1 sec)
 	}
 	delete _env;
+	_status = 200;
 	return (readChildOutput(fd_child_to_parent[0]));
 }
 

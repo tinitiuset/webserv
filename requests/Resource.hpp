@@ -40,7 +40,7 @@ public:
 	void            set4GETEnv(std::string cgiPath, std::string qStr);
     void   		    set4Post();
 	std::string		buildCGI(std::string qStr);
-	std::string    	initCgi(std::string cgiPath, std::string interpret, std::string qStr);
+	std::string    	initCgi(std::string interpret, std::string qStr);
 
 private:
 	std::string _path;
