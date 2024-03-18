@@ -2,7 +2,12 @@
 
 Request* createRequest(const int&fd) {
 	Request temp;
-	temp.parseRequest(fd);
+	try{
+		temp.parseRequest(fd);
+	} catch (const RequestException& e) {
+		Logger::error("RequestException");
+		return NULL;
+	}
 
 	if (temp.isGetRequest())
 		return (new GetRequest(temp));

@@ -22,8 +22,10 @@ Request::~Request() {
 }
 
 void Request::parseRequest(const int&fd) {
-	char buffer[99999] = {0};
-	read(fd, buffer, 99999);
+	const int BUFFER_SIZE = 999999;
+	char buffer[BUFFER_SIZE] = {0};
+	if (read(fd, buffer, BUFFER_SIZE) == BUFFER_SIZE)
+		throw RequestException(413);
 	std::string request(buffer);
 	Logger::debug("Raw request: " + request);
 
@@ -45,9 +47,12 @@ void Request::parseRequest(const int&fd) {
 		std::getline(headerLineStream, value);
 		_headers[key] = value.substr(1);
 	}
-	!_headers["Content-Length"].empty()
-		? _body = std::string(&buffer[requestStream.tellg()], Utils::toInt(_headers["Content-Length"]))
-		: _body = "";
+	if (!_headers["Content-Length"].empty()) {
+		Utils::toInt(_headers["Content-Length"]) > conf->getServer(getPort()).body_size() ? throw RequestException(413) : 0;
+    	_body = std::string(&buffer[requestStream.tellg()], Utils::toInt(_headers["Content-Length"]));
+    // Aquí puedes añadir más acciones
+	} else
+    	_body = "";
 }
 
 int Request::getPort() const {
