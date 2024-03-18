@@ -18,11 +18,10 @@ std::string PostRequest::handle() {
 	Response response;
 
 	try {
-		Request::hostnameAllowed();
-
-		if (dynamic_cast<Redirect *>(conf->getServer(getPort()).bestLocation(_uri)))
+		if (dynamic_cast<Redirect *>(conf->getServer(getPort()).location(_uri)))
 			return redirect();
 
+		Request::hostnameAllowed();
 		Request::methodAllowed();
 
 		// AddToList
