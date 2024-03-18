@@ -186,7 +186,6 @@ std::string Resource::buildCGI(std::string qStr)
 		Logger::info("Resource::buildCGI() access() failed");
 		throw RequestException(403);
 	}
-		//return (ErrorPage::build(403));
 
 	if (cgiPath.substr(cgiPath.length() - 3) == ".py")
         interpret = "/usr/local/bin/python3";
