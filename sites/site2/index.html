@@ -18,11 +18,11 @@
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
-      width: 17%; /* Ajusta el ancho de la ventana aquí */
+      width: 90%; /* Ajusta el ancho de la ventana aquí */
+      max-width: 400px; /* Ancho máximo para evitar que los botones sean demasiado anchos en pantallas grandes */
       margin: 75px auto; /* Ajusta la posición vertical de la ventana aquí */
     }
     .container {
-      max-width: 250px; /* Ajusta el ancho máximo del contenido aquí */
       margin: auto;
     }
     h1 {
@@ -59,6 +59,22 @@
       text-align: center;
       color: #000000;
       font-size: 14px;
+    }
+
+    /* Consultas de medios para hacer que los botones sean más pequeños en pantallas pequeñas */
+    @media only screen and (max-width: 600px) {
+      .overlay {
+        width: 90%;
+        margin: 50px auto;
+      }
+      .button {
+        padding: 10px 0;
+        font-size: 12px;
+      }
+      h1 {
+        font-size: 20px;
+        margin-bottom: 20px;
+      }
     }
   </style>
 </head>

@@ -170,7 +170,7 @@ void Server::bind() {
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_addr.s_addr = htonl(custom_inet_addr(_address));
 
-	if (_port <= 0 || _port > 65535)
+	if (_port <= 1024 || _port > 65535)
 		throw std::runtime_error("Invalid port number on server " + _server_name);
 	servaddr.sin_port = htons(_port);
 
