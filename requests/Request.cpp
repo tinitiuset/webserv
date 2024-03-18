@@ -103,7 +103,7 @@ bool Request::isDeleteRequest() const {
 }
 
 std::string Request::redirect() const {
-	Redirect* redirect = dynamic_cast<Redirect *>(conf->getServer(getPort()).location(_uri));
+	Redirect* redirect = dynamic_cast<Redirect *>(conf->getServer(getPort()).bestLocation(_uri));
 
 	Response response;
 

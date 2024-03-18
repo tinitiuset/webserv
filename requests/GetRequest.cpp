@@ -12,11 +12,12 @@ std::string GetRequest::handle() {
 	Response response;
 
 	try {
-		if (dynamic_cast<Redirect *>(conf->getServer(getPort()).location(_uri)))
+		Request::hostnameAllowed();
+
+		if (dynamic_cast<Redirect *>(conf->getServer(getPort()).bestLocation(_uri)))
 			return redirect();
 
 		Request::methodAllowed();
-		Request::hostnameAllowed();
 
 		std::string resPath = Utils::extractFilePath(_uri);
 		std::string qStr = Utils::extractQStr(_uri);
