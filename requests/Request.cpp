@@ -25,7 +25,7 @@ Request::~Request() {
 }
 
 void Request::parseRequest(const int&fd) {
-	char buffer[99999];
+	char buffer[9999];
 	std::string request;
 	ssize_t bytesReceived;
 
@@ -59,7 +59,7 @@ void Request::parseRequest(const int&fd) {
 		std::getline(headerLineStream, value);
 		_headers[key] = value.substr(1);
 	}
-	std::getline(requestStream, _body, '\0');
+	_body = requestStream.str().substr(requestStream.tellg());
 }
 
 int Request::getPort() const {

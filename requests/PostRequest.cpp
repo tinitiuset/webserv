@@ -119,7 +119,7 @@ void	PostRequest::parse_multipart_body(std::string body){
 	std::istringstream bodyStream(body);
 	std::string line;
 
-	std::cout << body << std::endl;
+	//std::cout << body << std::endl;
 	std::getline(bodyStream, line);
 	line.erase(line.end() - 1, line.end()); // Remove trailing '\r'
 	if (line == delimiter) {
@@ -155,7 +155,7 @@ void	PostRequest::parse_multipart_body(std::string body){
 void	PostRequest::save_file(std::string body){
 	Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
 	std::string path = loc->root() + _uri + "/" + _postHeaders["filename"];
-	std::cout << path << std::endl;
+	//std::cout << path << std::endl;
 	std::ofstream outfile(path.c_str(), std::ios::out | std::ios::binary);
 
 	if (!outfile.is_open())
