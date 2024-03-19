@@ -6,8 +6,6 @@
 
 PostRequest::PostRequest(const Request& request): Request(request) {
 	parse_type();
-	if (_headers["Content-Type"].find("multipart/form-data") != std::string::npos)
-		parse_multipart_body(_body);
 }
 
 PostRequest::~PostRequest() {}
@@ -24,6 +22,11 @@ std::string PostRequest::handle() {
 			return redirect();
 
 		Request::methodAllowed();
+
+		if (_headers["Content-Type"].find("multipart/form-data") != std::string::npos && !_body.empty())
+			parse_multipart_body(_body);
+		else
+			throw RequestException(500);
 
 		// AddToList
 		// UploadFile
