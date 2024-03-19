@@ -1,21 +1,29 @@
 #!/usr/bin/perl
 
-my $query_string = $ENV{'QUERY_STRING'};
 
-if (defined $query_string and $query_string ne "") {
-    my ($key, $num) = split '=', $query_string;
 
-    if ($num =~ /^\d+$/) {
-        if (is_prime($num)) {
-            print "$num is prime.";
+eval {
+    my $query_string = $ENV{'QUERY_STRING'};
+
+    if (defined $query_string and $query_string ne "") {
+        my ($key, $num) = split '=', $query_string;
+
+        if ($num =~ /^\d+$/) {
+            if (is_prime($num)) {
+                print "$num is prime.";
+            } else {
+                print "$num is not prime.";
+            }
         } else {
-            print "$num is not prime.";
+            print "Error: $num is not an integer.";
         }
     } else {
-        print "Error: $num is not an integer.";
+        print "Error: QUERY_STRING is not present or empty.";
     }
-} else {
-    print "Error: QUERY_STRING is not present or empty.";
+};
+
+if ($@) {
+    print "Error: An unexpected error occurred.";
 }
 
 sub is_prime {
