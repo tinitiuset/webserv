@@ -74,7 +74,7 @@ std::string GetRequest::handle() {
 		Server server = conf->getServer(getPort());
 		if (!server.errorPage(exception.status()).empty()) {
 			Logger::info("GetRequest::handle() loading error page from " + server.root() + server.errorPage(exception.status()));
-			std::ifstream file(server.root() + "/" + server.errorPage(exception.status()).c_str());
+			std::ifstream file((server.root() + "/" + server.errorPage(exception.status())).c_str());
 			response.set_body(std::string(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()));
 		}
 		else {

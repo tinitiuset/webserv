@@ -3,6 +3,7 @@
 
 # include <map>
 # include <string>
+# include <cstring>
 # include "Response.hpp"
 # include "../utils/defaults.hpp"
 # include "../utils/Codes.hpp"
