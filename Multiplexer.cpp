@@ -66,7 +66,7 @@ void Multiplexer::run() {
 							? throw std::runtime_error("Failed to accept\n")
 							: Logger::debug("Client socket accepted by server\n");
 
-						(fcntl(cliFd, F_SETFL, O_NONBLOCK) == -1)
+						(fcntl(fd, F_SETFL, O_NONBLOCK, FD_CLOEXEC) == -1)
 							? throw std::runtime_error("Failed to set client socket as non-blocked\n0")
 							: Logger::debug("Client socket set as non-blocking\n");
 
