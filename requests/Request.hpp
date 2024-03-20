@@ -31,6 +31,7 @@ public:
 
 	virtual std::string handle();
 
+	int getFd() const;
 	std::string getUri() const;
 	std::map<std::string, std::string> getHeaders() const;
 
@@ -41,6 +42,7 @@ public:
 	bool checkHostServName() const;
 
 protected:
+	int _fd;
 	std::string _method;
 	std::string _uri;
 	std::map<std::string, std::string> _headers;

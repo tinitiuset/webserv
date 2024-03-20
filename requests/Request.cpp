@@ -7,6 +7,7 @@ Request::Request() {
 }
 
 Request::Request(const Request&request) {
+	_fd = request._fd;
 	_method = request._method;
 	_uri = request._uri;
 	_headers = request._headers;
@@ -14,6 +15,7 @@ Request::Request(const Request&request) {
 }
 
 Request& Request::operator=(const Request&request) {
+	_fd = request._fd;
 	_method = request._method;
 	_uri = request._uri;
 	_headers = request._headers;
@@ -25,6 +27,7 @@ Request::~Request() {
 }
 
 void Request::parseRequest(const int&fd) {
+	_fd = fd;
     char buffer[9999];
     std::string request;
     ssize_t bytesReceived;
@@ -143,6 +146,10 @@ std::string Request::redirect() const {
 	Logger::debug("Request::redirect() returning response -> " + response.format());
 
 	return response.format();
+}
+
+int Request::getFd() const {
+	return _fd;
 }
 
 std::string Request::getUri() const {
