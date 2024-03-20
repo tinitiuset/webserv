@@ -23,11 +23,6 @@ std::string PostRequest::handle() {
 
 		Request::methodAllowed();
 
-		if (_headers["Content-Type"].find("multipart/form-data") != std::string::npos && !_body.empty())
-			parse_multipart_body(_body);
-		else
-			throw RequestException(500);
-
 		// AddToList
 		// UploadFile
 		// SetCookie
@@ -55,6 +50,11 @@ std::string PostRequest::handle() {
 			response.set_body(resource.buildCGI(qStr));
 		else
 		{
+			if (_headers["Content-Type"].find("multipart/form-data") != std::string::npos && !_body.empty())
+				parse_multipart_body(_body);
+			else
+				throw RequestException(400);
+
 			save_file(_body);
 
 			response.set_body("File correctly uploaded!");
