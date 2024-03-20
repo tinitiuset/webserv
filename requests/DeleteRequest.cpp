@@ -53,15 +53,14 @@ DeleteRequest::~DeleteRequest() {}
 
 std::string DeleteRequest::handle() {
 
-
-
 	Logger::debug("DeleteRequest::handle() called");
     Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
     std::string path;
     
 	Response response;
     try{
-        Request::handle();
+        Request::hostnameAllowed();
+        Request::methodAllowed();
         if ((loc->path())[(loc->path()).length() - 1] == '/')
             path = _uri.replace(0, loc->path().length() - 1, loc->root());
         else

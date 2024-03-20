@@ -39,7 +39,7 @@ void Request::parseRequest(const int&fd) {
         request.append(buffer, bytesReceived);
     } while (bytesReceived == sizeof(buffer) - 1);
 
-    //Logger::debug("Raw request: " + request);
+    Logger::debug("Raw request: " + request);
 
     std::istringstream requestStream(request);
 
