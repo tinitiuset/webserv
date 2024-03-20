@@ -3,6 +3,7 @@
 
 # include <map>
 # include <string>
+# include <cstring>
 # include "Response.hpp"
 # include "../utils/defaults.hpp"
 # include "../utils/Codes.hpp"
@@ -19,7 +20,7 @@ public:
 	Request& operator=(const Request&);
 	virtual ~Request();
 
-	void parseRequest(const int&);
+	bool parseRequest(const int&);
 	void printRequest() const;
 
 	bool isGetRequest() const;

@@ -24,42 +24,72 @@ Request& Request::operator=(const Request&request) {
 Request::~Request() {
 }
 
-void Request::parseRequest(const int&fd) {
-	char buffer[99999];
-	std::string request;
-	ssize_t bytesReceived;
+bool Request::parseRequest(const int&fd) {
+    char buffer[9999];
+    std::string request;
+    ssize_t bytesReceived;
 
-	do {
-		memset(buffer, 0, sizeof(buffer));
-		bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
-		if (bytesReceived == -1) {
-			throw std::runtime_error("recv failed");
-			break;
-		}
-		request.append(buffer, bytesReceived);
-	} while (bytesReceived == sizeof(buffer) - 1);
+    do {
+    	std::fill(buffer, buffer + sizeof(buffer), 0);
+        bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
+        if (bytesReceived == -1) {
+            throw std::runtime_error("recv failed");
+            break;
+        }
+        request.append(buffer, bytesReceived);
+    } while (bytesReceived == sizeof(buffer) - 1);
 
+	if (request.find("GET") != 0 && request.find("POST") != 0 && request.find("DELETE") != 0)
+		return false;
+
+	
 	Logger::debug("Raw request: " + request);
 
-	std::istringstream requestStream(request);
 
-	std::string requestLine;
-	std::getline(requestStream, requestLine);
-	std::istringstream requestLineStream(requestLine);
+    std::istringstream requestStream(request);
 
-	requestLineStream >> _method >> _uri;
 
-	std::string headerLine;
-	while (std::getline(requestStream, headerLine) && headerLine != "\r") {
-		headerLine.erase(headerLine.end() - 1, headerLine.end());
-		std::istringstream headerLineStream(headerLine);
-		std::string key;
-		std::getline(headerLineStream, key, ':');
-		std::string value;
-		std::getline(headerLineStream, value);
-		_headers[key] = value.substr(1);
-	}
-	std::getline(requestStream, _body, '\0');
+    std::string requestLine;
+    std::getline(requestStream, requestLine);
+    std::istringstream requestLineStream(requestLine);
+
+    requestLineStream >> _method >> _uri;
+
+	
+
+    std::string headerLine;
+    while (std::getline(requestStream, headerLine) && headerLine != "\r"){
+        headerLine.erase(headerLine.end() - 1, headerLine.end());
+        std::istringstream headerLineStream(headerLine);
+        std::string key;
+        std::getline(headerLineStream, key, ':');
+        std::string value;
+        std::getline(headerLineStream, value);
+		
+        _headers[key] = value.substr(1);
+    }
+
+
+    if (_headers.find("Content-Length") != _headers.end()
+    	&& _headers["User-Agent"].find("Mozilla") == std::string::npos) {
+        int contentLength = Utils::toInt(_headers["Content-Length"]);
+
+    	while (_body.size() < static_cast<unsigned long>(contentLength)) {
+    		std::fill(buffer, buffer + sizeof(buffer), 0);
+            bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
+    		if (bytesReceived == 0) {
+    			break;
+			}
+            if (bytesReceived > 0)
+            	_body.append(buffer, bytesReceived);
+        }
+    } else {
+        _body = std::string(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
+    }
+
+	
+	
+	return true;
 }
 
 int Request::getPort() const {
