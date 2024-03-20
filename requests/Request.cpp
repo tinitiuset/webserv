@@ -11,6 +11,8 @@ Request::Request(const Request&request) {
 	_uri = request._uri;
 	_headers = request._headers;
 	_body = request._body;
+	_request = request._request;
+	_read_complete = request._read_complete;
 }
 
 Request& Request::operator=(const Request&request) {
@@ -18,25 +20,16 @@ Request& Request::operator=(const Request&request) {
 	_uri = request._uri;
 	_headers = request._headers;
 	_body = request._body;
+	_request = request._request;
+	_read_complete = request._read_complete;
 	return *this;
 }
 
 Request::~Request() {
 }
 
-void Request::parseRequest(const int&fd) {
-    char buffer[9999];
-    std::string request;
-    ssize_t bytesReceived;
-
-	std::fill(buffer, buffer + sizeof(buffer), 0);
-	bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
-	if (bytesReceived == -1) {
-		throw std::runtime_error("recv failed");
-	}
-	request.append(buffer, bytesReceived);
-
-    Logger::debug("Readed from request: " + request);
+void Request::parseRequest(const std::string& request) {
+    //Logger::debug("Raw request: " + request);
 
     std::istringstream requestStream(request);
 
@@ -56,23 +49,27 @@ void Request::parseRequest(const int&fd) {
         std::getline(headerLineStream, value);
         _headers[key] = value.substr(1);
     }
+	if (_headers.find("Content-Length") != _headers.end())
+		_body = std::string(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
+	else
+		_body = "";
+	Logger::debug("Parsed request:");
+	printRequest();
+}
 
-    if (_headers.find("Content-Length") != _headers.end()
-    	&& _headers["User-Agent"].find("Mozilla") == std::string::npos) {
-        int contentLength = Utils::toInt(_headers["Content-Length"]);
-
-    	while (_body.size() < static_cast<unsigned long>(contentLength)) {
-    		std::fill(buffer, buffer + sizeof(buffer), 0);
-            bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
-    		if (bytesReceived == 0) {
-    			break;
-			}
-            if (bytesReceived > 0)
-            	_body.append(buffer, bytesReceived);
-        }
-    } else {
-        _body = std::string(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
-    }
+void Request::read(const int&fd) {
+    char buffer[9999];
+    ssize_t bytesReceived;
+		
+	std::fill(buffer, buffer + sizeof(buffer), 0);
+	bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
+	if (bytesReceived == 0) {
+		_read_complete = true;
+	}
+	else if (bytesReceived > 0)
+		_request.append(buffer, bytesReceived);
+	else
+		throw std::runtime_error("Error reading from socket");
 }
 
 int Request::getPort() const {
@@ -117,6 +114,10 @@ void Request::printRequest() const {
 
 bool Request::isGetRequest() const {
 	return _method == "GET";
+}
+
+bool Request::isReadComlete() const{
+	return _read_complete;
 }
 
 bool Request::isPostRequest() const {

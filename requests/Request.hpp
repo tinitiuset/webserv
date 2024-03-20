@@ -20,7 +20,8 @@ public:
 	Request& operator=(const Request&);
 	virtual ~Request();
 
-	void parseRequest(const int&);
+	void parseRequest(const std::string&);
+	void read(const int&);
 	void printRequest() const;
 
 	bool isGetRequest() const;
@@ -28,6 +29,7 @@ public:
 	bool isDeleteRequest() const;
 	void methodAllowed() const;
 	void hostnameAllowed() const;
+	bool isReadComlete() const;
 
 	virtual std::string handle();
 
@@ -45,6 +47,8 @@ protected:
 	std::string _uri;
 	std::map<std::string, std::string> _headers;
 	std::string _body;
+	std::string _request;
+	bool  _read_complete;
 };
 
 #endif
