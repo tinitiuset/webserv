@@ -4,6 +4,12 @@
 #include <unistd.h>
 
 Request::Request() {
+	_read_complete = false;
+}
+
+Request::Request(const int& fd) {
+	_read_complete = false;
+	_fd = fd;
 }
 
 Request::Request(const Request&request) {
@@ -57,12 +63,12 @@ void Request::parseRequest(const std::string& request) {
 	printRequest();
 }
 
-void Request::read(const int&fd) {
+void Request::read() {
     char buffer[9999];
     ssize_t bytesReceived;
 		
 	std::fill(buffer, buffer + sizeof(buffer), 0);
-	bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
+	bytesReceived = recv(_fd, buffer, sizeof(buffer) - 1, 0);
 	if (bytesReceived == 0) {
 		_read_complete = true;
 	}
@@ -116,7 +122,7 @@ bool Request::isGetRequest() const {
 	return _method == "GET";
 }
 
-bool Request::isReadComlete() const{
+bool Request::isReadComplete() const{
 	return _read_complete;
 }
 

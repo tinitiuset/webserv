@@ -10,14 +10,17 @@
 #include "utils/Utils.hpp"
 
 #include "requests/Request.hpp"
+#include "requests/RequestList.hpp"
 #include "requests/GetRequest.hpp"
 #include "requests/PostRequest.hpp"
 #include "requests/DeleteRequest.hpp"
+
 
 class Multiplexer {
 private:
 	std::vector<int> serverFdVec;
 	std::vector<int> clientFdVec;
+	RequestList requestList;
 
 public:
 	static bool _endserver;
@@ -31,7 +34,7 @@ public:
 
 	size_t getServerFdIdx(int fd) const;
 	size_t getClientFdIdx(int fd) const;
-
+	Request* createRequest(const int&fd);
 	void setServerFdVec(const std::vector<int>&);
 };
 

@@ -1,15 +1,14 @@
 #include "Multiplexer.hpp"
 
-Request* createRequest(const int&fd) {
-	Request temp;
-	temp.parseRequest(fd);
+Request* Multiplexer::createRequest(const int&fd) {
+	Request* temp = requestList.getRequest(fd);
 
-	if (temp.isGetRequest())
-		return (new GetRequest(temp));
-	else if (temp.isPostRequest())
-		return new PostRequest(temp);
-	else if (temp.isDeleteRequest())
-		return new DeleteRequest(temp);
+	if (temp->isGetRequest())
+		return (new GetRequest(*temp));
+	else if (temp->isPostRequest())
+		return new PostRequest(*temp);
+	else if (temp->isDeleteRequest())
+		return new DeleteRequest(*temp);
 
 	return NULL;
 }
@@ -77,8 +76,14 @@ void Multiplexer::run() {
 							max_fd = cliFd;
 
 						Logger::debug("Client connected\n");
+						Request* request = new Request(cliFd);
+						requestList.addRequest(cliFd, request);
 					}
-					else if (locWriteVec != -1) {
+					else if ((requestList.getRequest(fd))->isReadComplete() == false) {
+						(requestList.getRequest(fd))->readRequest();
+					}
+					else if ((locWriteVec != -1) && (requestList.getRequest(fd))->isReadComplete()) {
+						(requestList.getRequest(fd))->parseRequest();
 						FD_CLR(clientFdVec[locWriteVec], &readSet);
 						FD_SET(clientFdVec[locWriteVec], &writeSet);
 					}
