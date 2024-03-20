@@ -29,17 +29,14 @@ void Request::parseRequest(const int&fd) {
     std::string request;
     ssize_t bytesReceived;
 
-    do {
-    	std::fill(buffer, buffer + sizeof(buffer), 0);
-        bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
-        if (bytesReceived == -1) {
-            throw std::runtime_error("recv failed");
-            break;
-        }
-        request.append(buffer, bytesReceived);
-    } while (bytesReceived == sizeof(buffer) - 1);
+	std::fill(buffer, buffer + sizeof(buffer), 0);
+	bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
+	if (bytesReceived == -1) {
+		throw std::runtime_error("recv failed");
+	}
+	request.append(buffer, bytesReceived);
 
-    Logger::debug("Raw request: " + request);
+    Logger::debug("Readed from request: " + request);
 
     std::istringstream requestStream(request);
 
