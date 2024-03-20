@@ -89,7 +89,12 @@ void Multiplexer::run() {
 						std::string response = request->handle();
 						Logger::debug(
 							"Multiplexer::run() sending response of size " + Utils::toString(response.length()));
-						write(fd, response.c_str(), response.length());
+						ssize_t bytesSent = 0;
+						while (bytesSent < static_cast<long>(response.length())) {
+							ssize_t result = send(fd, response.c_str() + bytesSent, response.length() - bytesSent, 0);
+							if (result > 0)
+								bytesSent += result;
+						}
 						delete request;
 					}
 					close(clientFdVec[locWriteVec]);
