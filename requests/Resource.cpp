@@ -27,7 +27,7 @@ std::string Resource::load() {
 	(mime().find("text") == std::string::npos) ?
 		file.open(_path.c_str(), std::ios::binary) : file.open(_path.c_str());
 
-	if (!file.is_open())
+	if (!Utils::isFile(_path.c_str()) || !file.is_open())
 		throw RequestException(404);
 
 	try {
