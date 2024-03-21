@@ -79,27 +79,21 @@ void Multiplexer::run() {
 							max_fd = cliFd;
 
 						Logger::debug("Client connected\n");
-						
+						//create request
+						//mirar flag  y cambiar por completed
 					}
 					else if (locWriteVec != -1) {
 						FD_CLR(clientFdVec[locWriteVec], &readSet);
+						//handle request, parseo
 						FD_SET(clientFdVec[locWriteVec], &writeSet);
 					}
 				}
 				else if (FD_ISSET(fd, &tmpWriteSet)) {
-					Request* request = createRequest(fd);
-					if (request != NULL) {
-						std::string response = request->handle();
-						Logger::debug(
-							"Multiplexer::run() sending response of size " + Utils::toString(response.length()));
-						ssize_t bytesSent = 0;
-						while (bytesSent < static_cast<long>(response.length())) {
-							ssize_t result = send(fd, response.c_str() + bytesSent, response.length() - bytesSent, 0);
-							if (result > 0)
-								bytesSent += result;
-						}
-						delete request;
-					}
+					
+						
+						//write
+
+				
 					close(clientFdVec[locWriteVec]);
 					if (clientFdVec[locWriteVec] == max_fd)
 						max_fd--;
