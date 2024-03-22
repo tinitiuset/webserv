@@ -46,14 +46,35 @@ std::string PostRequest::handle() {
 
 		Resource resource(resPath, _method);
 
+		//vamos a printear los _headers
+		std::map<std::string, std::string>::iterator it = _headers.begin();
+		std::cout << "\nHeaders: " << std::endl;
+		while (it != _headers.end())
+		{
+			std::cout << it->first << " : " << it->second << std::endl;
+			it++;
+		}
+		std::cout << std::endl;
+
+		//body
+		std::cout << "Body: " << _body << std::endl;
+
 		if (loc->cgi() == true && (resPath.substr(resPath.length() - 3) == ".py" || resPath.substr(resPath.length() - 3) == ".pl"))
 			response.set_body(resource.buildCGI(qStr));
 		else
 		{
 			if (_headers["Content-Type"].find("multipart/form-data") != std::string::npos && !_body.empty())
 				parse_multipart_body(_body);
+			else if (_headers["Transfer-Encoding"].find("chunked") != std::string::npos)
+			{
+				std::cout << "deChunck TUPUTAMADRE" << std::endl;
+				parse_multipart_body(_body);
+			}
 			else
+			{
+				std::cout << "MIERDA 400" << std::endl;
 				throw RequestException(400);
+			}
 
 			save_file(_body);
 
@@ -157,13 +178,16 @@ void	PostRequest::parse_multipart_body(std::string body){
 //Method to save the file in the server
 void	PostRequest::save_file(std::string body){
 	Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
-	std::string path = loc->root() + _uri + "/" + _postHeaders["filename"];
-	//std::cout << path << std::endl;
+	std::cout << "loc->root()" << loc->root() << std::endl;
+	std::cout << "_postHeaders[\"filename\"]" << _postHeaders["filename"] << std::endl;
+	std::string path = loc->root() + "/" + _postHeaders["filename"];
+	std::cout << path << std::endl;
 	std::ofstream outfile(path.c_str(), std::ios::out | std::ios::binary);
 
 	if (!outfile.is_open())
 	{
 		outfile.close();
+		std::cout << "open failed\n";
 		throw RequestException(403);
 	}
 	outfile << body;

@@ -42,8 +42,10 @@ bool Request::parseRequest(const int&fd) {
 	if (request.find("GET") != 0 && request.find("POST") != 0 && request.find("DELETE") != 0)
 		return false;
 
-	
-	Logger::debug("Raw request: " + request);
+
+
+	//Logger::debug("Raw request: " + request);
+	//imprimir de request solo hasta el final de los headers, sin el body
 
 
     std::istringstream requestStream(request);
@@ -87,7 +89,10 @@ bool Request::parseRequest(const int&fd) {
         _body = std::string(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
     }
 
-	
+	//imprimir la request sin el body
+	Logger::debug("Request: " + request.substr(0, request.find("\r\n\r\n")));
+
+
 	
 	return true;
 }
