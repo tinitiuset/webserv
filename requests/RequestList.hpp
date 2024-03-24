@@ -3,6 +3,8 @@
 
 #include <vector>
 
+#include "Request.hpp"
+
 class RequestList {
 
 public:

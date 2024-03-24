@@ -66,7 +66,7 @@ std::string PostRequest::handle() {
 			headers["Set-Cookie"] = "webserv = " + cookie;
 			int fd = open("./cookies/cookies.txt", O_WRONLY | O_APPEND | O_CREAT, 0644);	
 			cookie += "\n";
-			write(fd, cookie.c_str(), cookie.length());
+			::write(fd, cookie.c_str(), cookie.length());
 			close(fd);		
 		}
 

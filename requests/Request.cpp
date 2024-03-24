@@ -3,11 +3,12 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-Request::Request() {
+Request::Request(int &fd) : _fd(fd) {
 }
 
 Request::Request(const Request&request) {
 	_fd = request._fd;
+	_raw = request._raw;
 	_method = request._method;
 	_uri = request._uri;
 	_headers = request._headers;
@@ -16,6 +17,7 @@ Request::Request(const Request&request) {
 
 Request& Request::operator=(const Request&request) {
 	_fd = request._fd;
+	_raw = request._raw;
 	_method = request._method;
 	_uri = request._uri;
 	_headers = request._headers;
@@ -24,6 +26,26 @@ Request& Request::operator=(const Request&request) {
 }
 
 Request::~Request() {
+}
+
+ssize_t Request::read(int bf) {
+	char buffer[bf];
+	ssize_t bytesReceived;
+
+	std::fill(buffer, buffer + sizeof(buffer), 0);
+	bytesReceived = recv(_fd, buffer, sizeof(buffer), 0);
+	if (bytesReceived == -1)
+		throw std::runtime_error("recv failed");
+	if (bytesReceived > 0)
+		_raw.append(buffer, bytesReceived);
+	return bytesReceived;
+}
+
+ssize_t Request::write() {
+	ssize_t bytesSent = send(_fd, _raw.c_str(), _raw.size(), 0);
+	if (bytesSent > 0)
+		_raw.erase(0, bytesSent);
+	return bytesSent;
 }
 
 void Request::parseRequest(const int&fd) {

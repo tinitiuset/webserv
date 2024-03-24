@@ -15,10 +15,13 @@
 
 class Request {
 public:
-	Request();
+	Request(int &);
 	Request(const Request&);
 	Request& operator=(const Request&);
 	virtual ~Request();
+
+	ssize_t read(int);
+	ssize_t write();
 
 	void parseRequest(const int&);
 	void printRequest() const;
@@ -43,6 +46,7 @@ public:
 
 protected:
 	int _fd;
+	std::string _raw;
 	std::string _method;
 	std::string _uri;
 	std::map<std::string, std::string> _headers;

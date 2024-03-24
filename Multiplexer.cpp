@@ -1,6 +1,6 @@
 #include "Multiplexer.hpp"
 
-Request* createRequest(const int&fd) {
+/*Request* createRequest(const int&fd) {
 	Request temp;
 	temp.parseRequest(fd);
 
@@ -12,7 +12,7 @@ Request* createRequest(const int&fd) {
 		return new DeleteRequest(temp);
 
 	return NULL;
-}
+}*/
 
 Multiplexer::Multiplexer() {
 	signal(SIGINT, signalHandler);
@@ -80,11 +80,10 @@ void Multiplexer::run() {
 
 						Logger::debug("Client connected\n");
 
-						requestList.addRequest(createRequest(cliFd));
+						requestList.addRequest(new Request(cliFd));
 					}
 					else if (locReadVec == -1) {
-						if (requestList.getRequest(fd)->read() <= 0) {
-							requestList.getRequest(fd)->parseRequest();
+						if (requestList.getRequest(fd)->read(9999) < 9999) {
 							FD_CLR(fd, &readSet);
 							FD_SET(fd, &writeSet);
 						}
@@ -93,6 +92,7 @@ void Multiplexer::run() {
 				else if (FD_ISSET(fd, &tmpWriteSet)) {
 					if (requestList.getRequest(fd)->write() <= 0) {
 						close(clientFdVec[locWriteVec]);
+						requestList.removeRequest(fd);
 						if (clientFdVec[locWriteVec] == max_fd)
 							max_fd--;
 						FD_CLR(clientFdVec[locWriteVec], &writeSet);
@@ -107,7 +107,7 @@ void Multiplexer::run() {
 		close(i);
 }
 
-int getMaxFd(std::vector<std::vector<int>> sockfd) {
+int getMaxFd(std::vector<std::vector<int> > sockfd) {
 	int max_fd = 0;
 
 	for (size_t i = 0; i < sockfd.size(); ++i) {
