@@ -43,6 +43,8 @@ ssize_t Request::read(int bf) {
 
 ssize_t Request::write() {
 	ssize_t bytesSent = send(_fd, _raw.c_str(), _raw.size(), 0);
+	if (bytesSent == -1)
+		throw std::runtime_error("send failed");
 	if (bytesSent > 0)
 		_raw.erase(0, bytesSent);
 	return bytesSent;
