@@ -1,6 +1,6 @@
 #include "Multiplexer.hpp"
 
-Request* createRequest(Request *request) {
+Request* morphRequest(Request *request) {
 
 	if (request->isGetRequest())
 		return (new GetRequest(*request));
@@ -80,11 +80,12 @@ void Multiplexer::run() {
 						requestList.addRequest(new Request(cliFd));
 					}
 					else if (locReadVec == -1) {
-						if (requestList.getRequest(fd)->read(9999) < 9999) {
-							requestList.getRequest(fd)->parseRequest();
-							Request *request = createRequest(requestList.getRequest(fd));
+						Request *req = requestList.getRequest(fd);
+						if (req->read(9999) < 9999) {
+							req->parseRequest();
+
+							requestList.addRequest(morphRequest(req));
 							requestList.removeRequest(fd);
-							requestList.addRequest(request);
 
 							requestList.getRequest(fd)->handle();
 							FD_CLR(fd, &readSet);
