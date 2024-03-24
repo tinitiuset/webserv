@@ -12,7 +12,7 @@ class PostRequest: public Request {
 	public:
 		PostRequest(const Request&);
 		~PostRequest();
-		std::string handle();
+		void		handle();
 		void		parse_multipart_body(std::string body);
 		void		parse_type();
 		void		save_file(std::string body);

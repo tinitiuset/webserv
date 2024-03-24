@@ -12,7 +12,7 @@ class DeleteRequest: public Request {
 	public:
 		DeleteRequest(const Request&);
 		~DeleteRequest();
-		std::string handle();
+		void	handle();
 		void	delete_file(std::string path);
 		void	delete_directory(std::string path);
 };

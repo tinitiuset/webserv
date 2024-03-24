@@ -23,7 +23,7 @@ public:
 	ssize_t read(int);
 	ssize_t write();
 
-	void parseRequest(const int&);
+	void parseRequest();
 	void printRequest() const;
 
 	bool isGetRequest() const;
@@ -32,7 +32,7 @@ public:
 	void methodAllowed() const;
 	void hostnameAllowed() const;
 
-	virtual std::string handle();
+	virtual void handle();
 
 	int getFd() const;
 	std::string getUri() const;

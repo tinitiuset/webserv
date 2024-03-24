@@ -1,18 +1,15 @@
 #include "Multiplexer.hpp"
 
-/*Request* createRequest(const int&fd) {
-	Request temp;
-	temp.parseRequest(fd);
+Request* createRequest(Request *request) {
 
-	if (temp.isGetRequest())
-		return (new GetRequest(temp));
-	else if (temp.isPostRequest())
-		return new PostRequest(temp);
-	else if (temp.isDeleteRequest())
-		return new DeleteRequest(temp);
-
+	if (request->isGetRequest())
+		return (new GetRequest(*request));
+	else if (request->isPostRequest())
+		return new PostRequest(*request);
+	else if (request->isDeleteRequest())
+		return new DeleteRequest(*request);
 	return NULL;
-}*/
+}
 
 Multiplexer::Multiplexer() {
 	signal(SIGINT, signalHandler);
@@ -84,6 +81,12 @@ void Multiplexer::run() {
 					}
 					else if (locReadVec == -1) {
 						if (requestList.getRequest(fd)->read(9999) < 9999) {
+							requestList.getRequest(fd)->parseRequest();
+							Request *request = createRequest(requestList.getRequest(fd));
+							requestList.removeRequest(fd);
+							requestList.addRequest(request);
+
+							requestList.getRequest(fd)->handle();
 							FD_CLR(fd, &readSet);
 							FD_SET(fd, &writeSet);
 						}

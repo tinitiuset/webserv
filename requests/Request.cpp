@@ -48,25 +48,11 @@ ssize_t Request::write() {
 	return bytesSent;
 }
 
-void Request::parseRequest(const int&fd) {
-	_fd = fd;
-    char buffer[9999];
-    std::string request;
-    ssize_t bytesReceived;
+void Request::parseRequest() {
 
-    do {
-    	std::fill(buffer, buffer + sizeof(buffer), 0);
-        bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
-        if (bytesReceived == -1) {
-            throw std::runtime_error("recv failed");
-            break;
-        }
-        request.append(buffer, bytesReceived);
-    } while (bytesReceived == sizeof(buffer) - 1);
+    Logger::debug("Raw request: " + _raw);
 
-    Logger::debug("Raw request: " + request);
-
-    std::istringstream requestStream(request);
+    std::istringstream requestStream(_raw);
 
     std::string requestLine;
     std::getline(requestStream, requestLine);
@@ -84,23 +70,7 @@ void Request::parseRequest(const int&fd) {
         std::getline(headerLineStream, value);
         _headers[key] = value.substr(1);
     }
-
-    if (_headers.find("Content-Length") != _headers.end()
-    	&& _headers["User-Agent"].find("Mozilla") == std::string::npos) {
-        int contentLength = Utils::toInt(_headers["Content-Length"]);
-
-    	while (_body.size() < static_cast<unsigned long>(contentLength)) {
-    		std::fill(buffer, buffer + sizeof(buffer), 0);
-            bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
-    		if (bytesReceived == 0) {
-    			break;
-			}
-            if (bytesReceived > 0)
-            	_body.append(buffer, bytesReceived);
-        }
-    } else {
-        _body = std::string(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
-    }
+    _body = std::string(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
 }
 
 int Request::getPort() const {
@@ -178,8 +148,7 @@ std::string Request::getUri() const {
 	return _uri;
 }
 
-std::string Request::handle() {
-	return NULL;
+void Request::handle() {
 }
 
 void Request::methodAllowed() const {

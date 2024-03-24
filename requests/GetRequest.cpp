@@ -6,7 +6,7 @@ GetRequest::GetRequest(const Request&request): Request(request) {
 GetRequest::~GetRequest() {
 }
 
-std::string GetRequest::handle() {
+void GetRequest::handle() {
 	Logger::info("GetRequest::handle() handling GET request");
 
 	Response response;
@@ -14,8 +14,10 @@ std::string GetRequest::handle() {
 	try {
 		Request::hostnameAllowed();
 
-		if (dynamic_cast<Redirect *>(conf->getServer(getPort()).bestLocation(_uri)))
-			return redirect();
+		if (dynamic_cast<Redirect *>(conf->getServer(getPort()).bestLocation(_uri))) {
+			_raw = redirect();
+			return;
+		}
 
 		Request::methodAllowed();
 
@@ -88,5 +90,5 @@ std::string GetRequest::handle() {
 	}
 
 	Logger::info("GetRequest::handle() returning response -> " + response.start_line());
-	return response.format();
+	_raw = response.format();
 }
