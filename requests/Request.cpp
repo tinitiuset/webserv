@@ -3,11 +3,12 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-Request::Request(int &fd) : _fd(fd) {
+Request::Request(int &fd) : _fd(fd), _index(0) {
 }
 
 Request::Request(const Request&request) {
 	_fd = request._fd;
+	_index = request._index;
 	_raw = request._raw;
 	_method = request._method;
 	_uri = request._uri;
@@ -17,6 +18,7 @@ Request::Request(const Request&request) {
 
 Request& Request::operator=(const Request&request) {
 	_fd = request._fd;
+	_index = request._index;
 	_raw = request._raw;
 	_method = request._method;
 	_uri = request._uri;
@@ -72,7 +74,11 @@ void Request::parseRequest() {
         std::getline(headerLineStream, value);
         _headers[key] = value.substr(1);
     }
-    _body = std::string(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
+    parseBody();
+}
+
+void Request::parseBody() {
+	_body = _raw.substr(_raw.find("\r\n\r\n") + 4);
 }
 
 int Request::getPort() const {
@@ -95,7 +101,7 @@ std::string Request::getHost() const {
 	return ("");
 }
 
-std::map<std::string, std::string> Request::getHeaders() const {
+std::map<std::string, std::string>& Request::getHeaders() {
 	return _headers;
 }
 

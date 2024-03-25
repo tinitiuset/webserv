@@ -24,6 +24,7 @@ public:
 	ssize_t write();
 
 	void parseRequest();
+	void parseBody();
 	void printRequest() const;
 
 	bool isGetRequest() const;
@@ -36,7 +37,7 @@ public:
 
 	int getFd() const;
 	std::string getUri() const;
-	std::map<std::string, std::string> getHeaders() const;
+	std::map<std::string, std::string>& getHeaders();
 
 	int getPort() const;
 	std::string getHost() const;
