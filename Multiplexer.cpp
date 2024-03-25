@@ -1,16 +1,13 @@
 #include "Multiplexer.hpp"
 
-Request* createRequest(const int&fd) {
-	Request temp;
-	temp.parseRequest(fd);
+Request* morphRequest(Request *request) {
 
-	if (temp.isGetRequest())
-		return (new GetRequest(temp));
-	else if (temp.isPostRequest())
-		return new PostRequest(temp);
-	else if (temp.isDeleteRequest())
-		return new DeleteRequest(temp);
-
+	if (request->isGetRequest())
+		return (new GetRequest(*request));
+	else if (request->isPostRequest())
+		return new PostRequest(*request);
+	else if (request->isDeleteRequest())
+		return new DeleteRequest(*request);
 	return NULL;
 }
 
@@ -27,6 +24,8 @@ void Multiplexer::run() {
 
 	fd_set readSet;
 	fd_set writeSet;
+
+	RequestList requestList;
 
 	FD_ZERO(&readSet);
 	FD_ZERO(&writeSet);
@@ -77,31 +76,32 @@ void Multiplexer::run() {
 							max_fd = cliFd;
 
 						Logger::debug("Client connected\n");
+
+						requestList.addRequest(new Request(cliFd));
 					}
-					else if (locWriteVec != -1) {
-						FD_CLR(clientFdVec[locWriteVec], &readSet);
-						FD_SET(clientFdVec[locWriteVec], &writeSet);
+					else if (locReadVec == -1) {
+						Request *req = requestList.getRequest(fd);
+						if (req->read(9999) < 9999) {
+							req->parseRequest();
+
+							requestList.addRequest(morphRequest(req));
+							requestList.removeRequest(fd);
+
+							requestList.getRequest(fd)->handle();
+							FD_CLR(fd, &readSet);
+							FD_SET(fd, &writeSet);
+						}
 					}
 				}
 				else if (FD_ISSET(fd, &tmpWriteSet)) {
-					Request* request = createRequest(fd);
-					if (request != NULL) {
-						std::string response = request->handle();
-						Logger::debug(
-							"Multiplexer::run() sending response of size " + Utils::toString(response.length()));
-						ssize_t bytesSent = 0;
-						while (bytesSent < static_cast<long>(response.length())) {
-							ssize_t result = send(fd, response.c_str() + bytesSent, response.length() - bytesSent, 0);
-							if (result > 0)
-								bytesSent += result;
-						}
-						delete request;
+					if (requestList.getRequest(fd)->write() <= 0) {
+						close(clientFdVec[locWriteVec]);
+						requestList.removeRequest(fd);
+						if (clientFdVec[locWriteVec] == max_fd)
+							max_fd--;
+						FD_CLR(clientFdVec[locWriteVec], &writeSet);
+						clientFdVec.erase(clientFdVec.begin() + locWriteVec);
 					}
-					close(clientFdVec[locWriteVec]);
-					if (clientFdVec[locWriteVec] == max_fd)
-						max_fd--;
-					FD_CLR(clientFdVec[locWriteVec], &writeSet);
-					clientFdVec.erase(clientFdVec.begin() + locWriteVec);
 				}
 				fd++;
 			}

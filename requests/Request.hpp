@@ -15,13 +15,15 @@
 
 class Request {
 public:
-	Request();
+	Request(int &);
 	Request(const Request&);
 	Request& operator=(const Request&);
 	virtual ~Request();
 
-	void parseRequest(const std::string&);
-	void read(const int&);
+	ssize_t read(int);
+	ssize_t write();
+
+	void parseRequest();
 	void printRequest() const;
 
 	bool isGetRequest() const;
@@ -29,10 +31,10 @@ public:
 	bool isDeleteRequest() const;
 	void methodAllowed() const;
 	void hostnameAllowed() const;
-	bool isReadComlete() const;
 
-	virtual std::string handle();
+	virtual void handle();
 
+	int getFd() const;
 	std::string getUri() const;
 	std::map<std::string, std::string> getHeaders() const;
 
@@ -43,12 +45,12 @@ public:
 	bool checkHostServName() const;
 
 protected:
+	int _fd;
+	std::string _raw;
 	std::string _method;
 	std::string _uri;
 	std::map<std::string, std::string> _headers;
 	std::string _body;
-	std::string _request;
-	bool  _read_complete;
 };
 
 #endif

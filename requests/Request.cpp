@@ -3,35 +3,58 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-Request::Request() {
+Request::Request(int &fd) : _fd(fd) {
 }
 
 Request::Request(const Request&request) {
+	_fd = request._fd;
+	_raw = request._raw;
 	_method = request._method;
 	_uri = request._uri;
 	_headers = request._headers;
 	_body = request._body;
-	_request = request._request;
-	_read_complete = request._read_complete;
 }
 
 Request& Request::operator=(const Request&request) {
+	_fd = request._fd;
+	_raw = request._raw;
 	_method = request._method;
 	_uri = request._uri;
 	_headers = request._headers;
 	_body = request._body;
-	_request = request._request;
-	_read_complete = request._read_complete;
 	return *this;
 }
 
 Request::~Request() {
 }
 
-void Request::parseRequest(const std::string& request) {
-    //Logger::debug("Raw request: " + request);
+ssize_t Request::read(int bf) {
+	char buffer[bf];
+	ssize_t bytesReceived;
 
-    std::istringstream requestStream(request);
+	std::fill(buffer, buffer + sizeof(buffer), 0);
+	bytesReceived = recv(_fd, buffer, sizeof(buffer), 0);
+	if (bytesReceived == -1)
+		throw std::runtime_error("recv failed");
+	if (bytesReceived > 0)
+		_raw.append(buffer, bytesReceived);
+	return bytesReceived;
+}
+
+ssize_t Request::write() {
+	ssize_t bytesSent = send(_fd, _raw.c_str(), _raw.size(), 0);
+	if (bytesSent == -1)
+		throw std::runtime_error("send failed");
+	if (bytesSent > 0)
+		_raw.erase(0, bytesSent);
+	return bytesSent;
+}
+
+void Request::parseRequest() {
+
+    Logger::debug("Raw request: " + _raw);
+
+    std::istringstream requestStream(_raw);
 
     std::string requestLine;
     std::getline(requestStream, requestLine);
@@ -49,27 +72,7 @@ void Request::parseRequest(const std::string& request) {
         std::getline(headerLineStream, value);
         _headers[key] = value.substr(1);
     }
-	if (_headers.find("Content-Length") != _headers.end())
-		_body = std::string(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
-	else
-		_body = "";
-	Logger::debug("Parsed request:");
-	printRequest();
-}
-
-void Request::read(const int&fd) {
-    char buffer[9999];
-    ssize_t bytesReceived;
-		
-	std::fill(buffer, buffer + sizeof(buffer), 0);
-	bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
-	if (bytesReceived == 0) {
-		_read_complete = true;
-	}
-	else if (bytesReceived > 0)
-		_request.append(buffer, bytesReceived);
-	else
-		throw std::runtime_error("Error reading from socket");
+    _body = std::string(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
 }
 
 int Request::getPort() const {
@@ -116,10 +119,6 @@ bool Request::isGetRequest() const {
 	return _method == "GET";
 }
 
-bool Request::isReadComlete() const{
-	return _read_complete;
-}
-
 bool Request::isPostRequest() const {
 	return _method == "POST";
 }
@@ -143,12 +142,15 @@ std::string Request::redirect() const {
 	return response.format();
 }
 
+int Request::getFd() const {
+	return _fd;
+}
+
 std::string Request::getUri() const {
 	return _uri;
 }
 
-std::string Request::handle() {
-	return NULL;
+void Request::handle() {
 }
 
 void Request::methodAllowed() const {

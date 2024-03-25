@@ -10,6 +10,7 @@
 #include "utils/Utils.hpp"
 
 #include "requests/Request.hpp"
+#include "requests/RequestList.hpp"
 #include "requests/GetRequest.hpp"
 #include "requests/PostRequest.hpp"
 #include "requests/DeleteRequest.hpp"

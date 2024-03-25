@@ -11,15 +11,17 @@ PostRequest::PostRequest(const Request& request): Request(request) {
 PostRequest::~PostRequest() {}
 
 
-std::string PostRequest::handle() {
+void PostRequest::handle() {
 
 	Response response;
 
 	try {
 		Request::hostnameAllowed();
 
-		if (dynamic_cast<Redirect *>(conf->getServer(getPort()).bestLocation(_uri)))
-			return redirect();
+		if (dynamic_cast<Redirect *>(conf->getServer(getPort()).bestLocation(_uri))) {
+			_raw = redirect();
+			return;
+		}
 
 		Request::methodAllowed();
 
@@ -66,7 +68,7 @@ std::string PostRequest::handle() {
 			headers["Set-Cookie"] = "webserv = " + cookie;
 			int fd = open("./cookies/cookies.txt", O_WRONLY | O_APPEND | O_CREAT, 0644);	
 			cookie += "\n";
-			write(fd, cookie.c_str(), cookie.length());
+			::write(fd, cookie.c_str(), cookie.length());
 			close(fd);		
 		}
 
@@ -96,7 +98,7 @@ std::string PostRequest::handle() {
 	}
 	
 	Logger::info("PostRequest::handle() returning response -> " + response.start_line());
-	return response.format();
+	_raw = response.format();
 }
 
 //Method to parse the type of the request if necessary

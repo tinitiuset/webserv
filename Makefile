@@ -13,6 +13,7 @@ SRC_FILES = main.cpp \
 			./requests/PostRequest.cpp \
 			./requests/DeleteRequest.cpp \
 			./requests/Request.cpp \
+			./requests/RequestList.cpp \
 			./requests/Resource.cpp \
 			./requests/Response.cpp \
 			./cookies/Cookie.cpp \
