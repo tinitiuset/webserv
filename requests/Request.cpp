@@ -58,6 +58,10 @@ void Request::parseRequest() {
 
     std::string requestLine;
     std::getline(requestStream, requestLine);
+	if (requestLine.find("GET") != 0 && requestLine.find("POST") != 0 && requestLine.find("DELETE") != 0)
+		throw RequestException(403);
+	
+	std::cout << "......requestLine: " << requestLine << std::endl;
     std::istringstream requestLineStream(requestLine);
 
     requestLineStream >> _method >> _uri;
