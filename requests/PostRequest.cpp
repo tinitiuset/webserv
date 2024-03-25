@@ -52,6 +52,12 @@ void PostRequest::handle() {
 			response.set_body(resource.buildCGI(qStr));
 		else
 		{
+			if(_headers["Content-Length"].empty())
+				throw RequestException(411);
+			else if (Utils::toInt(_headers["Content-Length"]) > conf->getServer(getPort()).body_size())
+				throw RequestException(413);
+			if (Utils::toInt(_headers["Content-Length"]) != (int)_body.length())
+				throw RequestException(400);
 			if (_headers["Content-Type"].find("multipart/form-data") != std::string::npos && !_body.empty())
 				parse_multipart_body(_body);
 			else
