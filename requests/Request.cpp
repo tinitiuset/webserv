@@ -52,7 +52,7 @@ ssize_t Request::write() {
 
 void Request::parseRequest() {
 
-    Logger::debug("Raw request: " + _raw);
+    //Logger::debug("Raw request: " + _raw);
 
     std::istringstream requestStream(_raw);
 
@@ -167,5 +167,8 @@ void Request::methodAllowed() const {
 void Request::hostnameAllowed() const {
 	Server server = conf->getServer(getPort());
 	if (std::string(server.server_name() + ":" + Utils::toString(server.port())) != getHost())
+	{
+		std::cout << "---400requestt\n";
 		throw RequestException(400);
+	}
 }

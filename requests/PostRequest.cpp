@@ -55,7 +55,24 @@ void PostRequest::handle() {
 			if (_headers["Content-Type"].find("multipart/form-data") != std::string::npos && !_body.empty())
 				parse_multipart_body(_body);
 			else
+			{
+				std::cout << "**400" << std::endl;
 				throw RequestException(400);
+				/* std::string resp = "HTTP/1.1 100 Continue\r\n\r\n";
+				send(_fd, resp.c_str(), resp.length(), 0);
+				while (1)
+				{
+					char buffer[1024] = {0};
+					int bytes = recv(_fd, buffer, 1024, 0);
+					if (bytes <= 0)
+						break;
+					_body += buffer;
+					if (_body.find("\r\n\r\n") != std::string::npos)
+						break;
+				}
+				std::cout << "bodyyyyyyy: " << _body << std::endl;*/
+
+			}
 
 			save_file(_body);
 
@@ -166,6 +183,7 @@ void	PostRequest::save_file(std::string body){
 	if (!outfile.is_open())
 	{
 		outfile.close();
+		std::cout << "**403 open" << std::endl;
 		throw RequestException(403);
 	}
 	outfile << body;
