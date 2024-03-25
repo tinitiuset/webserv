@@ -29,6 +29,8 @@ bool Request::parseRequest(const int&fd) {
     std::string request;
     ssize_t bytesReceived;
 
+	printf("-fd: %d\n", fd);
+
     do {
     	std::fill(buffer, buffer + sizeof(buffer), 0);
         bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
@@ -39,14 +41,13 @@ bool Request::parseRequest(const int&fd) {
         request.append(buffer, bytesReceived);
     } while (bytesReceived == sizeof(buffer) - 1);
 
+
+
+
+	Logger::debug("Raw request: " + request);
+
 	if (request.find("GET") != 0 && request.find("POST") != 0 && request.find("DELETE") != 0)
 		return false;
-
-
-
-	//Logger::debug("Raw request: " + request);
-	//imprimir de request solo hasta el final de los headers, sin el body
-
 
     std::istringstream requestStream(request);
 
@@ -90,7 +91,7 @@ bool Request::parseRequest(const int&fd) {
     }
 
 	//imprimir la request sin el body
-	Logger::debug("Request: " + request.substr(0, request.find("\r\n\r\n")));
+	//Logger::debug("Request: " + request.substr(0, request.find("\r\n\r\n")));
 
 
 	
