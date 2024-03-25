@@ -30,5 +30,8 @@ void RequestList::addRequest(const int& fd, Request* request) {
 
 void RequestList::removeRequest(const int& fd) {
 	if (_requests.find(fd) != _requests.end())
+	{
+		delete _requests[fd];
 		_requests.erase(fd);
+	}
 }

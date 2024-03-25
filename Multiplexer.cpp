@@ -1,21 +1,33 @@
 #include "Multiplexer.hpp"
 
-Request* Multiplexer::createRequest(const int&fd) {
+Request* Multiplexer::createRequest(const int& fd) {
 	Request* temp = requestList.getRequest(fd);
+	Request* retRequest = NULL;
 
 	if (temp->isGetRequest())
-		return (new GetRequest(*temp));
+	{
+		retRequest = new GetRequest(*temp);
+		requestList.removeRequest(fd);
+	}
 	else if (temp->isPostRequest())
-		return new PostRequest(*temp);
+	{
+		retRequest = new PostRequest(*temp);
+		requestList.removeRequest(fd);
+	}
 	else if (temp->isDeleteRequest())
-		return new DeleteRequest(*temp);
+	{
+		retRequest = new DeleteRequest(*temp);
+		requestList.removeRequest(fd);
+	}
 
-	return NULL;
+	return retRequest;
 }
 
 Multiplexer::Multiplexer() {
 	signal(SIGINT, signalHandler);
 	signal(SIGTERM, signalHandler);
+	_timeout.tv_sec = 10;
+	_timeout.tv_usec = 10000;
 }
 
 Multiplexer::~Multiplexer() {
@@ -36,10 +48,10 @@ void Multiplexer::run() {
 		FD_SET(serverFdVec[i], &readSet);
 
 	while (!_endserver) {
-		fd_set tmpReadSet = readSet;
-		fd_set tmpWriteSet = writeSet;
-
-		const int selectRes = select(max_fd + 1, &tmpReadSet, &tmpWriteSet, NULL, NULL);
+		/* fd_set tmpReadSet = readSet;
+		fd_set tmpWriteSet = writeSet; */
+		sleep(10);
+		const int selectRes = select(max_fd + 1, &readSet, &writeSet, NULL, &_timeout);
 
 		if (selectRes == 0)
 			std::cout << "Selection OK" << std::endl;
@@ -49,23 +61,23 @@ void Multiplexer::run() {
 		}
 		else if (selectRes > 0) {
 			int fd = 3;
-
+			std::cout << "Selection RES: " << selectRes << std::endl;
 			while (fd <= max_fd) {
 				const int locReadVec = getServerFdIdx(fd);
 				const int locWriteVec = getClientFdIdx(fd);
 
-				if (FD_ISSET(fd, &tmpReadSet)) {
-					if (locReadVec != -1) {
+				if (FD_ISSET(fd, &readSet)) {
+					if (locReadVec != -1 && (locWriteVec == -1)) {
 						sockaddr cli = {};
 						socklen_t clilen = sizeof(cli);
 						int cliFd;
 
-						cliFd = accept(fd, &cli, &clilen);
+						cliFd = accept(serverFdVec[locReadVec], &cli, &clilen);
 						cliFd == -1
 							? throw std::runtime_error("Failed to accept\n")
 							: Logger::debug("Client socket accepted by server\n");
 
-						(fcntl(fd, F_SETFL, O_NONBLOCK, FD_CLOEXEC) == -1)
+						(fcntl(cliFd, F_SETFL, O_NONBLOCK, FD_CLOEXEC) == -1)
 							? throw std::runtime_error("Failed to set client socket as non-blocked\n0")
 							: Logger::debug("Client socket set as non-blocking\n");
 
@@ -78,20 +90,21 @@ void Multiplexer::run() {
 						Logger::debug("Client connected\n");
 						Request* request = new Request(cliFd);
 						requestList.addRequest(cliFd, request);
+						request->read();
 					}
-					else if ((requestList.getRequest(fd))->isReadComplete() == false) {
-						(requestList.getRequest(fd))->readRequest();
-					}
-					else if ((locWriteVec != -1) && (requestList.getRequest(fd))->isReadComplete()) {
-						(requestList.getRequest(fd))->parseRequest();
+					/* else if ((requestList.getRequest(fd)) && (requestList.getRequest(fd))->isReadComplete() == false) {
+						(requestList.getRequest(fd))->read();
+					} */
+					else if ((locWriteVec != -1) && (requestList.getRequest(clientFdVec[locWriteVec]))->isReadComplete()) {
+						(requestList.getRequest(clientFdVec[locWriteVec]))->parseRequest();
 						FD_CLR(clientFdVec[locWriteVec], &readSet);
 						FD_SET(clientFdVec[locWriteVec], &writeSet);
 					}
 				}
-				else if (FD_ISSET(fd, &tmpWriteSet)) {
-					Request* request = createRequest(fd);
-					if (request != NULL) {
-						std::string response = request->handle();
+				else if (FD_ISSET(fd, &writeSet)) {
+					Request* specRequest = createRequest(fd);
+					if (specRequest != NULL) {
+						std::string response = specRequest->handle();
 						Logger::debug(
 							"Multiplexer::run() sending response of size " + Utils::toString(response.length()));
 						ssize_t bytesSent = 0;
@@ -100,7 +113,7 @@ void Multiplexer::run() {
 							if (result > 0)
 								bytesSent += result;
 						}
-						delete request;
+						delete specRequest;
 					}
 					close(clientFdVec[locWriteVec]);
 					if (clientFdVec[locWriteVec] == max_fd)

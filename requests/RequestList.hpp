@@ -1,5 +1,5 @@
-#ifndef REQUEST_HPP
-# define REQUEST_HPP
+#ifndef REQUESTLIST_HPP
+# define REQUESTLIST_HPP
 
 # include <map>
 # include <string>

@@ -34,10 +34,10 @@ Request& Request::operator=(const Request&request) {
 Request::~Request() {
 }
 
-void Request::parseRequest(const std::string& request) {
+void Request::parseRequest() {
     //Logger::debug("Raw request: " + request);
 
-    std::istringstream requestStream(request);
+    std::istringstream requestStream(_request);
 
     std::string requestLine;
     std::getline(requestStream, requestLine);
@@ -66,16 +66,20 @@ void Request::parseRequest(const std::string& request) {
 void Request::read() {
     char buffer[9999];
     ssize_t bytesReceived;
-		
-	std::fill(buffer, buffer + sizeof(buffer), 0);
-	bytesReceived = recv(_fd, buffer, sizeof(buffer) - 1, 0);
-	if (bytesReceived == 0) {
-		_read_complete = true;
-	}
-	else if (bytesReceived > 0)
-		_request.append(buffer, bytesReceived);
-	else
-		throw std::runtime_error("Error reading from socket");
+	
+	do
+	{
+		std::fill(buffer, buffer + sizeof(buffer), 0);
+		bytesReceived = recv(_fd, buffer, sizeof(buffer) - 1, 0);
+		if (bytesReceived == 0) {
+			_read_complete = true;
+		}
+		else if (bytesReceived > 0)
+			_request.append(buffer, bytesReceived);
+		else
+			throw std::runtime_error("Error reading from socket");
+	} while (bytesReceived == 9999);
+	_read_complete = true;
 }
 
 int Request::getPort() const {
@@ -173,3 +177,8 @@ void Request::hostnameAllowed() const {
 	if (std::string(server.server_name() + ":" + Utils::toString(server.port())) != getHost())
 		throw RequestException(400);
 }
+
+int Request::getFd() const {
+	return _fd;
+}
+

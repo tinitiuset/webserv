@@ -17,25 +17,26 @@
 
 
 class Multiplexer {
-private:
-	std::vector<int> serverFdVec;
-	std::vector<int> clientFdVec;
-	RequestList requestList;
+	private:
+		std::vector<int> serverFdVec;
+		std::vector<int> clientFdVec;
+		RequestList requestList;
+		struct timeval	_timeout;
 
-public:
-	static bool _endserver;
+	public:
+		static bool _endserver;
 
-	Multiplexer();
-	~Multiplexer();
+		Multiplexer();
+		~Multiplexer();
 
-	void run();
+		void run();
 
-	static void signalHandler(int signal);
+		static void signalHandler(int signal);
 
-	size_t getServerFdIdx(int fd) const;
-	size_t getClientFdIdx(int fd) const;
-	Request* createRequest(const int&fd);
-	void setServerFdVec(const std::vector<int>&);
+		size_t getServerFdIdx(int fd) const;
+		size_t getClientFdIdx(int fd) const;
+		Request* createRequest(const int&fd);
+		void setServerFdVec(const std::vector<int>&);
 };
 
 #endif

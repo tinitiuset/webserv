@@ -20,7 +20,7 @@ public:
 	Request& operator=(const Request&);
 	virtual ~Request();
 
-	void parseRequest(const std::string&);
+	void parseRequest();
 	void read();
 	void printRequest() const;
 
@@ -30,6 +30,7 @@ public:
 	void methodAllowed() const;
 	void hostnameAllowed() const;
 	bool isReadComplete() const;
+	int	getFd() const;
 
 	virtual std::string handle();
 
