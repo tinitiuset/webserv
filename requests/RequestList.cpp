@@ -16,6 +16,7 @@ void RequestList::addRequest(Request* request) {
 void RequestList::removeRequest(int fd) {
 	for (std::vector<Request*>::iterator it = _requests.begin(); it != _requests.end(); ++it) {
 		if ((*it)->getFd() == fd) {
+			delete *it;
 			_requests.erase(it);
 			break;
 		}

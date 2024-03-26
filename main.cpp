@@ -28,6 +28,5 @@ int main(int argc, char **argv)
 		Logger::error(e.what());
 		return (delete conf, 1);
 	}
-
 	return (delete conf, 0);
 }

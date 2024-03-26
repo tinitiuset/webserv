@@ -147,7 +147,7 @@ void Multiplexer::run() {
 			}
 		}
 	}
-	for (int i = 0; i < max_fd; ++i)
+	for (int i = 3; i < max_fd; ++i)
 		close(i);
 }
 
@@ -168,7 +168,9 @@ bool Multiplexer::_endserver = false;
 
 void Multiplexer::signalHandler(int signal) {
 	if (signal == SIGINT || signal == SIGTERM)
+	{
 		_endserver = true;
+	}
 }
 
 size_t Multiplexer::getServerFdIdx(const int fd) const {
