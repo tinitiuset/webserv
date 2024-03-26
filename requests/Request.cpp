@@ -56,23 +56,18 @@ ssize_t Request::write() {
 
 void Request::parseRequest() {
 
-    //Logger::debug("Raw request: " + _raw);
-
     std::istringstream requestStream(_raw);
-
 
     std::string requestLine;
     std::getline(requestStream, requestLine);
-	//if (requestLine.find("GET") != 0 && requestLine.find("POST") != 0 && requestLine.find("DELETE") != 0)
 	
+	Logger::debug(requestLine);
+
     std::istringstream requestLineStream(requestLine);
 
     requestLineStream >> _method >> _uri;
 
-	
-
     std::string headerLine;
-	std::cout << requestLine << std::endl;
 
 	try {
 		while (std::getline(requestStream, headerLine) && headerLine != "\r") {
@@ -88,6 +83,10 @@ void Request::parseRequest() {
 	}
     _body = std::string(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
 
+}
+
+void Request::parseBody() {
+	_body = _raw.substr(_raw.find("\r\n\r\n") + 4);
 }
 
 int Request::getPort() const {
@@ -183,7 +182,7 @@ void Request::hostnameAllowed() const {
 	Server server = conf->getServer(getPort());
 	if (std::string(server.server_name() + ":" + Utils::toString(server.port())) != getHost())
 	{
-		std::cout << "---400requestt\n";
+		std::cout << "servname: " <<  std::endl;
 		throw RequestException(400);
 	}
 }

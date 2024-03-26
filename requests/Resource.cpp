@@ -30,7 +30,6 @@ std::string Resource::load() {
 	if (!file.is_open() || Utils::isDirectory(_path.c_str())) {
 		throw RequestException(404);
 	}
-	std::cout << "file open" << std::endl;
 
 	try {
 		std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());

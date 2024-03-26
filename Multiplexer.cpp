@@ -121,7 +121,6 @@ void Multiplexer::run() {
 							requestList.removeRequest(fd);
 
 							requestList.getRequest(fd)->handle();
->>>>>>> imontero_newmultpwip
 							FD_CLR(fd, &readSet);
 							FD_SET(fd, &writeSet);
 						}
