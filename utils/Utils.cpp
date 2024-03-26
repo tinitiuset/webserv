@@ -123,3 +123,4 @@ std::string Utils::extractQStr(const std::string uri)
 
 	return (qStr);
 }
+

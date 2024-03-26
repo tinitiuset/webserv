@@ -104,7 +104,7 @@ void Multiplexer::run() {
 				}
 				else if (FD_ISSET(fd, &tmpWriteSet)) {
 					std::map<std::string, std::string>::iterator it = requestList.getRequest(fd)->getHeaders().find("Expect");
-					if (it != requestList.getRequest(fd)->getHeaders().end() && it->second == "100-continue") {
+					if (it != requestList.getRequest(fd)->getHeaders().end() && it->second == "100-continue" && requestList.getRequest(fd)->checkContentLength() == 0) {
 						Response response;
 						response.set_start_line("HTTP/1.1 100 Continue");
 						send(fd, response.format().c_str(), response.format().length(), 0);

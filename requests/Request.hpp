@@ -12,6 +12,7 @@
 # include "../utils/Utils.hpp"
 # include "../model/Location.hpp"
 # include "../exceptions/RequestException.hpp"
+# include "../dynamicpages/ErrorPage.hpp"
 
 class Request {
 public:
@@ -45,6 +46,8 @@ public:
 	std::string redirect() const;
 	bool checkHostServName() const;
 
+	int checkContentLength();
+
 protected:
 	int _fd;
 	std::string _raw;
@@ -52,6 +55,8 @@ protected:
 	std::string _uri;
 	std::map<std::string, std::string> _headers;
 	std::string _body;
+	int _index;
+	bool _isLonger;
 };
 
 #endif

@@ -3,7 +3,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-Request::Request(int &fd) : _fd(fd), _index(0) {
+Request::Request(int &fd) : _fd(fd), _index(0), _isLonger(false) {
 }
 
 Request::Request(const Request&request) {
@@ -14,6 +14,7 @@ Request::Request(const Request&request) {
 	_uri = request._uri;
 	_headers = request._headers;
 	_body = request._body;
+	_isLonger = request._isLonger;
 }
 
 Request& Request::operator=(const Request&request) {
@@ -24,6 +25,7 @@ Request& Request::operator=(const Request&request) {
 	_uri = request._uri;
 	_headers = request._headers;
 	_body = request._body;
+	_isLonger = request._isLonger;
 	return *this;
 }
 
@@ -174,4 +176,42 @@ void Request::hostnameAllowed() const {
 	Server server = conf->getServer(getPort());
 	if (std::string(server.server_name() + ":" + Utils::toString(server.port())) != getHost())
 		throw RequestException(400);
+}
+
+// Function checks if there is Content Length and if it is not bigger than the body_size.
+// Gives 0 if its ok, -1 if not
+int Request::checkContentLength() {
+	if (_isLonger)
+		return (-1);
+	try{
+		std::map<std::string, std::string>::const_iterator it = _headers.find("Content-Length");
+		if(it == _headers.end())
+			throw RequestException(411);
+		else if (Utils::toInt(it->second) > conf->getServer(getPort()).body_size())
+			throw RequestException(413);
+		return (0);
+	}
+	catch (const RequestException&exception) {
+		_isLonger = true;
+		Response response;
+		response.set_start_line("HTTP/1.1 " + Codes::status(exception.status()));
+		Server server = conf->getServer(getPort());
+		if (!server.errorPage(exception.status()).empty()) {
+			Logger::info("Content-Length error loading error page from " + server.root() + server.errorPage(exception.status()));
+			std::ifstream file((server.root() + "/" + server.errorPage(exception.status())).c_str());
+			response.set_body(std::string(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()));
+		}
+		else {
+			Logger::debug("Content-Length error building default error page for status " + Utils::toString(exception.status()));
+			response.set_body(ErrorPage::build(exception.status()));
+		}
+		std::map<std::string, std::string> headers;
+		headers.insert(std::make_pair("Content-Type", "text/html"));
+		headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
+		response.set_headers(headers);
+		Logger::info("Content-Length error returning response -> " + response.start_line());
+		_raw = response.format();
+		return (-1);
+	}
+	
 }
