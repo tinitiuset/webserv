@@ -204,7 +204,7 @@ void Server::bind() {
 	Logger::info("Server listening on port " + Utils::toString(_port));
 
 	// setting socket as non blocking
-	(fcntl(_fd, F_SETFL, O_NONBLOCK) == -1)
+	(fcntl(_fd, F_SETFL, O_NONBLOCK, FD_CLOEXEC) == -1)
 		? throw std::runtime_error("Setting to nonblocking failed")
 		: Logger::debug("Socket setted to non blocking");
 

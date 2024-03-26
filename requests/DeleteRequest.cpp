@@ -51,7 +51,7 @@ DeleteRequest::DeleteRequest(const Request& request): Request(request) {
 
 DeleteRequest::~DeleteRequest() {}
 
-std::string DeleteRequest::handle() {
+void DeleteRequest::handle() {
 
 	Logger::debug("DeleteRequest::handle() called");
     Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
@@ -91,5 +91,5 @@ std::string DeleteRequest::handle() {
 		headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
 		response.set_headers(headers);
     }
-	return response.format();
+	_raw = response.format();
 }

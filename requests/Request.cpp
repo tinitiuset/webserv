@@ -3,50 +3,62 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-Request::Request() {
+Request::Request(int &fd) : _fd(fd), _index(0), _isLonger(false) {
 }
 
 Request::Request(const Request&request) {
+	_fd = request._fd;
+	_index = request._index;
+	_raw = request._raw;
 	_method = request._method;
 	_uri = request._uri;
 	_headers = request._headers;
 	_body = request._body;
+	_isLonger = request._isLonger;
 }
 
 Request& Request::operator=(const Request&request) {
+	_fd = request._fd;
+	_index = request._index;
+	_raw = request._raw;
 	_method = request._method;
 	_uri = request._uri;
 	_headers = request._headers;
 	_body = request._body;
+	_isLonger = request._isLonger;
 	return *this;
 }
 
 Request::~Request() {
 }
 
-bool Request::parseRequest(const int&fd) {
-    char buffer[9999];
-    std::string request;
-    ssize_t bytesReceived;
+ssize_t Request::read(int bf) {
+	char buffer[bf];
+	ssize_t bytesReceived;
 
-    do {
-    	std::fill(buffer, buffer + sizeof(buffer), 0);
-        bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
-        if (bytesReceived == -1) {
-            throw std::runtime_error("recv failed");
-            break;
-        }
-        request.append(buffer, bytesReceived);
-    } while (bytesReceived == sizeof(buffer) - 1);
+	std::fill(buffer, buffer + sizeof(buffer), 0);
+	bytesReceived = recv(_fd, buffer, sizeof(buffer), 0);
+	if (bytesReceived == -1)
+		throw std::runtime_error("recv failed");
+	if (bytesReceived > 0)
+		_raw.append(buffer, bytesReceived);
+	return bytesReceived;
+}
 
-	if (request.find("GET") != 0 && request.find("POST") != 0 && request.find("DELETE") != 0)
-		return false;
+ssize_t Request::write() {
+	ssize_t bytesSent = send(_fd, _raw.c_str(), _raw.size(), 0);
+	if (bytesSent == -1)
+		throw std::runtime_error("send failed");
+	if (bytesSent > 0)
+		_raw.erase(0, bytesSent);
+	return bytesSent;
+}
 
-	
-	Logger::debug("Raw request: " + request);
+void Request::parseRequest() {
 
+    Logger::debug("Raw request: " + _raw);
 
-    std::istringstream requestStream(request);
+    std::istringstream requestStream(_raw);
 
 
     std::string requestLine;
@@ -68,28 +80,11 @@ bool Request::parseRequest(const int&fd) {
 		
         _headers[key] = value.substr(1);
     }
+    parseBody();
+}
 
-
-    if (_headers.find("Content-Length") != _headers.end()
-    	&& _headers["User-Agent"].find("Mozilla") == std::string::npos) {
-        int contentLength = Utils::toInt(_headers["Content-Length"]);
-
-    	while (_body.size() < static_cast<unsigned long>(contentLength)) {
-    		std::fill(buffer, buffer + sizeof(buffer), 0);
-            bytesReceived = recv(fd, buffer, sizeof(buffer) - 1, 0);
-    		if (bytesReceived == 0) {
-    			break;
-			}
-            if (bytesReceived > 0)
-            	_body.append(buffer, bytesReceived);
-        }
-    } else {
-        _body = std::string(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
-    }
-
-	
-	
-	return true;
+void Request::parseBody() {
+	_body = _raw.substr(_raw.find("\r\n\r\n") + 4);
 }
 
 int Request::getPort() const {
@@ -112,7 +107,7 @@ std::string Request::getHost() const {
 	return ("");
 }
 
-std::map<std::string, std::string> Request::getHeaders() const {
+std::map<std::string, std::string>& Request::getHeaders() {
 	return _headers;
 }
 
@@ -159,12 +154,15 @@ std::string Request::redirect() const {
 	return response.format();
 }
 
+int Request::getFd() const {
+	return _fd;
+}
+
 std::string Request::getUri() const {
 	return _uri;
 }
 
-std::string Request::handle() {
-	return NULL;
+void Request::handle() {
 }
 
 void Request::methodAllowed() const {
@@ -182,4 +180,42 @@ void Request::hostnameAllowed() const {
 	Server server = conf->getServer(getPort());
 	if (std::string(server.server_name() + ":" + Utils::toString(server.port())) != getHost())
 		throw RequestException(400);
+}
+
+// Function checks if there is Content Length and if it is not bigger than the body_size.
+// Gives 0 if its ok, -1 if not
+int Request::checkContentLength() {
+	if (_isLonger)
+		return (-1);
+	try{
+		std::map<std::string, std::string>::const_iterator it = _headers.find("Content-Length");
+		if(it == _headers.end())
+			throw RequestException(411);
+		else if (Utils::toInt(it->second) > conf->getServer(getPort()).body_size())
+			throw RequestException(413);
+		return (0);
+	}
+	catch (const RequestException&exception) {
+		_isLonger = true;
+		Response response;
+		response.set_start_line("HTTP/1.1 " + Codes::status(exception.status()));
+		Server server = conf->getServer(getPort());
+		if (!server.errorPage(exception.status()).empty()) {
+			Logger::info("Content-Length error loading error page from " + server.root() + server.errorPage(exception.status()));
+			std::ifstream file((server.root() + "/" + server.errorPage(exception.status())).c_str());
+			response.set_body(std::string(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()));
+		}
+		else {
+			Logger::debug("Content-Length error building default error page for status " + Utils::toString(exception.status()));
+			response.set_body(ErrorPage::build(exception.status()));
+		}
+		std::map<std::string, std::string> headers;
+		headers.insert(std::make_pair("Content-Type", "text/html"));
+		headers.insert(std::make_pair("Content-Length", Utils::toString(response.body().length())));
+		response.set_headers(headers);
+		Logger::info("Content-Length error returning response -> " + response.start_line());
+		_raw = response.format();
+		return (-1);
+	}
+	
 }

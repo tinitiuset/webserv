@@ -12,15 +12,20 @@
 # include "../utils/Utils.hpp"
 # include "../model/Location.hpp"
 # include "../exceptions/RequestException.hpp"
+# include "../dynamicpages/ErrorPage.hpp"
 
 class Request {
 public:
-	Request();
+	Request(int &);
 	Request(const Request&);
 	Request& operator=(const Request&);
 	virtual ~Request();
 
-	bool parseRequest(const int&);
+	ssize_t read(int);
+	ssize_t write();
+
+	void parseRequest();
+	void parseBody();
 	void printRequest() const;
 
 	bool isGetRequest() const;
@@ -29,10 +34,11 @@ public:
 	void methodAllowed() const;
 	void hostnameAllowed() const;
 
-	virtual std::string handle();
+	virtual void handle();
 
+	int getFd() const;
 	std::string getUri() const;
-	std::map<std::string, std::string> getHeaders() const;
+	std::map<std::string, std::string>& getHeaders();
 
 	int getPort() const;
 	std::string getHost() const;
@@ -40,11 +46,17 @@ public:
 	std::string redirect() const;
 	bool checkHostServName() const;
 
+	int checkContentLength();
+
 protected:
+	int _fd;
+	std::string _raw;
 	std::string _method;
 	std::string _uri;
 	std::map<std::string, std::string> _headers;
 	std::string _body;
+	int _index;
+	bool _isLonger;
 };
 
 #endif

@@ -9,7 +9,7 @@ public:
 	GetRequest(const Request&);
 	~GetRequest();
 
-	std::string handle();
+	void handle();
 };
 
 #endif

@@ -1,6 +1,7 @@
 webserv
 a.out
 .vscode
+.DS_Store
 webserv.dSYM
 cookies/cookies.txt
 webHelpTO2-all
