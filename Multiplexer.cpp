@@ -84,8 +84,13 @@ void Multiplexer::run() {
 						if (req->read(9999) < 9999) {
 							req->parseRequest();
 
-							//***if (!req->isGetRequest() && !req->isPostRequest() && !req->isDeleteRequest())
-								//continue;
+							if (!req->isGetRequest() && !req->isPostRequest() && !req->isDeleteRequest())
+							{
+								FD_CLR(fd, &readSet);
+								FD_SET(fd, &writeSet);
+								fd++;
+								continue;
+							}
 
 							requestList.addRequest(morphRequest(req));
 							requestList.removeRequest(fd);

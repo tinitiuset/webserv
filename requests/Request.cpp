@@ -58,25 +58,30 @@ void Request::parseRequest() {
 
     std::string requestLine;
     std::getline(requestStream, requestLine);
-	/* if (requestLine.find("GET") != 0 && requestLine.find("POST") != 0 && requestLine.find("DELETE") != 0)
-		throw RequestException(403); */
+	//if (requestLine.find("GET") != 0 && requestLine.find("POST") != 0 && requestLine.find("DELETE") != 0)
 	
-	std::cout << "......requestLine: " << requestLine << std::endl;
     std::istringstream requestLineStream(requestLine);
 
     requestLineStream >> _method >> _uri;
 
     std::string headerLine;
-    while (std::getline(requestStream, headerLine) && headerLine != "\r") {
-        headerLine.erase(headerLine.end() - 1, headerLine.end());
-        std::istringstream headerLineStream(headerLine);
-        std::string key;
-        std::getline(headerLineStream, key, ':');
-        std::string value;
-        std::getline(headerLineStream, value);
-        _headers[key] = value.substr(1);
-    }
+	std::cout << requestLine << std::endl;
+
+	try {
+		while (std::getline(requestStream, headerLine) && headerLine != "\r") {
+			headerLine.erase(headerLine.end() - 1, headerLine.end());
+			std::istringstream headerLineStream(headerLine);
+			std::string key;
+			std::getline(headerLineStream, key, ':');
+			std::string value;
+			std::getline(headerLineStream, value);
+			_headers[key] = value.substr(1);
+		}
+	} catch (const std::exception& e) {
+		//std::cout << "NOT FUCKING FOUND\n";
+	}
     _body = std::string(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
+
 }
 
 int Request::getPort() const {

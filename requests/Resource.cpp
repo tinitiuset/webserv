@@ -27,8 +27,10 @@ std::string Resource::load() {
 	(mime().find("text") == std::string::npos) ?
 		file.open(_path.c_str(), std::ios::binary) : file.open(_path.c_str());
 
-	if (!file.is_open())
+	if (!file.is_open() || Utils::isDirectory(_path.c_str())) {
 		throw RequestException(404);
+	}
+	std::cout << "file open" << std::endl;
 
 	try {
 		std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
