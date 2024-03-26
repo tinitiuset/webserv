@@ -17,10 +17,12 @@ int main(int argc, char **argv)
 		Multiplexer().run();
 	}
 	catch (std::runtime_error &e) {
+		std::cout << "Main1" << std::endl;
 		Logger::error(e.what());
 		return (delete conf, 1);
 	}
 	catch (std::exception &e) {
+		std::cout << "Main2" << std::endl;
 		Logger::error(e.what());
 		return (delete conf, 1);
 	}

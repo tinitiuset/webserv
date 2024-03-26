@@ -52,6 +52,12 @@ void PostRequest::handle() {
 			response.set_body(resource.buildCGI(qStr));
 		else
 		{
+			if(_headers["Content-Length"].empty())
+				throw RequestException(411);
+			else if (Utils::toInt(_headers["Content-Length"]) > conf->getServer(getPort()).body_size())
+				throw RequestException(413);
+			if (Utils::toInt(_headers["Content-Length"]) != (int)_body.length())
+				throw RequestException(400);
 			if (_headers["Content-Type"].find("multipart/form-data") != std::string::npos && !_body.empty())
 				parse_multipart_body(_body);
 			else
@@ -83,12 +89,12 @@ void PostRequest::handle() {
 		response.set_start_line("HTTP/1.1 " + Codes::status(exception.status()));
 		Server server = conf->getServer(getPort());
 		if (!server.errorPage(exception.status()).empty()) {
-			Logger::info("GetRequest::handle() loading error page from " + server.root() + server.errorPage(exception.status()));
+			Logger::info("PostRequest::handle() loading error page from " + server.root() + server.errorPage(exception.status()));
 			std::ifstream file((server.root() + "/" + server.errorPage(exception.status())).c_str());
 			response.set_body(std::string(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()));
 		}
 		else {
-			Logger::debug("GetRequest::handle() building default error page for status " + Utils::toString(exception.status()));
+			Logger::debug("PostRequest::handle() building default error page for status " + Utils::toString(exception.status()));
 			response.set_body(ErrorPage::build(exception.status()));
 		}
 		std::map<std::string, std::string> headers;
@@ -159,7 +165,7 @@ void	PostRequest::parse_multipart_body(std::string body){
 //Method to save the file in the server
 void	PostRequest::save_file(std::string body){
 	Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
-	std::string path = loc->root() + _uri + "/" + _postHeaders["filename"];
+	std::string path = Utils::strReplace(_uri, loc->path(), loc->root()) + "/" + _postHeaders["filename"];
 	//std::cout << path << std::endl;
 	std::ofstream outfile(path.c_str(), std::ios::out | std::ios::binary);
 

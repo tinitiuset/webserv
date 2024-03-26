@@ -82,19 +82,35 @@ void Multiplexer::run() {
 					else if (locReadVec == -1) {
 						Request *req = requestList.getRequest(fd);
 						if (req->read(9999) < 9999) {
-							req->parseRequest();
+							std::map<std::string, std::string>::iterator it = req->getHeaders().find("Expect");
+							if (it != req->getHeaders().end() && it->second == "100-continue") {
+								req->getHeaders().erase("Expect");
+								req->parseBody();
+							}
+							else {
+								req->parseRequest();
 
-							requestList.addRequest(morphRequest(req));
-							requestList.removeRequest(fd);
+								requestList.addRequest(morphRequest(req));
+								requestList.removeRequest(fd);
+							}
 
-							requestList.getRequest(fd)->handle();
+							req = requestList.getRequest(fd);
+							if (req->getHeaders().find("Expect") == req->getHeaders().end())
+								req->handle();
 							FD_CLR(fd, &readSet);
 							FD_SET(fd, &writeSet);
 						}
 					}
 				}
 				else if (FD_ISSET(fd, &tmpWriteSet)) {
-					if (requestList.getRequest(fd)->write() <= 0) {
+					std::map<std::string, std::string>::iterator it = requestList.getRequest(fd)->getHeaders().find("Expect");
+					if (it != requestList.getRequest(fd)->getHeaders().end() && it->second == "100-continue" && requestList.getRequest(fd)->checkContentLength() == 0) {
+						Response response;
+						response.set_start_line("HTTP/1.1 100 Continue");
+						send(fd, response.format().c_str(), response.format().length(), 0);
+						FD_CLR(fd, &writeSet);
+						FD_SET(fd, &readSet);
+					} else if (requestList.getRequest(fd)->write() <= 0) {
 						close(clientFdVec[locWriteVec]);
 						requestList.removeRequest(fd);
 						if (clientFdVec[locWriteVec] == max_fd)
