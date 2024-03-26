@@ -56,13 +56,15 @@ ssize_t Request::write() {
 
 void Request::parseRequest() {
 
-    Logger::debug("Raw request: " + _raw);
+    //Logger::debug("Raw request: " + _raw);
 
     std::istringstream requestStream(_raw);
 
 
     std::string requestLine;
     std::getline(requestStream, requestLine);
+	//if (requestLine.find("GET") != 0 && requestLine.find("POST") != 0 && requestLine.find("DELETE") != 0)
+	
     std::istringstream requestLineStream(requestLine);
 
     requestLineStream >> _method >> _uri;
@@ -70,21 +72,22 @@ void Request::parseRequest() {
 	
 
     std::string headerLine;
-    while (std::getline(requestStream, headerLine) && headerLine != "\r"){
-        headerLine.erase(headerLine.end() - 1, headerLine.end());
-        std::istringstream headerLineStream(headerLine);
-        std::string key;
-        std::getline(headerLineStream, key, ':');
-        std::string value;
-        std::getline(headerLineStream, value);
-		
-        _headers[key] = value.substr(1);
-    }
-    parseBody();
-}
+	std::cout << requestLine << std::endl;
 
-void Request::parseBody() {
-	_body = _raw.substr(_raw.find("\r\n\r\n") + 4);
+	try {
+		while (std::getline(requestStream, headerLine) && headerLine != "\r") {
+			headerLine.erase(headerLine.end() - 1, headerLine.end());
+			std::istringstream headerLineStream(headerLine);
+			std::string key;
+			std::getline(headerLineStream, key, ':');
+			std::string value;
+			std::getline(headerLineStream, value);
+			_headers[key] = value.substr(1);
+		}
+	} catch (const std::exception& e) {
+	}
+    _body = std::string(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
+
 }
 
 int Request::getPort() const {
@@ -179,7 +182,10 @@ void Request::methodAllowed() const {
 void Request::hostnameAllowed() const {
 	Server server = conf->getServer(getPort());
 	if (std::string(server.server_name() + ":" + Utils::toString(server.port())) != getHost())
+	{
+		std::cout << "---400requestt\n";
 		throw RequestException(400);
+	}
 }
 
 // Function checks if there is Content Length and if it is not bigger than the body_size.

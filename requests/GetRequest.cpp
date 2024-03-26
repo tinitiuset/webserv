@@ -40,7 +40,6 @@ void GetRequest::handle() {
 			}
 		}
 
-
 		Resource resource(resPath, _method);
 
 		std::map<std::string, std::string> headers;

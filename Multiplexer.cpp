@@ -82,6 +82,7 @@ void Multiplexer::run() {
 					else if (locReadVec == -1) {
 						Request *req = requestList.getRequest(fd);
 						if (req->read(9999) < 9999) {
+
 							std::map<std::string, std::string>::iterator it = req->getHeaders().find("Expect");
 							if (it != req->getHeaders().end() && it->second == "100-continue") {
 								req->getHeaders().erase("Expect");
@@ -90,6 +91,14 @@ void Multiplexer::run() {
 							else {
 								req->parseRequest();
 
+								if (!req->isGetRequest() && !req->isPostRequest() && !req->isDeleteRequest())
+								{
+									FD_CLR(fd, &readSet);
+									FD_SET(fd, &writeSet);
+									fd++;
+									continue;
+								}
+
 								requestList.addRequest(morphRequest(req));
 								requestList.removeRequest(fd);
 							}
@@ -97,6 +106,22 @@ void Multiplexer::run() {
 							req = requestList.getRequest(fd);
 							if (req->getHeaders().find("Expect") == req->getHeaders().end())
 								req->handle();
+
+							req->parseRequest();
+
+							if (!req->isGetRequest() && !req->isPostRequest() && !req->isDeleteRequest())
+							{
+								FD_CLR(fd, &readSet);
+								FD_SET(fd, &writeSet);
+								fd++;
+								continue;
+							}
+
+							requestList.addRequest(morphRequest(req));
+							requestList.removeRequest(fd);
+
+							requestList.getRequest(fd)->handle();
+>>>>>>> imontero_newmultpwip
 							FD_CLR(fd, &readSet);
 							FD_SET(fd, &writeSet);
 						}
