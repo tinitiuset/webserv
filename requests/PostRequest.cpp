@@ -56,8 +56,6 @@ void PostRequest::handle() {
 				throw RequestException(411);
 			else if (Utils::toInt(_headers["Content-Length"]) > conf->getServer(getPort()).body_size())
 				throw RequestException(413);
-			if (Utils::toInt(_headers["Content-Length"]) != (int)_body.length())
-				throw RequestException(400);
 			if (_headers["Content-Type"].find("multipart/form-data") != std::string::npos && !_body.empty())
 				parse_multipart_body(_body);
 			else
@@ -164,9 +162,13 @@ void	PostRequest::parse_multipart_body(std::string body){
 
 //Method to save the file in the server
 void	PostRequest::save_file(std::string body){
+	std::string path;
 	Index* loc = dynamic_cast<Index*>(conf->getServer(getPort()).bestLocation(_uri));
-	std::string path = Utils::strReplace(_uri, loc->path(), loc->root()) + "/" + _postHeaders["filename"];
-	//std::cout << path << std::endl;
+	if (loc->path() == "/")
+		path =loc->root() + "/" + _postHeaders["filename"];
+	else
+		path = Utils::strReplace(_uri, loc->path(), loc->root()) + "/" + _postHeaders["filename"];
+	std::cout << path << std::endl;
 	std::ofstream outfile(path.c_str(), std::ios::out | std::ios::binary);
 
 	if (!outfile.is_open())

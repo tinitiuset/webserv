@@ -89,7 +89,16 @@ void Multiplexer::run() {
 							}
 							else {
 								req->parseRequest();
-
+								if (!req->isGetRequest() && !req->isPostRequest() && !req->isDeleteRequest())
+								{
+									FD_CLR(fd, &readSet);
+									close(clientFdVec[locWriteVec]);
+									requestList.removeRequest(fd);
+									if (clientFdVec[locWriteVec] == max_fd)
+										max_fd--;
+									clientFdVec.erase(clientFdVec.begin() + locWriteVec);
+									continue;
+								}
 								requestList.addRequest(morphRequest(req));
 								requestList.removeRequest(fd);
 							}
