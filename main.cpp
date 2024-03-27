@@ -10,8 +10,11 @@ int main(int argc, char **argv)
   	else if (argc == 2) conf = new Conf(argv[1]);
   	else return std::cerr << "Usage: " << argv[0] << " [config_file]" << std::endl, 1;
 
+	if (!conf->parse())
+		return (delete conf, 1);
+
 	try {
-		conf->parse();
+		//conf->parse();
 		conf->load();
 		conf->validate();
 		Multiplexer().run();

@@ -56,27 +56,34 @@ ssize_t Request::write() {
 
 void Request::parseRequest() {
 
-    Logger::debug("Raw request: " + _raw);
-
     std::istringstream requestStream(_raw);
 
     std::string requestLine;
     std::getline(requestStream, requestLine);
+	
+	Logger::debug(requestLine);
+
     std::istringstream requestLineStream(requestLine);
 
     requestLineStream >> _method >> _uri;
 
     std::string headerLine;
-    while (std::getline(requestStream, headerLine) && headerLine != "\r") {
-        headerLine.erase(headerLine.end() - 1, headerLine.end());
-        std::istringstream headerLineStream(headerLine);
-        std::string key;
-        std::getline(headerLineStream, key, ':');
-        std::string value;
-        std::getline(headerLineStream, value);
-        _headers[key] = value.substr(1);
-    }
-    parseBody();
+
+	try {
+		while (std::getline(requestStream, headerLine) && headerLine != "\r") {
+			headerLine.erase(headerLine.end() - 1, headerLine.end());
+			std::istringstream headerLineStream(headerLine);
+			std::string key;
+			std::getline(headerLineStream, key, ':');
+			std::string value;
+			std::getline(headerLineStream, value);
+			_headers[key] = value.substr(1);
+		}
+	} catch (const std::exception& e) {
+		Logger::error("UNHANDLEABLE ERROR OR REQUEST");
+	}
+    _body = std::string(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
+
 }
 
 void Request::parseBody() {
@@ -175,7 +182,10 @@ void Request::methodAllowed() const {
 void Request::hostnameAllowed() const {
 	Server server = conf->getServer(getPort());
 	if (std::string(server.server_name() + ":" + Utils::toString(server.port())) != getHost())
+	{
+		std::cout << "servname: " <<  std::endl;
 		throw RequestException(400);
+	}
 }
 
 // Function checks if there is Content Length and if it is not bigger than the body_size.
