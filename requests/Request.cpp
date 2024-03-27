@@ -82,8 +82,7 @@ void Request::parseRequest() {
 	} catch (const std::exception& e) {
 		Logger::error("UNHANDLEABLE ERROR OR REQUEST");
 	}
-    _body = std::string(std::istreambuf_iterator<char>(requestStream), std::istreambuf_iterator<char>());
-
+	parseBody();
 }
 
 void Request::parseBody() {
