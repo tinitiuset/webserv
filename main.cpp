@@ -14,7 +14,7 @@ int main(int argc, char **argv)
 		return std::cerr << "Usage: " << argv[0] << " [config_file]" << std::endl, 1;
 
 	if (!conf->parse())
-		return 1;
+		return (delete conf, 1);
 	try {
 		conf->load();
 		conf->validate();
