@@ -80,6 +80,7 @@ void Multiplexer::run() {
 						requestList.addRequest(new Request(cliFd));
 					}
 					else if (locReadVec == -1) {
+						try {
 						Request *req = requestList.getRequest(fd);
 						if (req->read(9999) < 9999) {
 							std::map<std::string, std::string>::iterator it = req->getHeaders().find("Expect");
@@ -108,6 +109,15 @@ void Multiplexer::run() {
 								req->handle();
 							FD_CLR(fd, &readSet);
 							FD_SET(fd, &writeSet);
+						}
+						} catch (const std::exception &e) {
+							Logger::error("Error parsing request: " + std::string(e.what()));
+							close(fd);
+							requestList.removeRequest(fd);
+							if (clientFdVec[locWriteVec] == max_fd)
+								max_fd--;
+							FD_CLR(clientFdVec[locWriteVec], &readSet);
+							clientFdVec.erase(clientFdVec.begin() + locWriteVec);
 						}
 					}
 				}

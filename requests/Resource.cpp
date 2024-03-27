@@ -27,7 +27,7 @@ std::string Resource::load() {
 	(mime().find("text") == std::string::npos) ?
 		file.open(_path.c_str(), std::ios::binary) : file.open(_path.c_str());
 
-	if (!file.is_open())
+	if (!file.is_open() || Utils::isDirectory(_path.c_str()))
 		throw RequestException(404);
 
 	try {
@@ -109,7 +109,7 @@ std::string Resource::buildAI(std::string uri, std::string host, std::string res
 	}
 	
 	result += "</ul>\n</body>\n</html>\n";
-
+	_status = 200;
     return (result);
 }
 

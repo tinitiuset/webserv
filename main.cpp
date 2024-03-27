@@ -10,19 +10,19 @@ int main(int argc, char **argv)
   	else if (argc == 2) conf = new Conf(argv[1]);
   	else return std::cerr << "Usage: " << argv[0] << " [config_file]" << std::endl, 1;
 
+	if (!conf->parse())
+		return (delete conf, 1);
+
 	try {
-		conf->parse();
 		conf->load();
 		conf->validate();
 		Multiplexer().run();
 	}
 	catch (std::runtime_error &e) {
-		std::cout << "Main1" << std::endl;
 		Logger::error(e.what());
 		return (delete conf, 1);
 	}
 	catch (std::exception &e) {
-		std::cout << "Main2" << std::endl;
 		Logger::error(e.what());
 		return (delete conf, 1);
 	}

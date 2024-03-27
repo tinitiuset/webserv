@@ -66,17 +66,18 @@ void Request::parseRequest() {
 
     requestLineStream >> _method >> _uri;
 
-    std::string headerLine;
-    while (std::getline(requestStream, headerLine) && headerLine != "\r") {
-        headerLine.erase(headerLine.end() - 1, headerLine.end());
-        std::istringstream headerLineStream(headerLine);
-        std::string key;
-        std::getline(headerLineStream, key, ':');
-        std::string value;
-        std::getline(headerLineStream, value);
-        _headers[key] = value.substr(1);
-    }
-    parseBody();
+	std::string headerLine;
+	while (std::getline(requestStream, headerLine) && headerLine != "\r") {
+		headerLine.erase(headerLine.end() - 1, headerLine.end());
+		std::istringstream headerLineStream(headerLine);
+		std::string key;
+		std::getline(headerLineStream, key, ':');
+		std::string value;
+		std::getline(headerLineStream, value);
+		_headers[key] = value.substr(1);
+	}
+	parseBody();
+    
 }
 
 void Request::parseBody() {
