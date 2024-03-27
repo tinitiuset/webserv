@@ -269,7 +269,8 @@ std::string    Resource::initCgi(std::string interpret, std::string qStr)
 	//parent process
 	if (_method == "POST")
 	{
-		write(fd_parent_to_child[1], qStr.c_str(), qStr.length());
+		if (write(fd_parent_to_child[1], qStr.c_str(), qStr.length()) < 0)
+			throw RequestException(500);
 		close(fd_parent_to_child[0]);
 		close(fd_parent_to_child[1]);
 	}

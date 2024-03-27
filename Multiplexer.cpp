@@ -126,7 +126,9 @@ void Multiplexer::run() {
 					if (it != requestList.getRequest(fd)->getHeaders().end() && it->second == "100-continue" && requestList.getRequest(fd)->checkContentLength() == 0) {
 						Response response;
 						response.set_start_line("HTTP/1.1 100 Continue");
-						send(fd, response.format().c_str(), response.format().length(), 0);
+						
+						if (send(fd, response.format().c_str(), response.format().length(), 0) <= 0)
+							throw std::runtime_error("send failed");
 						FD_CLR(fd, &writeSet);
 						FD_SET(fd, &readSet);
 					} else if (requestList.getRequest(fd)->write() <= 0) {
